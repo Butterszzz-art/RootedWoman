@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rooted Woman Method</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root {
+    --sage: #7a9e7e;
+    --sage-light: #d4e5d6;
+    --sage-pale: #f0f5f0;
+    --warm: #c4a882;
+    --warm-light: #ede3d6;
+    --warm-pale: #faf7f3;
+    --soil: #3d3530;
+    --soil-muted: #7a6e68;
+    --soil-hint: #b8afa9;
+    --cream: #fefcf8;
+    --border: rgba(61,53,48,0.12);
+    --border-strong: rgba(61,53,48,0.22);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--soil);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--soil);
+    color: var(--cream);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand {
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-brand .eyebrow {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--warm);
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-brand h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--cream);
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 20px 24px 8px;
+    font-weight: 400;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.6);
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    font-weight: 300;
+  }
+
+  .nav-item:hover {
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .nav-item.active {
+    color: var(--cream);
+    border-left-color: var(--warm);
+    background: rgba(255,255,255,0.06);
+    font-weight: 400;
+  }
+
+  .nav-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .nav-item.active .dot { background: var(--warm); }
+  .nav-item.done .dot { background: var(--sage); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--warm);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  /* MAIN */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-header {
+    padding: 48px 56px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .section-header .tag {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--warm);
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 400;
+    color: var(--soil);
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  .section-header p {
+    font-size: 14px;
+    color: var(--soil-muted);
+    max-width: 520px;
+    font-weight: 300;
+  }
+
+  .section-content {
+    padding: 40px 56px 80px;
+    max-width: 860px;
+  }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* FIELD GROUPS */
+  .field-group {
+    margin-bottom: 28px;
+  }
+
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--soil-muted);
+    margin-bottom: 8px;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  textarea, input[type="text"], input[type="date"], input[type="tel"] {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--soil);
+    background: #fff;
+    resize: vertical;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  textarea:focus, input:focus {
+    outline: none;
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(122,158,126,0.12);
+  }
+
+  textarea { min-height: 100px; }
+  textarea.small { min-height: 64px; }
+  textarea.large { min-height: 140px; }
+
+  /* GRID FIELDS */
+  .field-row {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .field-row.two { grid-template-columns: 1fr 1fr; }
+  .field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* CHECKBOXES */
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkbox-group.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: #fff;
+    transition: all 0.15s;
+  }
+
+  .checkbox-item:hover {
+    border-color: var(--sage);
+    background: var(--sage-pale);
+  }
+
+  .checkbox-item input[type="checkbox"],
+  .checkbox-item input[type="radio"] {
+    width: 16px; height: 16px;
+    accent-color: var(--sage);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .checkbox-item span {
+    font-size: 13.5px;
+    color: var(--soil);
+    font-weight: 300;
+  }
+
+  /* RATING */
+  .rating-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .rating-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--soil-muted);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .rating-btn:hover, .rating-btn.active {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: #fff;
+  }
+
+  .rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--soil-muted);
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+
+  /* EXERCISE CARDS */
+  .exercise-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 28px;
+  }
+
+  .exercise-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .exercise-num {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--warm-light);
+    color: var(--warm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .exercise-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--soil);
+    line-height: 1.2;
+  }
+
+  .exercise-header p {
+    font-size: 13px;
+    color: var(--soil-muted);
+    margin-top: 4px;
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  /* QUOTE */
+  .quote-block {
+    border-left: 3px solid var(--sage);
+    padding: 14px 20px;
+    background: var(--sage-pale);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-bottom: 24px;
+  }
+
+  .quote-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--soil);
+    line-height: 1.5;
+  }
+
+  /* COVENANT */
+  .covenant-block {
+    background: var(--warm-pale);
+    border: 1px solid var(--warm-light);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-top: 8px;
+  }
+
+  .covenant-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--soil);
+    margin-bottom: 20px;
+  }
+
+  .covenant-block strong { font-weight: 600; }
+
+  /* ANCHOR TABLE */
+  .anchor-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .anchor-table tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .anchor-table td {
+    padding: 12px 14px;
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  .anchor-table td:first-child {
+    width: 120px;
+    color: var(--soil-muted);
+    font-weight: 400;
+    font-size: 13px;
+    padding-top: 14px;
+    white-space: nowrap;
+  }
+
+  .anchor-table td input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border-strong);
+    border-radius: 0;
+    padding: 4px 0;
+    font-size: 14px;
+    background: transparent;
+    color: var(--soil);
+    font-weight: 300;
+  }
+
+  .anchor-table td input:focus {
+    outline: none;
+    border-bottom-color: var(--sage);
+    box-shadow: none;
+  }
+
+  /* MONTH CARD */
+  .month-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+
+  .month-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .month-badge {
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sage-light);
+    color: var(--sage);
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  /* BUTTON */
+  .btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 26px;
+    background: var(--soil);
+    color: var(--cream);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-save:hover { background: #2a2420; }
+  .btn-save:active { transform: scale(0.98); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 26px;
+    background: transparent;
+    color: var(--soil-muted);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-ghost:hover { border-color: var(--soil); color: var(--soil); }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .save-status {
+    font-size: 12px;
+    color: var(--sage);
+    font-weight: 300;
+    margin-left: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .save-status.visible { opacity: 1; }
+
+  /* WELCOME */
+  .welcome-card {
+    background: var(--soil);
+    color: var(--cream);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    margin-bottom: 32px;
+  }
+
+  .welcome-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    color: var(--cream);
+  }
+
+  .welcome-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+    max-width: 480px;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .overview-tile {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+
+  .overview-tile:hover { border-color: var(--sage); transform: translateY(-1px); }
+
+  .overview-tile .tile-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 6px;
+    font-weight: 400;
+  }
+
+  .overview-tile h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 6px;
+  }
+
+  .overview-tile p {
+    font-size: 12.5px;
+    color: var(--soil-muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* INLINE PAIR */
+  .inline-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  /* DECLARATION BOX */
+  .declaration-box {
+    background: var(--sage-pale);
+    border: 1px solid var(--sage-light);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+
+  .declaration-box .ex {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--soil-muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  .declaration-box label {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--sage);
+    font-weight: 400;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* TIME INPUT */
+  .time-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .time-row span {
+    font-size: 13px;
+    color: var(--soil-muted);
+    white-space: nowrap;
+    font-weight: 300;
+  }
+
+  .time-row input[type="time"] {
+    width: 140px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--soil);
+    background: #fff;
+    resize: none;
+  }
+
+  /* EXPORT */
+  .export-section {
+    background: var(--warm-pale);
+    border: 1px solid var(--warm-light);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .export-section p { font-size: 13px; color: var(--soil-muted); font-weight: 300; max-width: 360px; }
+  .export-section h4 { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(61,53,48,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--cream);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    max-width: 480px;
+    width: 90%;
+    position: relative;
+  }
+
+  .modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 10px;
+  }
+
+  .modal p {
+    font-size: 14px;
+    color: var(--soil-muted);
+    font-weight: 300;
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .modal .modal-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    font-size: 24px;
+  }
+
+  .modal .modal-icon.success { background: var(--sage-light); color: var(--sage); }
+  .modal .modal-icon.error   { background: #fde8e8; color: #b94a48; }
+  .modal .modal-icon.loading { background: var(--warm-light); color: var(--warm); }
+
+  .modal-btn-row { display: flex; gap: 10px; margin-top: 24px; }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; color: var(--soil-muted); line-height: 1;
+  }
+
+  /* SUBMIT SECTION */
+  .submit-section {
+    background: var(--soil);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .submit-section h4 { font-size: 17px; font-weight: 500; color: var(--cream); margin-bottom: 4px; }
+  .submit-section p  { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 300; max-width: 300px; }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background: var(--warm);
+    color: var(--soil);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-submit:hover { background: #d4b88f; }
+  .btn-submit:active { transform: scale(0.97); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* SETUP BANNER */
+  .setup-banner {
+    background: #fff8ed;
+    border: 1px solid #f5d8a0;
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .setup-banner .setup-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .setup-banner h4 { font-size: 14px; font-weight: 500; color: #7a5200; margin-bottom: 4px; }
+  .setup-banner p  { font-size: 12.5px; color: #9e6e0a; font-weight: 300; line-height: 1.6; }
+  .setup-banner a  { color: #9e6e0a; font-weight: 500; }
+  .setup-banner code { background: rgba(0,0,0,0.07); border-radius: 4px; padding: 1px 5px; font-size: 12px; }
+  .setup-banner.hidden { display: none; }
+
+  /* EMAILJS CONFIG FIELDS */
+  .config-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .config-fields input {
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    min-height: unset !important;
+  }
+
+  /* PAYWALL */
+  .paywall { position: fixed; inset: 0; background: var(--cream); z-index: 999; overflow-y: auto; display: flex; flex-direction: column; }
+  .paywall.hidden { display: none; }
+
+  .paywall-hero {
+    background: var(--soil);
+    padding: 64px 48px 56px;
+    text-align: center;
+    position: relative;
+  }
+
+  .paywall-hero .eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--warm);
+    font-weight: 400;
+    margin-bottom: 18px;
+  }
+
+  .paywall-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .paywall-hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.75;
+  }
+
+  .paywall-body {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 40px 80px;
+    width: 100%;
+  }
+
+  .paywall-intro {
+    background: var(--warm-pale);
+    border: 1px solid var(--warm-light);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    margin-bottom: 40px;
+  }
+
+  .paywall-intro p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    line-height: 1.75;
+    color: var(--soil);
+    font-weight: 400;
+  }
+
+  .paywall-intro p + p { margin-top: 14px; }
+
+  .paywall-intro .sign {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--soil-muted);
+    font-weight: 300;
+    font-style: italic;
+  }
+
+  .paywall-what h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 20px;
+  }
+
+  .paywall-includes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .paywall-include-item {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .paywall-include-item .ico { font-size: 24px; flex-shrink: 0; }
+
+  .paywall-include-item h4 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 3px;
+  }
+
+  .paywall-include-item p {
+    font-size: 12.5px;
+    color: var(--soil-muted);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  .paywall-price {
+    background: var(--soil);
+    border-radius: var(--radius);
+    padding: 36px 40px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .paywall-price .price-tag {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--warm);
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+
+  .paywall-price .amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 60px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .paywall-price .period {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+
+  .paywall-price .spots {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+
+  .paywall-price a.wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--warm);
+    color: var(--soil);
+    padding: 14px 32px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .paywall-price a.wa-btn:hover { background: #d4b88f; }
+
+  .paywall-unlock {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+  }
+
+  .paywall-unlock h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--soil);
+    margin-bottom: 6px;
+  }
+
+  .paywall-unlock p {
+    font-size: 13.5px;
+    color: var(--soil-muted);
+    font-weight: 300;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .unlock-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .unlock-row input {
+    flex: 1;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--soil);
+    background: var(--cream);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 400;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .unlock-row input:focus {
+    outline: none;
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(122,158,126,0.12);
+  }
+
+  .unlock-row input.error { border-color: #b94a48; box-shadow: 0 0 0 3px rgba(185,74,72,0.1); }
+
+  .unlock-row button {
+    padding: 13px 24px;
+    background: var(--soil);
+    color: var(--cream);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .unlock-row button:hover { background: #2a2420; }
+  .unlock-row button:active { transform: scale(0.97); }
+
+  .unlock-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #b94a48;
+    font-weight: 300;
+    display: none;
+  }
+
+  .unlock-error.visible { display: block; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(61,53,48,0.15); border-radius: 99px; }
+
+  @media (max-width: 768px) {
+    .sidebar { width: 100%; height: auto; position: relative; }
+    .main { margin-left: 0; }
+    .section-header, .section-content { padding: 24px 20px; }
+    .field-row.two, .inline-pair { grid-template-columns: 1fr; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .checkbox-group.columns { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="paywall" id="paywall">
+
+  <div class="paywall-hero">
+    <div class="eyebrow">Rooted in 40 · 40-day programme</div>
+    <h1>For Women Who Are<br>Done Starting Over</h1>
+    <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
+  </div>
+
+  <div class="paywall-body">
+
+    <div class="paywall-intro">
+      <p>Bon dia 🌸</p>
+      <p>You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.</p>
+      <p>I built all of that into a programme. It's called <strong>Rooted in 40</strong>.</p>
+      <p class="sign">— Shadey</p>
+    </div>
+
+    <div class="paywall-what">
+      <h2>What you get</h2>
+    </div>
+
+    <div class="paywall-includes">
+      <div class="paywall-include-item">
+        <div class="ico">🌸</div>
+        <div>
+          <h4>2 Coaching sessions</h4>
+          <p>Day 1 kick-off + midpoint check-in with Shadey personally.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">💪</div>
+        <div>
+          <h4>5 Personal training sessions</h4>
+          <p>One session every weekend, training with Shadey directly.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📋</div>
+        <div>
+          <h4>Full 5-week training schedule</h4>
+          <p>A personalised plan so you always know what to do and when.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">🏋️</div>
+        <div>
+          <h4>Gym orientation on Day 1</h4>
+          <p>So you never feel lost or intimidated in the gym again.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📲</div>
+        <div>
+          <h4>Twice-weekly WhatsApp check-ins</h4>
+          <p>Video guidance for every solo session. You are never doing this alone.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📖</div>
+        <div>
+          <h4>The Rooted Woman Method Workbook</h4>
+          <p>The full identity, rhythm, and recovery system — this workbook.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="paywall-price">
+      <div class="price-tag">Investment</div>
+      <div class="amount">AWG 500</div>
+      <div class="period">for the full 40 days</div>
+      <div class="spots">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
+      <a href="https://wa.me/2977300112" target="_blank" class="wa-btn">📱 WhatsApp Shadey · +297 730 0112</a>
+      <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,0.3);font-weight:300;">If something in you is saying yes — reach out and let's talk 🌸</div>
+    </div>
+
+    <div class="paywall-unlock">
+      <h3>Already joined? Enter your access code</h3>
+      <p>After payment, Shadey will send you a personal access code that unlocks your full workbook, intake questionnaire, and nutrition guide.</p>
+      <div class="unlock-row">
+        <input type="text" id="unlock-input" placeholder="Enter code…" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') tryUnlock()">
+        <button onclick="tryUnlock()">Unlock →</button>
+      </div>
+      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="eyebrow">Rooted in 40</div>
+    <h1>The Rooted<br>Woman Method</h1>
+  </div>
+
+  <div class="nav-section-label">Programme</div>
+  <div class="nav-item active" onclick="showPage('welcome')" id="nav-welcome">
+    <span class="dot"></span> Overview
+  </div>
+  <div class="nav-item" onclick="showPage('programme')" id="nav-programme">
+    <span class="dot"></span> About Rooted in 40
+  </div>
+
+  <div class="nav-section-label">Part 1</div>
+  <div class="nav-item" onclick="showPage('intake')" id="nav-intake">
+    <span class="dot"></span> Client Intake
+  </div>
+
+  <div class="nav-section-label">Part 2 — The Method</div>
+  <div class="nav-item" onclick="showPage('layer1')" id="nav-layer1">
+    <span class="dot"></span> Layer 1 · Identity
+  </div>
+  <div class="nav-item" onclick="showPage('layer2')" id="nav-layer2">
+    <span class="dot"></span> Layer 2 · Rhythm
+  </div>
+  <div class="nav-item" onclick="showPage('layer3')" id="nav-layer3">
+    <span class="dot"></span> Layer 3 · Recovery
+  </div>
+
+  <div class="nav-section-label">Part 3</div>
+  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin">
+    <span class="dot"></span> 90-Day Check-ins
+  </div>
+
+  <div class="nav-section-label">Resources</div>
+  <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition">
+    <span class="dot"></span> Nutrition Guide
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- WELCOME -->
+  <div class="page active" id="page-welcome">
+    <div class="section-header">
+      <div class="tag">Welcome</div>
+      <h2>A Blueprint for Women<br>Done Starting Over</h2>
+      <p>Work through each section honestly. Come back to the method whenever you fall — that is not failure, it is Layer 3.</p>
+    </div>
+    <div class="section-content">
+      <div class="welcome-card">
+        <h3>This is not a programme you finish.<br>It is a practice you return to.</h3>
+        <p>This workbook has two parts. The first is your intake questionnaire — complete this before your first coaching session. The second is the Rooted Woman Method — three layers that address the real reason consistency is hard.</p>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-tile" onclick="showPage('intake')">
+          <div class="tile-tag">Part 1</div>
+          <h4>Client Intake</h4>
+          <p>Your starting point — physically, mentally, and emotionally. Complete before your first session.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer1')">
+          <div class="tile-tag">Layer 1</div>
+          <h4>Identity</h4>
+          <p>Who am I becoming? Rewrite the story your brain tells about who you are.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer2')">
+          <div class="tile-tag">Layer 2</div>
+          <h4>Rhythm</h4>
+          <p>What are my non-negotiables? Build anchors that bend with life but always come back.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer3')">
+          <div class="tile-tag">Layer 3</div>
+          <h4>Recovery</h4>
+          <p>How do I return without shame? The return is built in — because falling is part of the practice.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('nutrition')">
+          <div class="tile-tag">Resource</div>
+          <h4>Nutrition Guide</h4>
+          <p>Simple, sustainable habits. No calorie counting — just the basics applied consistently.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('programme')">
+          <div class="tile-tag">Programme</div>
+          <h4>About Rooted in 40</h4>
+          <p>Everything included in the 40-day experience, and how to get started.</p>
+        </div>
+      </div>
+
+      <div class="export-section" style="margin-top: 32px;">
+        <div>
+          <h4>Save your progress</h4>
+          <p>Your answers are stored in your browser. Use the export button to download a summary at any time.</p>
+        </div>
+        <button class="btn-save" onclick="exportData()">↓ Export answers</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTAKE -->
+  <div class="page" id="page-intake">
+    <div class="section-header">
+      <div class="tag">Part 1 · Before your first session</div>
+      <h2>Client Intake<br>Questionnaire</h2>
+      <p>Take 20–30 minutes in a quiet space. Be honest. The more specific you are, the better your coach can support you.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="field-row two">
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Full name</label>
+          <input type="text" id="i-name" placeholder="Your full name" oninput="autosave()">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Date of birth</label>
+          <input type="date" id="i-dob" oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="field-row two" style="margin-top:16px">
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Occupation</label>
+          <input type="text" id="i-occ" placeholder="Your occupation" oninput="autosave()">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">WhatsApp number</label>
+          <input type="tel" id="i-wa" placeholder="+297 …" oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:16px">
+        <label class="field-label">How did you hear about Rooted in 40?</label>
+        <input type="text" id="i-referral" placeholder="Friend, Instagram, Google …" oninput="autosave()">
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">A — Your Starting Point</h3>
+
+      <div class="field-group">
+        <label class="field-label">How would you describe your current relationship with your body?</label>
+        <div class="field-hint">Be honest — there is no wrong answer here.</div>
+        <textarea class="large" id="a-body" oninput="autosave()" placeholder="Write freely…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What does a typical week look like for you right now?</label>
+        <div class="field-hint">Work, family, routine, stress levels — give the real picture.</div>
+        <textarea id="a-week" oninput="autosave()" placeholder="Work, family, routine, stress…"></textarea>
+      </div>
+
+      <div class="field-row two">
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Average hours of sleep per night</label>
+          <input type="text" id="a-sleep" placeholder="e.g. 6–7 hours" oninput="autosave()">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Energy levels day-to-day</label>
+          <div class="field-hint">1 = exhausted · 5 = great</div>
+          <div class="rating-group" id="r-energy"></div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:20px">
+        <label class="field-label">What is the biggest challenge you face when trying to take care of yourself?</label>
+        <textarea id="a-challenge" oninput="autosave()" placeholder="Be specific…"></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">B — Training History</h3>
+
+      <div class="field-group">
+        <label class="field-label">Have you trained in a gym before?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="never" onchange="autosave()"><span>Never — this will be my first time</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="few" onchange="autosave()"><span>A few times, but not consistently</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="past" onchange="autosave()"><span>Yes, I trained regularly in the past</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="current" onchange="autosave()"><span>Yes, I currently train regularly</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">If you have trained before — what did you do and when did you stop?</label>
+        <textarea class="small" id="b-history" oninput="autosave()" placeholder="Or write 'never trained'…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Which of these movements have you done before?</label>
+        <div class="checkbox-group columns">
+          <label class="checkbox-item"><input type="checkbox" id="mv-hip" onchange="autosave()"><span>Hip thrust / glute bridge</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-squat" onchange="autosave()"><span>Squat (barbell or bodyweight)</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-rdl" onchange="autosave()"><span>Romanian deadlift / stiff leg</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-legpress" onchange="autosave()"><span>Leg press</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-lat" onchange="autosave()"><span>Lat pulldown</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-shoulder" onchange="autosave()"><span>Dumbbell shoulder press</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-row" onchange="autosave()"><span>Machine row</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-none" onchange="autosave()"><span>None of the above</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Do you have any injuries, pain, or physical limitations?</label>
+        <div class="checkbox-group" style="flex-direction:row;gap:12px;margin-bottom:14px">
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="injury" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="injury" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="injury" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <textarea class="small" id="b-injury" oninput="autosave()" placeholder="If yes — describe the injury and area of the body…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Any medical condition that affects exercise?</label>
+        <div class="checkbox-group" style="flex-direction:row;gap:12px;margin-bottom:14px">
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="medical" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="medical" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="medical" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <textarea class="small" id="b-medical" oninput="autosave()" placeholder="If yes — please describe…"></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">C — Your Goals</h3>
+
+      <div class="field-group">
+        <label class="field-label">What do you most want to change or achieve in these 40 days?</label>
+        <textarea id="c-goal" oninput="autosave()" placeholder="Be as specific as you can…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Why is this important to you right now?</label>
+        <div class="field-hint">What is the deeper reason?</div>
+        <textarea id="c-why" oninput="autosave()" placeholder="The deeper reason…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What has stopped you from achieving this before?</label>
+        <textarea id="c-blocker" oninput="autosave()" placeholder="Be honest with yourself…"></textarea>
+      </div>
+
+      <div class="inline-pair">
+        <div>
+          <label class="field-label">What would success look like at the end of Day 40?</label>
+          <textarea id="c-success" oninput="autosave()" placeholder="Paint the picture…"></textarea>
+        </div>
+        <div>
+          <label class="field-label">How will you feel differently in your body?</label>
+          <textarea id="c-feel" oninput="autosave()" placeholder="Describe the feeling…"></textarea>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">D — Your Training Schedule</h3>
+
+      <div class="field-group">
+        <label class="field-label">Which days can you train independently?</label>
+        <div class="checkbox-group columns">
+          <label class="checkbox-item"><input type="checkbox" id="d-mon" onchange="autosave()"><span>Monday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-tue" onchange="autosave()"><span>Tuesday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-wed" onchange="autosave()"><span>Wednesday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-thu" onchange="autosave()"><span>Thursday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-fri" onchange="autosave()"><span>Friday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-sat" onchange="autosave()"><span>Saturday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-sun" onchange="autosave()"><span>Sunday</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How much time per solo training session?</label>
+        <div class="checkbox-group" style="flex-direction:row;gap:12px;flex-wrap:wrap">
+          <label class="checkbox-item"><input type="radio" name="session-time" value="30" onchange="autosave()"><span>30 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="45" onchange="autosave()"><span>45 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="60" onchange="autosave()"><span>60 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="60+" onchange="autosave()"><span>60+ min</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">For your training programme, which do you prefer?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="coach" onchange="autosave()"><span>I want my coach to design my full programme</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="app" onchange="autosave()"><span>I use a workout app and would like coaching support alongside it</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="own" onchange="autosave()"><span>I have my own programme and want coaching support</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="unsure" onchange="autosave()"><span>I'm not sure yet — I want to discuss with my coach</span></label>
+        </div>
+        <textarea class="small" id="d-prog-detail" oninput="autosave()" style="margin-top:12px" placeholder="If you use an app or have an existing programme, describe it here…"></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">E — Lifestyle &amp; Daily Habits</h3>
+
+      <div class="field-group">
+        <label class="field-label">How would you describe your current eating habits?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="eating" value="well" onchange="autosave()"><span>I eat fairly well most of the time</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="weekends" onchange="autosave()"><span>I eat well during the week but lose control on weekends</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="inconsistent" onchange="autosave()"><span>I struggle with consistency — I eat well then fall off</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="skip" onchange="autosave()"><span>I tend to skip meals or eat on the go</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="takeaway" onchange="autosave()"><span>I eat mostly takeaway, processed, or fast food</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="unaware" onchange="autosave()"><span>I'm not sure — I don't pay much attention to what I eat</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How much water do you drink per day on average?</label>
+        <div class="checkbox-group" style="flex-direction:row;gap:12px;flex-wrap:wrap">
+          <label class="checkbox-item"><input type="radio" name="water" value="<1" onchange="autosave()"><span>Less than 1 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value="1-1.5" onchange="autosave()"><span>1–1.5 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value="1.5-2" onchange="autosave()"><span>1.5–2 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value=">2" onchange="autosave()"><span>More than 2 L</span></label>
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Stress levels on a typical week</label>
+          <div class="field-hint">1 = very low · 5 = very high</div>
+          <div class="rating-group" id="r-stress"></div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label">Consistency with self-care habits</label>
+          <div class="field-hint">1 = not at all · 5 = very consistent</div>
+          <div class="rating-group" id="r-selfcare"></div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:20px">
+        <label class="field-label">Do you currently take any supplements or vitamins?</label>
+        <div class="checkbox-group" style="flex-direction:row;gap:12px;margin-bottom:12px">
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="supps" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="supps" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item" style="flex:1"><input type="radio" name="supps" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <input type="text" id="e-supps" placeholder="If yes — which ones…" oninput="autosave()">
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">F — Mindset &amp; Readiness</h3>
+
+      <div class="field-group">
+        <label class="field-label">Finish this sentence: When I think about committing to 40 days of this programme, I feel…</label>
+        <textarea id="f-commit" oninput="autosave()" placeholder="…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What is the story you most often tell yourself about why you cannot stay consistent?</label>
+        <textarea id="f-story" oninput="autosave()" placeholder="Be honest…"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What would you tell your best friend if she was about to start this programme and was nervous?</label>
+        <textarea id="f-friend" oninput="autosave()" placeholder="What would you say to her?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">On a scale of 1–5, how ready are you to commit fully to these 40 days?</label>
+        <div class="rating-group" id="r-ready"></div>
+        <div class="rating-labels" style="max-width:220px"><span>Not at all</span><span>Very much</span></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What would make you feel even more ready or supported?</label>
+        <textarea class="small" id="f-support" oninput="autosave()" placeholder="What would help?"></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:24px;color:var(--soil)">G — Anything Else</h3>
+
+      <div class="field-group">
+        <label class="field-label">Is there anything else you want your coach to know before your first session?</label>
+        <div class="field-hint">Anything about your life, your history, your fears, or your hopes that feels important to share.</div>
+        <textarea class="large" id="g-extra" oninput="autosave()" placeholder="This is your space…"></textarea>
+      </div>
+
+      <!-- EMAILJS SETUP BANNER -->
+      <div class="setup-banner" id="setup-banner">
+        <div class="setup-icon">⚙️</div>
+        <div>
+          <h4>One-time EmailJS setup required</h4>
+          <p>To send emails automatically, create a free account at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a>, connect your Gmail, and create an email template. Then paste your three keys below. <a href="#" onclick="showEmailJSGuide(); return false;">How to set this up →</a></p>
+          <div class="config-fields">
+            <input type="text" id="ejs-public-key" placeholder="Public Key (e.g. abc123XYZ)" oninput="saveEJSConfig()">
+            <input type="text" id="ejs-service-id" placeholder="Service ID (e.g. service_xxxxxx)" oninput="saveEJSConfig()">
+            <input type="text" id="ejs-template-id" placeholder="Template ID (e.g. template_xxxxxx)" oninput="saveEJSConfig()" style="grid-column:1/-1">
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-section">
+        <div>
+          <h4>Ready to send to your coach?</h4>
+          <p>This will email your completed intake questionnaire to shadeybahali@gmail.com.</p>
+        </div>
+        <button class="btn-submit" id="btn-submit-email" onclick="submitIntakeEmail()">✉ Send to coach</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('intake'); showPage('layer1')">Continue to Layer 1 →</button>
+        <button class="btn-ghost" onclick="saveSection('intake')">Save progress</button>
+        <span class="save-status" id="status-intake">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <div class="page" id="page-layer1">
+    <div class="section-header">
+      <div class="tag">Layer 1 · Body · Mind · Soul</div>
+      <h2>Identity</h2>
+      <p>Who am I becoming? The work starts here — not with a new habit, but with a new story about who you are.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.1</div>
+          <div>
+            <h3>The Self-Image Audit</h3>
+            <p>Answer honestly. No one is watching.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Finish this sentence: When it comes to taking care of myself, I am someone who…</label>
+          <textarea id="l1-selfimage" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The story I most often tell myself about why I cannot stay consistent is…</label>
+          <textarea id="l1-story" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">Evidence I use to support that story</label>
+            <textarea id="l1-evidence-for" oninput="autosave()" placeholder="What 'proves' this story to you?"></textarea>
+          </div>
+          <div>
+            <label class="field-label">Evidence that contradicts that story</label>
+            <textarea id="l1-evidence-against" oninput="autosave()" placeholder="What shows it might not be true?"></textarea>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">If that story were not true, who would I be free to become?</label>
+          <textarea id="l1-free" oninput="autosave()" placeholder="Imagine her…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.2</div>
+          <div>
+            <h3>Vision Casting</h3>
+            <p>Your brain cannot pursue a destination it cannot picture. Make her real.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Describe the version of you who is fully rooted.</label>
+          <div class="field-hint">What does her morning look like? How does she feel in her body? How does she respond when life gets hard?</div>
+          <textarea class="large" id="l1-vision" oninput="autosave()" placeholder="Describe her in detail…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What three words describe how she feels on the inside?</label>
+          <input type="text" id="l1-words" oninput="autosave()" placeholder="e.g. Grounded, Calm, Powerful">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What has she stopped tolerating? What has she stopped saying to herself?</label>
+          <textarea id="l1-stopped" oninput="autosave()" placeholder="She no longer…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What does she do consistently that you currently struggle to do?</label>
+          <textarea id="l1-consistent" oninput="autosave()" placeholder="She consistently…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.3</div>
+          <div>
+            <h3>Your Daily Declaration</h3>
+            <p>A statement of identity written in the present tense, as if it is already true.</p>
+          </div>
+        </div>
+
+        <div class="declaration-box">
+          <p class="ex">"I am a woman who chooses herself. I move my body because I respect it, not punish it. I return to my practice without guilt because returning is part of the practice. I am becoming more rooted every day."</p>
+          <label>Your declaration — make it specific to you. Make it feel almost too bold.</label>
+          <textarea class="large" id="l1-declaration" oninput="autosave()" placeholder="I am a woman who…"></textarea>
+        </div>
+
+        <div class="time-row">
+          <span>I will say my declaration every day at:</span>
+          <input type="time" id="l1-declaration-time" oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer1'); showPage('layer2')">Continue to Layer 2 →</button>
+        <button class="btn-ghost" onclick="saveSection('layer1')">Save progress</button>
+        <span class="save-status" id="status-layer1">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div class="page" id="page-layer2">
+    <div class="section-header">
+      <div class="tag">Layer 2</div>
+      <h2>Rhythm</h2>
+      <p>What are my non-negotiables? A rhythm bends with life but keeps coming back — like a heartbeat.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>Your rhythm is made up of anchors: 3–5 commitments you return to regardless of what is happening around you. Anchors are small enough to do on your hardest day. That is the test.</p>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.1</div>
+          <div><h3>Your Body Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one form of movement I will do even on my hardest day</label>
+          <div class="field-hint">Be specific — not 'exercise' but '20 minutes of walking'</div>
+          <textarea class="small" id="l2-body-move" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one non-negotiable I have about how I fuel my body</label>
+          <textarea class="small" id="l2-body-fuel" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one thing I will protect for rest and recovery</label>
+          <textarea class="small" id="l2-body-rest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.2</div>
+          <div><h3>Your Mind Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My daily stillness practice</label>
+          <div class="field-hint">Meditation, prayer, breathwork, quiet coffee — even 5 minutes counts</div>
+          <textarea class="small" id="l2-mind-stillness" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">How I set my intention for the day</label>
+          <textarea class="small" id="l2-mind-intention" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What I am currently reading, listening to, or learning that feeds my mind</label>
+          <textarea class="small" id="l2-mind-learning" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.3</div>
+          <div><h3>Your Soul Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My spiritual or reflective practice</label>
+          <div class="field-hint">Prayer, journaling, nature, gratitude, study</div>
+          <textarea class="small" id="l2-soul-practice" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What gives me the deepest sense of meaning and purpose right now</label>
+          <textarea class="small" id="l2-soul-meaning" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The community or connection that keeps me accountable and held</label>
+          <textarea class="small" id="l2-soul-community" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.4</div>
+          <div>
+            <h3>My Anchor Board</h3>
+            <p>Your 5 anchors — the commitments that define your rhythm.</p>
+          </div>
+        </div>
+
+        <table class="anchor-table">
+          <tr>
+            <td><strong>1</strong> Body anchor</td>
+            <td><input type="text" id="anc-1" oninput="autosave()" placeholder="Your first body anchor…"></td>
+          </tr>
+          <tr>
+            <td><strong>2</strong> Body anchor</td>
+            <td><input type="text" id="anc-2" oninput="autosave()" placeholder="Your second body anchor…"></td>
+          </tr>
+          <tr>
+            <td><strong>3</strong> Mind anchor</td>
+            <td><input type="text" id="anc-3" oninput="autosave()" placeholder="Your mind anchor…"></td>
+          </tr>
+          <tr>
+            <td><strong>4</strong> Soul anchor</td>
+            <td><input type="text" id="anc-4" oninput="autosave()" placeholder="Your first soul anchor…"></td>
+          </tr>
+          <tr>
+            <td><strong>5</strong> Soul anchor</td>
+            <td><input type="text" id="anc-5" oninput="autosave()" placeholder="Your second soul anchor…"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer2'); showPage('layer3')">Continue to Layer 3 →</button>
+        <button class="btn-ghost" onclick="saveSection('layer2')">Save progress</button>
+        <span class="save-status" id="status-layer2">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div class="page" id="page-layer3">
+    <div class="section-header">
+      <div class="tag">Layer 3</div>
+      <h2>Recovery</h2>
+      <p>How do I return — without shame? Recovery is not the failure mode. It is built into the practice.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>"The return is the practice. Every time you come back, you are strengthening the root."</p>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.1</div>
+          <div>
+            <h3>The Fall Audit</h3>
+            <p>Complete this AFTER a slide — not in the moment, but when you have a quiet 15 minutes.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What was happening in my life when I started to slide?</label>
+          <div class="field-hint">Go deeper than 'I was busy' — what was the emotional or circumstantial trigger?</div>
+          <textarea class="large" id="l3-slide-trigger" oninput="autosave()" placeholder="The deeper context was…"></textarea>
+        </div>
+
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">Which anchor slipped first?</label>
+            <textarea class="small" id="l3-anchor-slipped" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+          <div>
+            <label class="field-label">What did I tell myself when it slipped?</label>
+            <textarea class="small" id="l3-told-myself" oninput="autosave()" placeholder="The story I told myself…"></textarea>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What need was I trying to meet through the behaviour that replaced my anchors?</label>
+          <div class="field-hint">Rest? Comfort? Escape? Numbing?</div>
+          <textarea id="l3-need" oninput="autosave()" placeholder="I was seeking…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What would I tell my best friend if she described this exact situation to me?</label>
+          <textarea id="l3-bestfriend" oninput="autosave()" placeholder="I would say to her…"></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.2</div>
+          <div>
+            <h3>The Return Ritual</h3>
+            <p>Design your return sequence now — before you need it.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The first anchor I will always return to (even after the longest slide)</label>
+          <textarea class="small" id="l3-first-anchor" oninput="autosave()" placeholder="Always, I return to…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My return ritual — what I do in the first 24 hours after deciding to come back</label>
+          <textarea id="l3-ritual" oninput="autosave()" placeholder="First, I will… Then…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one person I will tell when I am returning</label>
+          <div class="field-hint">Accountability without shame.</div>
+          <input type="text" id="l3-accountability" oninput="autosave()" placeholder="Name or relationship…">
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.3</div>
+          <div>
+            <h3>The Self-Covenant</h3>
+            <p>A commitment you make to yourself — to be returned to, not broken over.</p>
+          </div>
+        </div>
+
+        <div class="covenant-block">
+          <p>I, <input type="text" id="cov-name" oninput="autosave()" placeholder="your name" style="border:none;border-bottom:1px solid var(--warm);background:transparent;font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--soil);padding:0 4px;width:200px">, commit to choosing myself. I will show up for my body, my mind, and my soul — not perfectly, but consistently. When I fall, I will not use it as proof that I cannot do this.</p>
+          <p><strong>I will return. The return is the practice.</strong></p>
+          <p>My anchor, always, is: <input type="text" id="cov-anchor" oninput="autosave()" placeholder="your anchor" style="border:none;border-bottom:1px solid var(--warm);background:transparent;font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--soil);padding:0 4px;width:220px"></p>
+          <div class="inline-pair" style="margin-top:20px;margin-bottom:0">
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label">Signed</label>
+              <input type="text" id="cov-signed" oninput="autosave()" placeholder="Your signature…">
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label">Date</label>
+              <input type="date" id="cov-date" oninput="autosave()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer3'); showPage('checkin')">Continue to 90-Day Check-in →</button>
+        <button class="btn-ghost" onclick="saveSection('layer3')">Save progress</button>
+        <span class="save-status" id="status-layer3">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECK-IN -->
+  <div class="page" id="page-checkin">
+    <div class="section-header">
+      <div class="tag">Part 3 · Monthly review</div>
+      <h2>90-Day Check-In Guide</h2>
+      <p>Use this at the end of each month. You are not grading yourself. You are getting to know yourself.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="month-card">
+        <h3>Month 1 <span class="month-badge">Day 1–30</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m1-strongest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m1-hardest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m1-proud" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m1-different" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-card">
+        <h3>Month 2 <span class="month-badge">Day 31–60</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m2-strongest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m2-hardest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m2-proud" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m2-different" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-card">
+        <h3>Month 3 <span class="month-badge">Day 61–90</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m3-strongest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m3-hardest" oninput="autosave()" placeholder="…"></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m3-proud" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m3-different" oninput="autosave()" placeholder="…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block" style="margin-top:32px">
+        <p>"You are not starting over. You are starting from experience."</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('checkin'); exportData()">↓ Export all answers</button>
+        <button class="btn-ghost" onclick="saveSection('checkin')">Save progress</button>
+        <span class="save-status" id="status-checkin">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+
+<!-- PROGRAMME PAGE -->
+  <div class="page" id="page-programme">
+    <div class="section-header">
+      <div class="tag">Rooted in 40 · 40-day programme</div>
+      <h2>For Women Who Are<br>Done Starting Over</h2>
+      <p>A coaching and training experience built around the Rooted Woman Method — with guidance, accountability, and personal training.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="welcome-card" style="background: linear-gradient(135deg, #3d3530 60%, #5a4840);">
+        <h3 style="font-size:32px; margin-bottom:16px;">Bon dia 🌸</h3>
+        <p style="font-size:15px; max-width:560px; line-height:1.8;">You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.<br><br>I built all of that into a programme. It's called <strong style="color:var(--warm)">Rooted in 40</strong>.</p>
+      </div>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin:36px 0 20px;color:var(--soil)">What you get</h3>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;">
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">🌸</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">2 Coaching sessions</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Day 1 kick-off + midpoint check-in with Shadey personally.</p>
+          </div>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">💪</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">5 Personal training sessions</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">One session every weekend, training with Shadey directly.</p>
+          </div>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">📋</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">Full 5-week training schedule</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">A personalised plan so you always know what to do and when.</p>
+          </div>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">🏋️</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">Gym orientation on Day 1</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">So you never feel lost or intimidated in the gym again.</p>
+          </div>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">📲</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">Twice-weekly WhatsApp check-ins</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Video guidance for every solo session. You are never doing this alone.</p>
+          </div>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;display:flex;align-items:flex-start;gap:16px;">
+          <div style="font-size:26px;flex-shrink:0;">📖</div>
+          <div>
+            <div class="field-label" style="margin-bottom:4px;">The Rooted Woman Method Workbook</div>
+            <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.5;">The full identity, rhythm, and recovery system — this workbook.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--warm-pale);border:1px solid var(--warm-light);border-radius:var(--radius);padding:32px 36px;text-align:center;margin-bottom:32px;">
+        <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);margin-bottom:10px;font-weight:400;">Investment</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:500;color:var(--soil);line-height:1;">AWG 500</div>
+        <div style="font-size:14px;color:var(--soil-muted);margin-top:8px;font-weight:300;">for the full 40 days</div>
+        <div style="margin-top:20px;font-size:13px;color:var(--soil-muted);font-weight:300;font-style:italic;">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
+      </div>
+
+      <div style="background:var(--soil);border-radius:var(--radius);padding:32px 36px;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--cream);font-weight:400;margin-bottom:10px;">If something in you is saying yes —</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.6);font-weight:300;margin-bottom:24px;">reach out on WhatsApp and let's talk. 🌸</div>
+        <a href="https://wa.me/2977300112" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:var(--warm);color:var(--soil);padding:14px 32px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;text-decoration:none;font-family:'DM Sans',sans-serif;">
+          📱 WhatsApp Shadey · +297 730 0112
+        </a>
+        <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.35);font-weight:300;">Saludos, Shadey</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NUTRITION PAGE -->
+  <div class="page" id="page-nutrition">
+    <div class="section-header">
+      <div class="tag">Resources · Nutrition Guide</div>
+      <h2>Nutrition Basics</h2>
+      <p>Simple habits that make a real difference. No calorie counting. No complicated plans. No perfection required.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>You do not need a perfect diet. You need a sustainable one. Read through the whole guide first. Then pick two or three habits to start with. Add more as those become natural.</p>
+      </div>
+
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin:0 0 20px;color:var(--soil)">Section 1 — Your Quick Wins</h3>
+      <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:24px;">Start here. These habits alone will change how you feel. Highest impact, lowest effort — no special food required.</p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:36px;">
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">💧</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 1 — Drink 2 litres of water every day</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Most people are dehydrated and don't know it. Fatigue, headaches, hunger, poor focus, and cravings are often simply your body asking for water. Start your morning with a large glass before coffee or food. Finish 1.5 litres before 3pm — the rest comes easily.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🥤</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 2 — Eliminate sugary drinks and sodas</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Sodas, fruit juices, energy drinks, and sweetened coffees are some of the biggest sources of hidden sugar. They spike your blood sugar, which leads to energy crashes and cravings. Replace with water, sparkling water, unsweetened herbal tea, or black coffee. Start by eliminating one per day.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🍔</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 3 — Reduce junk food and fast food</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Fast food is engineered to make you want more — this is not a willpower problem. You don't need to eliminate it forever. If you currently eat fast food 5 times per week, reduce to 3. Then 2. Then 1. Small reductions done consistently beat dramatic cuts that don't last.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🍳</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 4 — Reduce fried food</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Frying dramatically increases calorie content and introduces fats that contribute to inflammation and low energy. When you cook at home, choose grilling or baking. When eating out, choose grilled where possible. Make a better choice more often than not.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🛒</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 5 — Reduce processed and packaged food</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">A simple rule: if a product has more than 5 ingredients, or ingredients you can't pronounce, eat it less often. Replace packaged snacks with whole foods: fruit, nuts, boiled eggs, vegetables with hummus.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🥣</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 6 — Eat a real breakfast</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Skipping breakfast sets your blood sugar on a rollercoaster for the rest of the day. A breakfast with protein keeps you fuller longer and gives you stable energy. Easy options: 2 eggs with vegetables, Greek yoghurt with fruit, oats with nuts, or a protein smoothie.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🥩</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 7 — Include protein in every meal</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Protein is the building block of muscle and keeps you fuller for longer. Good sources: chicken, fish, eggs, Greek yoghurt, legumes, cottage cheese, tofu. You don't need to count grams — just make sure it's on the plate.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card" style="margin-bottom:0;display:flex;gap:18px;align-items:flex-start;">
+          <div style="font-size:28px;flex-shrink:0;margin-top:2px;">🥦</div>
+          <div>
+            <div class="field-label" style="margin-bottom:5px;">Quick Win 8 — Add vegetables to at least two meals per day</div>
+            <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Vegetables keep your digestive system healthy, help you feel full, and stabilise blood sugar. You don't need to eat salad every day. Add spinach to eggs, put cucumber and tomato on the side of your lunch, roast a tray of vegetables for dinner. Small additions add up.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin:0 0 20px;color:var(--soil)">Section 2 — Eat More of This</h3>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🍗</div>
+          <div class="field-label" style="margin-bottom:4px;">Lean protein</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Chicken, fish, eggs, legumes, Greek yoghurt, tofu</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🍠</div>
+          <div class="field-label" style="margin-bottom:4px;">Complex carbs</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Sweet potato, oats, brown rice, quinoa, whole grain bread</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🥑</div>
+          <div class="field-label" style="margin-bottom:4px;">Healthy fats</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Avocado, olive oil, nuts, seeds, fatty fish like salmon</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🍌</div>
+          <div class="field-label" style="margin-bottom:4px;">Fruits</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Banana, mango, berries, papaya, citrus — whole fruit, not juice</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🥗</div>
+          <div class="field-label" style="margin-bottom:4px;">Vegetables</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">Any and all — the more colour variety, the better</p>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;">
+          <div style="font-size:22px;margin-bottom:8px;">💧</div>
+          <div class="field-label" style="margin-bottom:4px;">Water</div>
+          <p style="font-size:12.5px;color:var(--soil-muted);font-weight:300;line-height:1.5;">2 litres minimum per day. More if you are training.</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin:0 0 8px;color:var(--soil)">Section 3 — Reduce or Avoid</h3>
+      <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:20px;">Not forever. Just less often than before. Progress is the goal, not perfection.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Sugary drinks and sodas — Fanta, Pepsi, fruit juice, energy drinks, sweetened iced tea</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Fried food — anything deep-fried or pan-fried in large amounts of oil</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Junk food and fast food — burgers, hot dogs, chips, fried chicken, pizza</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Packaged and processed snacks — crisps, cookies, flavoured crackers, instant noodles</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Excess sugar — sweets, desserts, sugary cereals, flavoured yoghurts with added sugar</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;gap:12px;">
+          <span style="color:#b94a48;font-size:16px;">✕</span>
+          <span style="font-size:13.5px;font-weight:300;color:var(--soil);">Alcohol — it disrupts sleep, recovery, and hormonal balance. If you drink, drink less.</span>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>A useful question before eating: Does this food give me energy, or take it from me? Answer honestly and choose accordingly.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;margin:0 0 20px;color:var(--soil)">Section 4 — Practical Tips</h3>
+      <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:24px;">Knowing what to eat is the easy part. These tips bridge the gap between knowing and doing.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px;">
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">🥡 Meal preparation</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">You don't need to meal prep for hours on Sunday. Even 30 minutes makes a difference. Boil eggs, wash and cut vegetables, cook a batch of rice. Having ready food removes the decision and the temptation.</p>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">🛒 Never shop hungry</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Grocery shopping on an empty stomach leads to buying food you didn't plan to buy. Eat first, then shop. And write a list before you go.</p>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">⚖️ The 80/20 approach</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Eat well 80% of the time. The other 20% is life — a birthday, a dinner out, a craving. This is not failure. This is balance. Make a good choice more often than a poor one.</p>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">🔍 Read labels</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Start noticing the sugar content on labels. If sugar is listed in the first three ingredients, or if the product has more than 10g of sugar per 100g, choose a different option or eat it less often.</p>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">🍽️ Eat slowly</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Your brain takes about 20 minutes to register that your stomach is full. Put down your fork between bites. Eat without your phone. Chew properly. These small things make a significant difference over time.</p>
+        </div>
+        <div class="exercise-card" style="margin-bottom:0;">
+          <div class="field-label" style="margin-bottom:8px;">🕐 Don't skip meals</div>
+          <p style="font-size:13px;color:var(--soil-muted);font-weight:300;line-height:1.65;">Skipping meals to compensate slows your metabolism, increases cravings, and almost always leads to overeating later. Eat regular meals. Keep portions sensible. Stay consistent.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--soil);border-radius:var(--radius);padding:28px 32px;text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--cream);font-weight:400;font-style:italic;line-height:1.4;">"You do not need to eat perfectly.<br>You need to eat better than you did yesterday."</div>
+        <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,0.35);font-weight:300;letter-spacing:1px;text-transform:uppercase;">The Rooted Woman Method</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="modal-icon" id="modal-icon">✉</div>
+    <h3 id="modal-title">Sending your intake…</h3>
+    <p id="modal-body">Please wait a moment while your answers are sent to your coach.</p>
+    <div class="modal-btn-row" id="modal-btns"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition'];
+const COACH_EMAIL = 'shadeybahali@gmail.com';
+const ACCESS_CODE = 'ROOTED40';
+
+function tryUnlock() {
+  const input = document.getElementById('unlock-input');
+  const errorEl = document.getElementById('unlock-error');
+  const paywall = document.getElementById('paywall');
+
+  if (!input || !errorEl || !paywall) return;
+
+  const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
+
+  if (val === ACCESS_CODE) {
+    try { localStorage.setItem('rwm-unlocked', '1'); } catch(e) {}
+    input.classList.remove('error');
+    errorEl.classList.remove('visible');
+    paywall.style.display = 'none';
+  } else {
+    input.classList.add('error');
+    errorEl.classList.add('visible');
+    input.select();
+    input.focus();
+  }
+}
+
+function checkUnlock() {
+  try {
+    if (localStorage.getItem('rwm-unlocked') === '1') {
+      const paywall = document.getElementById('paywall');
+      if (paywall) paywall.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+
+function saveEJSConfig() {
+  localStorage.setItem('rwm-ejs-pk',  document.getElementById('ejs-public-key').value.trim());
+  localStorage.setItem('rwm-ejs-sid', document.getElementById('ejs-service-id').value.trim());
+  localStorage.setItem('rwm-ejs-tid', document.getElementById('ejs-template-id').value.trim());
+  checkEJSReady();
+}
+
+function checkEJSReady() {
+  const pk  = localStorage.getItem('rwm-ejs-pk')  || '';
+  const sid = localStorage.getItem('rwm-ejs-sid') || '';
+  const tid = localStorage.getItem('rwm-ejs-tid') || '';
+  const ready = pk && sid && tid;
+  const banner = document.getElementById('setup-banner');
+  if(banner) banner.style.opacity = ready ? '0.5' : '1';
+  return {pk, sid, tid, ready};
+}
+
+function buildIntakeText() {
+  const get = id => (localStorage.getItem('rwm-'+id) || '').trim();
+  const radio = name => (localStorage.getItem('rwm-radio-'+name) || '—');
+  const cb = id => localStorage.getItem('rwm-cb-'+id) === '1';
+
+  const movements = ['hip thrust/glute bridge','squat','Romanian deadlift','leg press','lat pulldown','shoulder press','machine row']
+    .filter((_,i) => cb(['mv-hip','mv-squat','mv-rdl','mv-legpress','mv-lat','mv-shoulder','mv-row'][i])).join(', ') || 'None ticked';
+
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    .filter((_,i) => cb(['d-mon','d-tue','d-wed','d-thu','d-fri','d-sat','d-sun'][i])).join(', ') || 'None selected';
+
+  return `
+NEW CLIENT INTAKE — THE ROOTED WOMAN METHOD
+============================================
+Submitted: ${new Date().toLocaleString('en-GB')}
+
+PERSONAL DETAILS
+Name:         ${get('i-name')}
+Date of birth:${get('i-dob')}
+Occupation:   ${get('i-occ')}
+WhatsApp:     ${get('i-wa')}
+How heard:    ${get('i-referral')}
+
+A — STARTING POINT
+Relationship with body:
+${get('a-body')}
+
+Typical week:
+${get('a-week')}
+
+Sleep: ${get('a-sleep')}
+Energy level (1–5): ${localStorage.getItem('rwm-r-energy') || '—'}
+Biggest challenge:
+${get('a-challenge')}
+
+B — TRAINING HISTORY
+Gym experience: ${radio('gym-history')}
+Training history: ${get('b-history')}
+Movements done: ${movements}
+Injury/pain: ${radio('injury')}
+Injury detail: ${get('b-injury')}
+Medical condition: ${radio('medical')}
+Medical detail: ${get('b-medical')}
+
+C — GOALS
+Goals for 40 days:
+${get('c-goal')}
+
+Why now:
+${get('c-why')}
+
+What stopped before:
+${get('c-blocker')}
+
+Success at Day 40: ${get('c-success')}
+How body will feel: ${get('c-feel')}
+
+D — TRAINING SCHEDULE
+Available days: ${days}
+Session length: ${radio('session-time')} min
+Programme preference: ${radio('prog-pref')}
+Programme detail: ${get('d-prog-detail')}
+
+E — LIFESTYLE
+Eating habits: ${radio('eating')}
+Water intake: ${radio('water')}
+Stress level (1–5): ${localStorage.getItem('rwm-r-stress') || '—'}
+Self-care consistency (1–5): ${localStorage.getItem('rwm-r-selfcare') || '—'}
+Supplements: ${radio('supps')} — ${get('e-supps')}
+
+F — MINDSET & READINESS
+Commitment sentence: ${get('f-commit')}
+Consistency story: ${get('f-story')}
+Advice to friend: ${get('f-friend')}
+Readiness (1–5): ${localStorage.getItem('rwm-r-ready') || '—'}
+What would help: ${get('f-support')}
+
+G — ANYTHING ELSE
+${get('g-extra')}
+`.trim();
+}
+
+function openModal(type, title, body, btns) {
+  const overlay = document.getElementById('modal-overlay');
+  const icon    = document.getElementById('modal-icon');
+  const t       = document.getElementById('modal-title');
+  const b       = document.getElementById('modal-body');
+  const btnRow  = document.getElementById('modal-btns');
+
+  icon.className  = 'modal-icon ' + type;
+  icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : '⏳';
+  t.textContent    = title;
+  b.innerHTML      = body;
+  btnRow.innerHTML = '';
+
+  (btns || []).forEach(({label, cls, fn}) => {
+    const btn = document.createElement('button');
+    btn.className   = cls || 'btn-ghost';
+    btn.textContent = label;
+    btn.onclick     = fn;
+    btnRow.appendChild(btn);
+  });
+
+  overlay.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+async function submitIntakeEmail() {
+  autosave();
+  const name = localStorage.getItem('rwm-i-name') || 'New client';
+  const {pk, sid, tid, ready} = checkEJSReady();
+
+  if(!ready) {
+    openModal('error', 'Setup not complete',
+      'Please fill in your EmailJS Public Key, Service ID, and Template ID in the setup section above before sending. <a href="#" onclick="showEmailJSGuide(); return false;" style="color:var(--sage)">See the guide →</a>',
+      [{label:'OK, got it', cls:'btn-save', fn: closeModal}]);
+    return;
+  }
+
+  const submitBtn = document.getElementById('btn-submit-email');
+  submitBtn.disabled = true;
+  openModal('loading', 'Sending your intake…', 'Please wait a moment while your answers are sent to your coach.', []);
+
+  try {
+    emailjs.init({publicKey: pk});
+    const intakeText = buildIntakeText();
+
+    await emailjs.send(sid, tid, {
+      to_email:    COACH_EMAIL,
+      to_name:     'Coach',
+      from_name:   name,
+      client_name: name,
+      client_wa:   localStorage.getItem('rwm-i-wa') || '—',
+      intake_text: intakeText,
+      reply_to:    localStorage.getItem('rwm-i-wa') || '',
+    });
+
+    localStorage.setItem('rwm-intake-submitted', new Date().toISOString());
+
+    openModal('success', 'Sent successfully!',
+      `Your intake has been sent to your coach at <strong>${COACH_EMAIL}</strong>.<br><br>You can now continue filling in the workbook. Your coach will be in touch before your first session.`,
+      [
+        {label:'Continue to Layer 1', cls:'btn-save', fn: () => { closeModal(); showPage('layer1'); }},
+        {label:'Close', cls:'btn-ghost', fn: closeModal}
+      ]);
+  } catch(err) {
+    console.error('EmailJS error:', err);
+    openModal('error', 'Something went wrong',
+      `The email couldn't be sent. Error: <code>${err.text || err.message || 'unknown'}</code><br><br>Double-check your EmailJS keys and that your template is set up correctly.`,
+      [{label:'Try again', cls:'btn-save', fn: () => { closeModal(); submitBtn.disabled = false; }},
+       {label:'Close', cls:'btn-ghost', fn: () => { closeModal(); submitBtn.disabled = false; }}]);
+  }
+}
+
+function showEmailJSGuide() {
+  openModal('loading', 'EmailJS setup guide',
+    `<strong>Step 1</strong> — Go to <a href="https://www.emailjs.com" target="_blank" style="color:var(--sage)">emailjs.com</a> and create a free account.<br><br>
+    <strong>Step 2</strong> — Add a Gmail service. Click <em>Email Services → Add New Service → Gmail</em>. Note your <code>Service ID</code>.<br><br>
+    <strong>Step 3</strong> — Create a template. Click <em>Email Templates → Create New Template</em>. In the template body use: <code>{{intake_text}}</code>. Set <em>To Email</em> to <code>${COACH_EMAIL}</code>. Note your <code>Template ID</code>.<br><br>
+    <strong>Step 4</strong> — Copy your <code>Public Key</code> from <em>Account → General</em>.<br><br>
+    Paste all three into the setup fields on the intake page. That's it — no server needed.`,
+    [{label:'Got it', cls:'btn-save', fn: closeModal}]);
+}
+
+
+
+function showPage(id) {
+  PAGES.forEach(p => {
+    document.getElementById('page-'+p).classList.remove('active');
+    const nav = document.getElementById('nav-'+p);
+    if(nav) nav.classList.remove('active');
+  });
+  document.getElementById('page-'+id).classList.add('active');
+  const nav = document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function buildRating(containerId, storageKey, max) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = '';
+  for(let i=1;i<=max;i++){
+    const btn = document.createElement('button');
+    btn.className = 'rating-btn';
+    btn.textContent = i;
+    btn.type = 'button';
+    const k = storageKey;
+    const v = i;
+    btn.onclick = function(){
+      el.querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      localStorage.setItem(k, v);
+      updateProgress();
+    };
+    const saved = localStorage.getItem(storageKey);
+    if(saved && parseInt(saved)===i) btn.classList.add('active');
+    el.appendChild(btn);
+  }
+}
+
+function loadAll() {
+  const textIds = [
+    'i-name','i-dob','i-occ','i-wa','i-referral',
+    'a-body','a-week','a-sleep','a-challenge',
+    'b-history','b-injury','b-medical',
+    'c-goal','c-why','c-blocker','c-success','c-feel',
+    'd-prog-detail',
+    'e-supps','f-commit','f-story','f-friend','f-support','g-extra',
+    'l1-selfimage','l1-story','l1-evidence-for','l1-evidence-against','l1-free',
+    'l1-vision','l1-words','l1-stopped','l1-consistent','l1-declaration','l1-declaration-time',
+    'l2-body-move','l2-body-fuel','l2-body-rest',
+    'l2-mind-stillness','l2-mind-intention','l2-mind-learning',
+    'l2-soul-practice','l2-soul-meaning','l2-soul-community',
+    'anc-1','anc-2','anc-3','anc-4','anc-5',
+    'l3-slide-trigger','l3-anchor-slipped','l3-told-myself','l3-need','l3-bestfriend',
+    'l3-first-anchor','l3-ritual','l3-accountability',
+    'cov-name','cov-anchor','cov-signed','cov-date',
+    'm1-strongest','m1-hardest','m1-proud','m1-different',
+    'm2-strongest','m2-hardest','m2-proud','m2-different',
+    'm3-strongest','m3-hardest','m3-proud','m3-different'
+  ];
+
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      const saved = localStorage.getItem('rwm-'+id);
+      if(saved) el.value = saved;
+    }
+  });
+
+  const radioNames = ['gym-history','injury','medical','session-time','prog-pref','eating','water','supps'];
+  radioNames.forEach(name => {
+    const saved = localStorage.getItem('rwm-radio-'+name);
+    if(saved) {
+      const radios = document.querySelectorAll('input[name="'+name+'"]');
+      radios.forEach(r => { if(r.value === saved) r.checked = true; });
+    }
+  });
+
+  const checkboxIds = ['mv-hip','mv-squat','mv-rdl','mv-legpress','mv-lat','mv-shoulder','mv-row','mv-none',
+    'd-mon','d-tue','d-wed','d-thu','d-fri','d-sat','d-sun'];
+  checkboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.checked = localStorage.getItem('rwm-cb-'+id) === '1';
+  });
+
+  buildRating('r-energy', 'rwm-r-energy', 5);
+  buildRating('r-stress', 'rwm-r-stress', 5);
+  buildRating('r-selfcare', 'rwm-r-selfcare', 5);
+  buildRating('r-ready', 'rwm-r-ready', 5);
+
+  const ejsPK  = document.getElementById('ejs-public-key');
+  const ejsSID = document.getElementById('ejs-service-id');
+  const ejsTID = document.getElementById('ejs-template-id');
+  if(ejsPK)  ejsPK.value  = localStorage.getItem('rwm-ejs-pk')  || '';
+  if(ejsSID) ejsSID.value = localStorage.getItem('rwm-ejs-sid') || '';
+  if(ejsTID) ejsTID.value = localStorage.getItem('rwm-ejs-tid') || '';
+  checkEJSReady();
+
+  updateProgress();
+}
+
+function autosave() {
+  const textIds = [
+    'i-name','i-dob','i-occ','i-wa','i-referral',
+    'a-body','a-week','a-sleep','a-challenge',
+    'b-history','b-injury','b-medical',
+    'c-goal','c-why','c-blocker','c-success','c-feel',
+    'd-prog-detail','e-supps','f-commit','f-story','f-friend','f-support','g-extra',
+    'l1-selfimage','l1-story','l1-evidence-for','l1-evidence-against','l1-free',
+    'l1-vision','l1-words','l1-stopped','l1-consistent','l1-declaration','l1-declaration-time',
+    'l2-body-move','l2-body-fuel','l2-body-rest',
+    'l2-mind-stillness','l2-mind-intention','l2-mind-learning',
+    'l2-soul-practice','l2-soul-meaning','l2-soul-community',
+    'anc-1','anc-2','anc-3','anc-4','anc-5',
+    'l3-slide-trigger','l3-anchor-slipped','l3-told-myself','l3-need','l3-bestfriend',
+    'l3-first-anchor','l3-ritual','l3-accountability',
+    'cov-name','cov-anchor','cov-signed','cov-date',
+    'm1-strongest','m1-hardest','m1-proud','m1-different',
+    'm2-strongest','m2-hardest','m2-proud','m2-different',
+    'm3-strongest','m3-hardest','m3-proud','m3-different'
+  ];
+
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) localStorage.setItem('rwm-'+id, el.value);
+  });
+
+  const radioNames = ['gym-history','injury','medical','session-time','prog-pref','eating','water','supps'];
+  radioNames.forEach(name => {
+    const checked = document.querySelector('input[name="'+name+'"]:checked');
+    if(checked) localStorage.setItem('rwm-radio-'+name, checked.value);
+  });
+
+  const checkboxIds = ['mv-hip','mv-squat','mv-rdl','mv-legpress','mv-lat','mv-shoulder','mv-row','mv-none',
+    'd-mon','d-tue','d-wed','d-thu','d-fri','d-sat','d-sun'];
+  checkboxIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) localStorage.setItem('rwm-cb-'+id, el.checked ? '1' : '0');
+  });
+
+  updateProgress();
+}
+
+function saveSection(section) {
+  autosave();
+  const status = document.getElementById('status-'+section);
+  if(status) {
+    status.classList.add('visible');
+    setTimeout(() => status.classList.remove('visible'), 2500);
+  }
+}
+
+function updateProgress() {
+  const fields = [
+    'i-name','a-body','a-week','c-goal','c-why',
+    'l1-selfimage','l1-story','l1-vision','l1-declaration',
+    'l2-body-move','l2-mind-stillness','l2-soul-practice',
+    'l3-slide-trigger','l3-ritual','cov-name'
+  ];
+  let filled = 0;
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.value && el.value.trim().length > 2) filled++;
+  });
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function exportData() {
+  const name = localStorage.getItem('rwm-i-name') || 'Client';
+  const date = new Date().toLocaleDateString('en-GB');
+  let out = `THE ROOTED WOMAN METHOD\nCompleted by: ${name}\nDate: ${date}\n\n`;
+
+  const sections = [
+    {title:'CLIENT INTAKE', fields:[
+      ['Full name','rwm-i-name'],['Date of birth','rwm-i-dob'],['Occupation','rwm-i-occ'],
+      ['WhatsApp','rwm-i-wa'],['How heard','rwm-i-referral'],
+      ['Relationship with body','rwm-a-body'],['Typical week','rwm-a-week'],
+      ['Sleep hours','rwm-a-sleep'],['Biggest challenge','rwm-a-challenge'],
+      ['Training history','rwm-b-history'],['Injuries','rwm-b-injury'],['Medical conditions','rwm-b-medical'],
+      ['Goals','rwm-c-goal'],['Why now','rwm-c-why'],['What stopped before','rwm-c-blocker'],
+      ['Success at Day 40','rwm-c-success'],['How body will feel','rwm-c-feel'],
+      ['Programme preference detail','rwm-d-prog-detail'],
+      ['Supplements','rwm-e-supps'],
+      ['Commitment sentence','rwm-f-commit'],['Consistency story','rwm-f-story'],
+      ['Advice to friend','rwm-f-friend'],['What would help','rwm-f-support'],
+      ['Anything else','rwm-g-extra']
+    ]},
+    {title:'LAYER 1 — IDENTITY', fields:[
+      ['Self-image sentence','rwm-l1-selfimage'],['Consistency story','rwm-l1-story'],
+      ['Evidence for story','rwm-l1-evidence-for'],['Evidence against story','rwm-l1-evidence-against'],
+      ['Who I could become','rwm-l1-free'],
+      ['Vision of rooted self','rwm-l1-vision'],['Three words','rwm-l1-words'],
+      ['What she stopped tolerating','rwm-l1-stopped'],['What she does consistently','rwm-l1-consistent'],
+      ['Daily declaration','rwm-l1-declaration'],['Declaration time','rwm-l1-declaration-time']
+    ]},
+    {title:'LAYER 2 — RHYTHM', fields:[
+      ['Body anchor: movement','rwm-l2-body-move'],['Body anchor: fuel','rwm-l2-body-fuel'],
+      ['Body anchor: rest','rwm-l2-body-rest'],
+      ['Mind anchor: stillness','rwm-l2-mind-stillness'],['Mind anchor: intention','rwm-l2-mind-intention'],
+      ['Mind anchor: learning','rwm-l2-mind-learning'],
+      ['Soul anchor: practice','rwm-l2-soul-practice'],['Soul anchor: meaning','rwm-l2-soul-meaning'],
+      ['Soul anchor: community','rwm-l2-soul-community'],
+      ['Anchor 1','rwm-anc-1'],['Anchor 2','rwm-anc-2'],['Anchor 3','rwm-anc-3'],
+      ['Anchor 4','rwm-anc-4'],['Anchor 5','rwm-anc-5']
+    ]},
+    {title:'LAYER 3 — RECOVERY', fields:[
+      ['Slide trigger','rwm-l3-slide-trigger'],['Anchor that slipped','rwm-l3-anchor-slipped'],
+      ['Story told self','rwm-l3-told-myself'],['Need behind behaviour','rwm-l3-need'],
+      ['What I would tell my friend','rwm-l3-bestfriend'],
+      ['First anchor to return to','rwm-l3-first-anchor'],['Return ritual','rwm-l3-ritual'],
+      ['Accountability person','rwm-l3-accountability'],
+      ['Covenant name','rwm-cov-name'],['Covenant anchor','rwm-cov-anchor'],
+      ['Signed','rwm-cov-signed'],['Date','rwm-cov-date']
+    ]},
+    {title:'90-DAY CHECK-INS', fields:[
+      ['Month 1 — strongest anchor','rwm-m1-strongest'],['Month 1 — hardest anchor','rwm-m1-hardest'],
+      ['Month 1 — proud of','rwm-m1-proud'],['Month 1 — do differently','rwm-m1-different'],
+      ['Month 2 — strongest anchor','rwm-m2-strongest'],['Month 2 — hardest anchor','rwm-m2-hardest'],
+      ['Month 2 — proud of','rwm-m2-proud'],['Month 2 — do differently','rwm-m2-different'],
+      ['Month 3 — strongest anchor','rwm-m3-strongest'],['Month 3 — hardest anchor','rwm-m3-hardest'],
+      ['Month 3 — proud of','rwm-m3-proud'],['Month 3 — do differently','rwm-m3-different']
+    ]}
+  ];
+
+  sections.forEach(s => {
+    out += '\n' + '='.repeat(50) + '\n' + s.title + '\n' + '='.repeat(50) + '\n\n';
+    s.fields.forEach(([label, key]) => {
+      const val = localStorage.getItem(key) || '';
+      if(val.trim()) out += label + ':\n' + val + '\n\n';
+    });
+  });
+
+  const blob = new Blob([out], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'rooted-woman-method-' + (localStorage.getItem('rwm-i-name') || 'answers').toLowerCase().replace(/\s+/g,'-') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', autosave);
+});
+document.querySelectorAll('input[type="radio"]').forEach(r => {
+  r.addEventListener('change', autosave);
+});
+
+checkUnlock();
+loadAll();
+</script>
+</body>
+</html>
