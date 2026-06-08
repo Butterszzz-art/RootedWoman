@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach Dashboard · Rooted in 40</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+:root {
+  --sage: #7a9e7e; --sage-light: #d4e5d6; --sage-pale: #f0f5f0;
+  --warm: #c4a882; --warm-light: #ede3d6; --warm-pale: #faf7f3;
+  --soil: #3d3530; --soil-muted: #7a6e68; --soil-hint: #b8afa9;
+  --cream: #fefcf8; --border: rgba(61,53,48,0.12); --border-strong: rgba(61,53,48,0.22);
+  --radius: 14px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--soil); min-height: 100vh; font-size: 15px; line-height: 1.65; }
+
+/* LOGIN */
+.coach-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--soil); padding: 24px; }
+.login-card { background: var(--cream); border-radius: var(--radius); padding: 48px 44px; max-width: 400px; width: 100%; }
+.login-card .eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 14px; }
+.login-card h1 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--soil); margin-bottom: 8px; line-height: 1.15; }
+.login-card p { font-size: 13.5px; color: var(--soil-muted); font-weight: 300; margin-bottom: 28px; line-height: 1.65; }
+.login-input { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 13px 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--soil); background: #fff; letter-spacing: 1px; margin-bottom: 12px; transition: border-color 0.15s, box-shadow 0.15s; }
+.login-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.12); }
+.login-input.error { border-color: #b94a48; }
+.login-btn { width: 100%; padding: 14px; background: var(--soil); color: var(--cream); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400; cursor: pointer; transition: background 0.15s; }
+.login-btn:hover { background: #2a2420; }
+.login-error { margin-top: 10px; font-size: 13px; color: #b94a48; font-weight: 300; display: none; }
+.login-error.visible { display: block; }
+
+/* SIDEBAR */
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: var(--soil); color: var(--cream); display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
+.sidebar-brand { padding: 28px 22px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-brand .eyebrow { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 5px; }
+.sidebar-brand h1 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; line-height: 1.25; color: var(--cream); }
+.sidebar-brand .coach-tag { font-size: 10px; background: var(--sage); color: #fff; padding: 2px 9px; border-radius: 99px; display: inline-block; margin-top: 8px; letter-spacing: 0.5px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 22px; cursor: pointer; font-size: 13.5px; color: rgba(255,255,255,0.6); border-left: 2px solid transparent; transition: all 0.15s; font-weight: 300; }
+.nav-item:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.04); }
+.nav-item.active { color: var(--cream); border-left-color: var(--warm); background: rgba(255,255,255,0.06); font-weight: 400; }
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; padding: 16px 22px; border-top: 1px solid rgba(255,255,255,0.08); }
+.logout-btn { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: rgba(255,255,255,0.4); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; transition: color 0.15s; }
+.logout-btn:hover { color: rgba(255,255,255,0.7); }
+
+/* MAIN LAYOUT */
+.main { margin-left: 240px; min-height: 100vh; }
+.page { display: none; }
+.page.active { display: block; }
+
+.section-header { padding: 40px 48px 28px; border-bottom: 1px solid var(--border); background: var(--cream); position: sticky; top: 0; z-index: 10; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.section-header-left .tag { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 8px; }
+.section-header-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 400; color: var(--soil); line-height: 1.15; }
+.section-content { padding: 36px 48px 80px; }
+
+/* STAT CARDS */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+.stat-card .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 8px; }
+.stat-card .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 500; color: var(--soil); line-height: 1; }
+.stat-card .stat-sub { font-size: 12px; color: var(--soil-hint); font-weight: 300; margin-top: 4px; }
+
+/* TABLES */
+.data-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.data-table th { padding: 12px 16px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; border-bottom: 1px solid var(--border); background: var(--warm-pale); }
+.data-table td { padding: 14px 16px; font-size: 13.5px; color: var(--soil); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr.clickable:hover td { background: var(--sage-pale); cursor: pointer; }
+.code-text { font-family: monospace; font-size: 13px; letter-spacing: 2px; font-weight: 600; color: var(--soil); }
+.badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 400; }
+.badge.active   { background: var(--sage-light); color: var(--sage); }
+.badge.inactive { background: var(--warm-light); color: var(--warm); }
+.badge.pending  { background: #fde8e8; color: #b94a48; }
+
+/* CLIENT DETAIL */
+.client-detail-header { padding: 24px 48px; border-bottom: 1px solid var(--border); background: var(--cream); display: flex; align-items: center; gap: 16px; }
+.back-btn { background: none; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 8px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--soil-muted); cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
+.back-btn:hover { border-color: var(--soil); color: var(--soil); }
+.client-detail-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: var(--soil); }
+.client-detail-meta { font-size: 13px; color: var(--soil-muted); font-weight: 300; margin-top: 2px; }
+
+/* TABS */
+.tab-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: #fff; padding: 0 48px; }
+.tab-btn { padding: 14px 20px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 400; color: var(--soil-muted); border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; transition: all 0.15s; margin-bottom: -1px; }
+.tab-btn:hover { color: var(--soil); }
+.tab-btn.active { color: var(--soil); border-bottom-color: var(--warm); font-weight: 500; }
+.tab-panel { display: none; padding: 36px 48px 80px; max-width: 920px; }
+.tab-panel.active { display: block; }
+
+/* INTAKE VIEWER */
+.intake-section-heading { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: var(--soil); margin: 32px 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.intake-field { margin-bottom: 20px; }
+.intake-field .intake-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-hint); font-weight: 400; margin-bottom: 5px; }
+.intake-field .intake-value { font-size: 14px; color: var(--soil); font-weight: 300; line-height: 1.65; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; min-height: 42px; white-space: pre-wrap; }
+.intake-field .intake-value.empty { color: var(--soil-hint); font-style: italic; }
+
+/* PROGRAMME BUILDER */
+.week-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.week-tab { padding: 8px 18px; border: 1px solid var(--border-strong); border-radius: 99px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; background: #fff; color: var(--soil-muted); transition: all 0.15s; }
+.week-tab:hover { border-color: var(--sage); color: var(--soil); }
+.week-tab.active { background: var(--soil); color: var(--cream); border-color: var(--soil); }
+.day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
+.day-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; }
+.day-card .day-name { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 8px; }
+.day-card select { width: 100%; border: 1px solid var(--border-strong); border-radius: 6px; padding: 6px 8px; font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--soil); background: var(--cream); margin-bottom: 6px; cursor: pointer; }
+.day-card select:focus { outline: none; border-color: var(--sage); }
+.day-card input[type="text"] { width: 100%; border: 1px solid var(--border-strong); border-radius: 6px; padding: 6px 8px; font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--soil); background: #fff; margin-bottom: 6px; }
+.day-card textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: 6px; padding: 7px 8px; font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--soil); background: #fff; resize: vertical; min-height: 90px; line-height: 1.5; }
+.day-card input:focus, .day-card textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 2px rgba(122,158,126,0.1); }
+
+/* MESSAGES */
+.message-feed { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 420px; overflow-y: auto; }
+.message-item { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; position: relative; }
+.message-item .msg-date { font-size: 11px; color: var(--soil-hint); font-weight: 300; margin-bottom: 4px; }
+.message-item .msg-text { font-size: 14px; color: var(--soil); font-weight: 300; line-height: 1.65; white-space: pre-wrap; }
+.message-item .msg-delete { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--soil-hint); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px; transition: color 0.15s; }
+.message-item .msg-delete:hover { color: #b94a48; }
+.compose-area { background: #fff; border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 20px 22px; }
+.compose-area h4 { font-size: 15px; font-weight: 500; margin-bottom: 12px; }
+.compose-area textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--soil); background: var(--cream); resize: vertical; min-height: 90px; line-height: 1.65; margin-bottom: 12px; }
+.compose-area textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.12); }
+
+/* NUTRITION */
+.nutrition-area textarea { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--soil); background: #fff; resize: vertical; min-height: 320px; line-height: 1.75; }
+.nutrition-area textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.12); }
+
+/* CODES */
+.new-code-form { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 28px; }
+.new-code-form h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: var(--soil); margin-bottom: 18px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.form-group label { font-size: 12px; font-weight: 500; color: var(--soil); margin-bottom: 6px; display: block; }
+.form-group input { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 13px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--soil); background: var(--cream); }
+.form-group input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.12); }
+
+/* SETTINGS */
+.settings-section { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 20px; }
+.settings-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; margin-bottom: 14px; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 400; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-primary { background: var(--soil); color: var(--cream); }
+.btn-primary:hover { background: #2a2420; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-sage { background: var(--sage); color: #fff; }
+.btn-sage:hover { background: #6a8e6e; }
+.btn-ghost { background: transparent; color: var(--soil-muted); border: 1px solid var(--border-strong); }
+.btn-ghost:hover { border-color: var(--soil); color: var(--soil); }
+.btn-danger { background: #fde8e8; color: #b94a48; border: 1px solid #f5c6c5; }
+.btn-danger:hover { background: #f5c6c5; }
+.btn-sm { padding: 6px 13px; font-size: 12px; }
+
+/* ACTIVITY */
+.activity-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); flex-shrink: 0; margin-top: 6px; }
+.activity-text { font-size: 13.5px; color: var(--soil); font-weight: 300; }
+.activity-time { font-size: 12px; color: var(--soil-hint); font-weight: 300; margin-top: 2px; }
+
+.empty-state { text-align: center; padding: 48px 24px; color: var(--soil-muted); }
+.empty-state p { font-size: 14px; font-weight: 300; }
+.save-status { font-size: 12px; color: var(--sage); opacity: 0; transition: opacity 0.3s; margin-left: 4px; }
+.save-status.visible { opacity: 1; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(61,53,48,0.15); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- ─── LOGIN ─────────────────────────────────────────────────────────── -->
+<div class="coach-login" id="coach-login">
+  <div class="login-card">
+    <div class="eyebrow">Coach Access</div>
+    <h1>Rooted in 40<br>Coach Dashboard</h1>
+    <p>Enter your coach password to manage clients, programmes, and access codes.</p>
+    <input class="login-input" type="password" id="coach-pw-input" placeholder="Coach password"
+      onkeydown="if(event.key==='Enter') coachLogin()">
+    <button class="login-btn" onclick="coachLogin()">Enter Dashboard →</button>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ─── APP ───────────────────────────────────────────────────────────── -->
+<div id="coach-app" style="display:none">
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="eyebrow">Rooted in 40</div>
+      <h1>The Rooted<br>Woman Method</h1>
+      <div class="coach-tag">Coach Dashboard</div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="nav-item active" onclick="showCoachPage('dashboard')" id="cnav-dashboard"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showCoachPage('clients')"   id="cnav-clients">  <span class="icon">👤</span> Clients</div>
+    <div class="nav-item" onclick="showCoachPage('codes')"     id="cnav-codes">    <span class="icon">🔑</span> Access Codes</div>
+    <div class="nav-item" onclick="showCoachPage('settings')"  id="cnav-settings"> <span class="icon">⚙️</span> Settings</div>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="coachLogout()">← Log out</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-header">
+        <div class="section-header-left">
+          <div class="tag">Overview</div>
+          <h2>Dashboard</h2>
+        </div>
+        <a href="rooted_woman_workbook.html" target="_blank" class="btn btn-ghost btn-sm">View client app ↗</a>
+      </div>
+      <div class="section-content">
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-label">Total Codes</div><div class="stat-value" id="stat-total">—</div><div class="stat-sub">access codes created</div></div>
+          <div class="stat-card"><div class="stat-label">Active Clients</div><div class="stat-value" id="stat-active">—</div><div class="stat-sub">logged in at least once</div></div>
+          <div class="stat-card"><div class="stat-label">Programmes</div><div class="stat-value" id="stat-programmes">—</div><div class="stat-sub">clients with a programme</div></div>
+          <div class="stat-card"><div class="stat-label">Messages Sent</div><div class="stat-value" id="stat-messages">—</div><div class="stat-sub">coach notes total</div></div>
+        </div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:16px">Recent activity</h3>
+        <div id="activity-feed"><div class="empty-state"><p>Loading…</p></div></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS LIST -->
+    <div class="page" id="page-clients">
+      <div class="section-header">
+        <div class="section-header-left"><div class="tag">Clients</div><h2>Your Clients</h2></div>
+        <button class="btn btn-primary" onclick="showCoachPage('codes')">+ New Access Code</button>
+      </div>
+      <div class="section-content">
+        <div id="clients-list-container"><div class="empty-state"><p>Loading clients…</p></div></div>
+      </div>
+    </div>
+
+    <!-- CLIENT DETAIL -->
+    <div class="page" id="page-client-detail">
+      <div class="client-detail-header">
+        <button class="back-btn" onclick="showCoachPage('clients')">← Back</button>
+        <div>
+          <div class="client-detail-name" id="detail-client-name">Client</div>
+          <div class="client-detail-meta" id="detail-client-meta"></div>
+        </div>
+      </div>
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="showClientTab('intake')"    id="ctab-intake">Intake Form</button>
+        <button class="tab-btn"        onclick="showClientTab('programme')" id="ctab-programme">Programme</button>
+        <button class="tab-btn"        onclick="showClientTab('messages')"  id="ctab-messages">Messages</button>
+        <button class="tab-btn"        onclick="showClientTab('nutrition')" id="ctab-nutrition">Nutrition</button>
+      </div>
+
+      <!-- Intake -->
+      <div class="tab-panel active" id="ctabp-intake">
+        <div id="intake-viewer"><div class="empty-state"><p>Loading…</p></div></div>
+      </div>
+
+      <!-- Programme -->
+      <div class="tab-panel" id="ctabp-programme">
+        <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:20px">Build a 5-week training schedule for this client. They will see their current week in their workbook.</p>
+        <div class="week-tabs" id="week-tabs"></div>
+        <div class="day-grid" id="day-grid"></div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="btn btn-primary" id="prog-save-btn" onclick="saveProgramme()">Save programme</button>
+          <span class="save-status" id="prog-save-status">✓ Saved</span>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="tab-panel" id="ctabp-messages">
+        <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:20px">Messages appear on the client's welcome page after they log in.</p>
+        <div class="message-feed" id="message-feed"><div class="empty-state"><p>No messages yet.</p></div></div>
+        <div class="compose-area">
+          <h4>New message</h4>
+          <textarea id="message-input" placeholder="Write a note or message for your client…"></textarea>
+          <button class="btn btn-primary" onclick="sendCoachMessage()">Send →</button>
+        </div>
+      </div>
+
+      <!-- Nutrition -->
+      <div class="tab-panel" id="ctabp-nutrition">
+        <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:20px">Custom nutrition notes for this client. They will see this in their Nutrition Guide section.</p>
+        <div class="nutrition-area">
+          <textarea id="nutrition-input" placeholder="Custom nutrition notes…&#10;&#10;e.g.&#10;Protein goal: 120g/day&#10;Breakfast: ...&#10;Lunch: ...&#10;Dinner: ...&#10;Snacks: ..."></textarea>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:14px">
+          <button class="btn btn-primary" onclick="saveNutrition()">Save nutrition</button>
+          <span class="save-status" id="nutr-save-status">✓ Saved</span>
+        </div>
+      </div>
+    </div><!-- /client-detail -->
+
+    <!-- ACCESS CODES -->
+    <div class="page" id="page-codes">
+      <div class="section-header">
+        <div class="section-header-left"><div class="tag">Access</div><h2>Access Codes</h2></div>
+      </div>
+      <div class="section-content">
+        <div id="codes-table-container" style="margin-bottom:32px"><div class="empty-state"><p>Loading…</p></div></div>
+        <div class="new-code-form">
+          <h3>Create a new code</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Client name</label>
+              <input type="text" id="new-code-name" placeholder="e.g. Maria">
+            </div>
+            <div class="form-group">
+              <label>Code <span style="font-size:11px;color:var(--soil-hint)">(leave blank to auto-generate)</span></label>
+              <input type="text" id="new-code-value" placeholder="e.g. MARIA2025" style="text-transform:uppercase;letter-spacing:1px">
+            </div>
+            <button class="btn btn-primary" onclick="saveNewCode()" style="height:42px;align-self:end">Create →</button>
+          </div>
+          <div id="new-code-error" style="margin-top:10px;font-size:13px;color:#b94a48;display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="section-header">
+        <div class="section-header-left"><div class="tag">Settings</div><h2>Settings</h2></div>
+      </div>
+      <div class="section-content">
+        <div class="settings-section">
+          <h3>Change coach password</h3>
+          <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;margin-bottom:18px">Default password is <strong>SHADEY2025</strong>. Change it here once you're set up.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end">
+            <div class="form-group"><label>New password</label><input type="password" id="new-pw" placeholder="New password"></div>
+            <div class="form-group"><label>Confirm password</label><input type="password" id="confirm-pw" placeholder="Confirm"></div>
+            <button class="btn btn-primary" onclick="saveCoachPassword()" style="height:42px;align-self:end">Save</button>
+          </div>
+          <div id="pw-status" style="margin-top:10px;font-size:13px;display:none"></div>
+        </div>
+        <div class="settings-section">
+          <h3>About</h3>
+          <p style="font-size:13.5px;color:var(--soil-muted);font-weight:300;line-height:1.75">
+            Rooted in 40 — Coach Dashboard<br>
+            Client workbook: <a href="rooted_woman_workbook.html" style="color:var(--sage)">rooted_woman_workbook.html</a><br>
+            Firebase project: <code style="background:var(--warm-pale);padding:1px 6px;border-radius:4px;font-size:13px">rooted-in-40</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .main -->
+</div><!-- #coach-app -->
+
+<script>
+// ─── FIREBASE ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAZuVfKnZcGzS7N3uJT_JGdFsk3flwZNPM",
+  authDomain: "rooted-in-40.firebaseapp.com",
+  databaseURL: "https://rooted-in-40-default-rtdb.firebaseio.com",
+  projectId: "rooted-in-40",
+  storageBucket: "rooted-in-40.firebasestorage.app",
+  messagingSenderId: "898334778171",
+  appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const DEFAULT_COACH_PW = 'SHADEY2025';
+const COACH_PAGES = ['dashboard','clients','client-detail','codes','settings'];
+const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+const DAY_LABELS = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' };
+const SESSION_TYPES = ['Rest','Training','Upper Body','Lower Body','Full Body','Cardio','Active Recovery','Stretching'];
+
+let currentClientCode = null;
+let currentWeek = 1;
+let progData = {};
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function coachLogin() {
+  const input   = document.getElementById('coach-pw-input');
+  const errorEl = document.getElementById('login-error');
+  const pw = input.value;
+  let storedPw = DEFAULT_COACH_PW;
+  try {
+    const snap = await db.ref('coach/password').once('value');
+    if (snap.val()) storedPw = snap.val();
+  } catch(e) {}
+  if (pw === storedPw) {
+    sessionStorage.setItem('coach-auth','1');
+    document.getElementById('coach-login').style.display = 'none';
+    document.getElementById('coach-app').style.display = 'block';
+    loadDashboard();
+  } else {
+    errorEl.classList.add('visible');
+    input.classList.add('error');
+    input.select();
+  }
+}
+
+function checkCoachSession() {
+  if (sessionStorage.getItem('coach-auth') === '1') {
+    document.getElementById('coach-login').style.display = 'none';
+    document.getElementById('coach-app').style.display = 'block';
+    loadDashboard();
+  }
+}
+
+function coachLogout() {
+  sessionStorage.removeItem('coach-auth');
+  location.reload();
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function showCoachPage(id) {
+  COACH_PAGES.forEach(p => {
+    document.getElementById('page-'+p)?.classList.remove('active');
+    document.getElementById('cnav-'+p)?.classList.remove('active');
+  });
+  document.getElementById('page-'+id)?.classList.add('active');
+  document.getElementById('cnav-'+id)?.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (id === 'clients')   loadClients();
+  if (id === 'codes')     loadCodes();
+  if (id === 'dashboard') loadDashboard();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [codesSnap, clientsSnap, progsSnap, msgsSnap] = await Promise.all([
+      db.ref('coach/codes').once('value'),
+      db.ref('clients').once('value'),
+      db.ref('programmes').once('value'),
+      db.ref('messages').once('value')
+    ]);
+    const codes   = codesSnap.val()   || {};
+    const clients = clientsSnap.val() || {};
+    const progs   = progsSnap.val()   || {};
+    const msgs    = msgsSnap.val()    || {};
+    let msgCount = 0;
+    Object.values(msgs).forEach(m => { msgCount += Object.keys(m).length; });
+
+    document.getElementById('stat-total').textContent      = Object.keys(codes).length;
+    document.getElementById('stat-active').textContent     = Object.keys(clients).length;
+    document.getElementById('stat-programmes').textContent = Object.keys(progs).length;
+    document.getElementById('stat-messages').textContent   = msgCount;
+
+    const activities = [];
+    Object.entries(clients).forEach(([code, data]) => {
+      const name = data.profile?.name || code;
+      if (data.profile?.createdAt)  activities.push({ text: `${name} joined the programme`, time: data.profile.createdAt });
+      if (data.profile?.lastSeen)   activities.push({ text: `${name} was last seen`, time: data.profile.lastSeen });
+    });
+    activities.sort((a,b) => b.time - a.time);
+
+    const feed = document.getElementById('activity-feed');
+    if (!activities.length) {
+      feed.innerHTML = '<div class="empty-state"><p>No activity yet. Share access codes with your clients to get started.</p></div>';
+    } else {
+      feed.innerHTML = activities.slice(0,10).map(a => `
+        <div class="activity-item">
+          <div class="activity-dot"></div>
+          <div>
+            <div class="activity-text">${escHtml(a.text)}</div>
+            <div class="activity-time">${formatTime(a.time)}</div>
+          </div>
+        </div>`).join('');
+    }
+  } catch(e) { console.error('Dashboard error:', e); }
+}
+
+// ─── CLIENTS ──────────────────────────────────────────────────────────────────
+async function loadClients() {
+  const container = document.getElementById('clients-list-container');
+  container.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try {
+    const [codesSnap, clientsSnap] = await Promise.all([
+      db.ref('coach/codes').once('value'),
+      db.ref('clients').once('value')
+    ]);
+    const codes   = codesSnap.val()   || {};
+    const clients = clientsSnap.val() || {};
+
+    if (!Object.keys(codes).length) {
+      container.innerHTML = '<div class="empty-state"><p>No access codes yet. Create codes to invite clients.</p></div>';
+      return;
+    }
+
+    const rows = Object.entries(codes).map(([code, info]) => {
+      const client   = clients[code];
+      const name     = client?.profile?.name || info.name || '—';
+      const whatsapp = client?.profile?.whatsapp || '—';
+      const lastSeen = client?.profile?.lastSeen ? formatTime(client.profile.lastSeen) : 'Never';
+      const joined   = !!client;
+      const status   = !info.active ? 'inactive' : (joined ? 'active' : 'pending');
+      const labels   = { active:'Active', inactive:'Inactive', pending:'Not joined yet' };
+      return `<tr class="clickable" onclick="viewClient('${code}')">
+        <td><strong>${escHtml(name)}</strong></td>
+        <td><span class="code-text">${code}</span></td>
+        <td>${escHtml(whatsapp)}</td>
+        <td><span class="badge ${status}">${labels[status]}</span></td>
+        <td>${lastSeen}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewClient('${code}')">View →</button></td>
+      </tr>`;
+    });
+
+    container.innerHTML = `<table class="data-table">
+      <thead><tr><th>Name</th><th>Code</th><th>WhatsApp</th><th>Status</th><th>Last seen</th><th></th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>`;
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state"><p>Error loading clients.</p></div>';
+    console.error(e);
+  }
+}
+
+// ─── CLIENT DETAIL ────────────────────────────────────────────────────────────
+async function viewClient(code) {
+  currentClientCode = code;
+  progData = {};
+  currentWeek = 1;
+  showCoachPage('client-detail');
+  try {
+    const [codeSnap, clientSnap] = await Promise.all([
+      db.ref('coach/codes/'+code).once('value'),
+      db.ref('clients/'+code).once('value')
+    ]);
+    const info   = codeSnap.val()   || {};
+    const client = clientSnap.val() || {};
+    const name   = client?.profile?.name || info.name || code;
+    const parts  = [
+      client?.profile?.whatsapp ? '📱 ' + client.profile.whatsapp : null,
+      client?.profile?.lastSeen ? 'Last seen ' + formatTime(client.profile.lastSeen) : 'Never logged in'
+    ].filter(Boolean);
+    document.getElementById('detail-client-name').textContent = name;
+    document.getElementById('detail-client-meta').textContent = parts.join(' · ');
+  } catch(e) {}
+  showClientTab('intake');
+}
+
+function showClientTab(tab) {
+  ['intake','programme','messages','nutrition'].forEach(t => {
+    document.getElementById('ctab-'+t)?.classList.remove('active');
+    document.getElementById('ctabp-'+t)?.classList.remove('active');
+  });
+  document.getElementById('ctab-'+tab)?.classList.add('active');
+  document.getElementById('ctabp-'+tab)?.classList.add('active');
+  if (tab === 'intake')     loadClientIntake(currentClientCode);
+  if (tab === 'programme')  loadClientProgramme(currentClientCode);
+  if (tab === 'messages')   loadClientMessages(currentClientCode);
+  if (tab === 'nutrition')  loadClientNutrition(currentClientCode);
+}
+
+// ── INTAKE
+const INTAKE_FIELDS = [
+  {section:'Profile'},
+  {key:'i-name',label:'Full name'},{key:'i-dob',label:'Date of birth'},{key:'i-occ',label:'Occupation'},
+  {key:'i-wa',label:'WhatsApp'},{key:'i-referral',label:'How they heard about Rooted in 40'},
+  {section:'A — Starting Point'},
+  {key:'a-body',label:'Relationship with body'},{key:'a-week',label:'Typical week'},
+  {key:'a-sleep',label:'Sleep hours'},{key:'a-challenge',label:'Biggest challenge'},
+  {section:'B — Training History'},
+  {key:'b-history',label:'Training history'},{key:'b-injury',label:'Injuries / pain'},{key:'b-medical',label:'Medical conditions'},
+  {section:'C — Goals'},
+  {key:'c-goal',label:'Goals for 40 days'},{key:'c-why',label:'Why this is important now'},
+  {key:'c-blocker',label:'What stopped them before'},{key:'c-success',label:'Success at Day 40'},{key:'c-feel',label:'How they will feel'},
+  {section:'D — Schedule'},
+  {key:'d-prog-detail',label:'Programme preference detail'},
+  {section:'E — Lifestyle'},
+  {key:'e-supps',label:'Supplements / vitamins'},
+  {section:'F — Mindset'},
+  {key:'f-commit',label:'How they feel about committing'},{key:'f-story',label:'Consistency story'},{key:'f-friend',label:'Advice to a friend'},{key:'f-support',label:'What would help'},
+  {section:'G — Anything else'},
+  {key:'g-extra',label:'Anything else'}
+];
+
+async function loadClientIntake(code) {
+  const viewer = document.getElementById('intake-viewer');
+  viewer.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try {
+    const snap = await db.ref('clients/'+code+'/data').once('value');
+    const data = snap.val() || {};
+    let html = '', hasAny = false;
+    INTAKE_FIELDS.forEach(f => {
+      if (f.section) {
+        html += `<div class="intake-section-heading">${f.section}</div>`;
+      } else {
+        const val = data[f.key];
+        const display = val && String(val).trim() ? String(val) : null;
+        if (display) hasAny = true;
+        html += `<div class="intake-field">
+          <div class="intake-label">${f.label}</div>
+          <div class="intake-value${display?'':' empty'}">${display ? escHtml(display) : 'Not answered'}</div>
+        </div>`;
+      }
+    });
+    viewer.innerHTML = hasAny ? html : '<div class="empty-state"><p>This client has not filled in their intake form yet.</p></div>';
+  } catch(e) {
+    viewer.innerHTML = '<div class="empty-state"><p>Error loading intake data.</p></div>';
+    console.error(e);
+  }
+}
+
+// ── PROGRAMME
+function buildWeekTabs() {
+  const el = document.getElementById('week-tabs');
+  el.innerHTML = '';
+  for (let w=1; w<=5; w++) {
+    const btn = document.createElement('button');
+    btn.className = 'week-tab' + (w===currentWeek?' active':'');
+    btn.textContent = 'Week '+w;
+    btn.onclick = () => { currentWeek=w; buildWeekTabs(); buildDayGrid(); };
+    el.appendChild(btn);
+  }
+}
+
+function buildDayGrid() {
+  const grid = document.getElementById('day-grid');
+  grid.innerHTML = '';
+  const weekData = progData['week'+currentWeek] || {};
+  DAYS.forEach(day => {
+    const d = weekData[day] || {};
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-name">${DAY_LABELS[day]}</div>
+      <select id="pd-${day}-type" onchange="updateProgData()">
+        ${SESSION_TYPES.map(t=>`<option value="${t}"${d.type===t?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <input type="text" id="pd-${day}-title" placeholder="Session name" value="${escAttr(d.title||'')}" oninput="updateProgData()">
+      <textarea id="pd-${day}-notes" placeholder="Exercises / notes…" oninput="updateProgData()">${escHtml(d.notes||'')}</textarea>`;
+    grid.appendChild(card);
+  });
+}
+
+function updateProgData() {
+  const wk = 'week'+currentWeek;
+  if (!progData[wk]) progData[wk] = {};
+  DAYS.forEach(day => {
+    progData[wk][day] = {
+      type:  document.getElementById('pd-'+day+'-type')?.value  || 'Rest',
+      title: document.getElementById('pd-'+day+'-title')?.value || '',
+      notes: document.getElementById('pd-'+day+'-notes')?.value || ''
+    };
+  });
+}
+
+async function loadClientProgramme(code) {
+  buildWeekTabs();
+  try {
+    const snap = await db.ref('programmes/'+code).once('value');
+    progData = snap.val() || {};
+  } catch(e) { progData = {}; }
+  buildDayGrid();
+}
+
+async function saveProgramme() {
+  if (!currentClientCode) return;
+  updateProgData();
+  const btn    = document.getElementById('prog-save-btn');
+  const status = document.getElementById('prog-save-status');
+  btn.disabled = true;
+  try {
+    await db.ref('programmes/'+currentClientCode).set(progData);
+    status.classList.add('visible');
+    setTimeout(() => status.classList.remove('visible'), 2500);
+  } catch(e) { alert('Error saving: ' + e.message); }
+  btn.disabled = false;
+}
+
+// ── MESSAGES
+async function loadClientMessages(code) {
+  const feed = document.getElementById('message-feed');
+  feed.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try {
+    const snap = await db.ref('messages/'+code).once('value');
+    const msgs = snap.val() || {};
+    const list = Object.entries(msgs).sort((a,b) => b[1].time - a[1].time);
+    feed.innerHTML = list.length
+      ? list.map(([key, m]) => `
+          <div class="message-item">
+            <div class="msg-date">${formatTime(m.time)}</div>
+            <div class="msg-text">${escHtml(m.text)}</div>
+            <button class="msg-delete" onclick="deleteMessage('${code}','${key}')" title="Delete">×</button>
+          </div>`).join('')
+      : '<div class="empty-state"><p>No messages yet.</p></div>';
+  } catch(e) {
+    feed.innerHTML = '<div class="empty-state"><p>Error loading messages.</p></div>';
+  }
+}
+
+async function sendCoachMessage() {
+  const input = document.getElementById('message-input');
+  const text  = input.value.trim();
+  if (!text || !currentClientCode) return;
+  try {
+    await db.ref('messages/'+currentClientCode).push({ text, from:'coach', time: Date.now() });
+    input.value = '';
+    loadClientMessages(currentClientCode);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteMessage(code, key) {
+  if (!confirm('Delete this message?')) return;
+  try {
+    await db.ref('messages/'+code+'/'+key).remove();
+    loadClientMessages(code);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── NUTRITION
+async function loadClientNutrition(code) {
+  const el = document.getElementById('nutrition-input');
+  try {
+    const snap = await db.ref('nutrition/'+code).once('value');
+    el.value = snap.val()?.notes || '';
+  } catch(e) { el.value = ''; }
+}
+
+async function saveNutrition() {
+  if (!currentClientCode) return;
+  const status = document.getElementById('nutr-save-status');
+  try {
+    await db.ref('nutrition/'+currentClientCode).set({ notes: document.getElementById('nutrition-input').value });
+    status.classList.add('visible');
+    setTimeout(() => status.classList.remove('visible'), 2500);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── ACCESS CODES ─────────────────────────────────────────────────────────────
+async function loadCodes() {
+  const container = document.getElementById('codes-table-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><p>Loading…</p></div>';
+  try {
+    const snap = await db.ref('coach/codes').once('value');
+    let codes = snap.val() || {};
+    if (!Object.keys(codes).length) {
+      await db.ref('coach/codes/ROOTED40').set({ active:true, name:'General', createdAt: Date.now() });
+      const snap2 = await db.ref('coach/codes').once('value');
+      codes = snap2.val() || {};
+    }
+    const rows = Object.entries(codes).map(([code, info]) => `
+      <tr>
+        <td><span class="code-text">${code}</span></td>
+        <td>${escHtml(info.name||'—')}</td>
+        <td>${info.createdAt ? formatDate(info.createdAt) : '—'}</td>
+        <td><span class="badge ${info.active?'active':'inactive'}">${info.active?'Active':'Inactive'}</span></td>
+        <td style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="toggleCode('${code}',${!info.active})">${info.active?'Deactivate':'Activate'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCode('${code}')">Delete</button>
+        </td>
+      </tr>`);
+    container.innerHTML = `<table class="data-table">
+      <thead><tr><th>Code</th><th>Client name</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>`;
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state"><p>Error loading codes.</p></div>';
+    console.error(e);
+  }
+}
+
+async function saveNewCode() {
+  const nameInput = document.getElementById('new-code-name');
+  const codeInput = document.getElementById('new-code-value');
+  const errorEl   = document.getElementById('new-code-error');
+  const name = nameInput.value.trim();
+  let code = codeInput.value.trim().toUpperCase().replace(/\s+/g,'');
+  errorEl.style.display = 'none';
+  if (!name) { errorEl.textContent='Please enter a client name.'; errorEl.style.display='block'; return; }
+  if (!code) {
+    const base = name.toUpperCase().replace(/[^A-Z]/g,'').slice(0,5);
+    code = base + Math.floor(1000+Math.random()*9000);
+  }
+  const snap = await db.ref('coach/codes/'+code).once('value');
+  if (snap.exists()) { errorEl.textContent='That code already exists. Choose a different one.'; errorEl.style.display='block'; return; }
+  await db.ref('coach/codes/'+code).set({ active:true, name, createdAt: Date.now() });
+  nameInput.value = '';
+  codeInput.value = '';
+  loadCodes();
+}
+
+async function toggleCode(code, active) {
+  await db.ref('coach/codes/'+code+'/active').set(active);
+  loadCodes();
+}
+
+async function deleteCode(code) {
+  if (!confirm(`Delete code "${code}"? This cannot be undone.`)) return;
+  await db.ref('coach/codes/'+code).remove();
+  loadCodes();
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
+async function saveCoachPassword() {
+  const pw1    = document.getElementById('new-pw').value;
+  const pw2    = document.getElementById('confirm-pw').value;
+  const status = document.getElementById('pw-status');
+  if (!pw1) { status.textContent='Please enter a new password.'; status.style.color='#b94a48'; status.style.display='block'; return; }
+  if (pw1 !== pw2) { status.textContent='Passwords do not match.'; status.style.color='#b94a48'; status.style.display='block'; return; }
+  await db.ref('coach/password').set(pw1);
+  status.textContent = '✓ Password updated. Use it next time you log in.';
+  status.style.color = 'var(--sage)';
+  status.style.display = 'block';
+  document.getElementById('new-pw').value = '';
+  document.getElementById('confirm-pw').value = '';
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function formatTime(ts) {
+  if (!ts) return '—';
+  const diff = Date.now() - ts;
+  if (diff < 60000)    return 'Just now';
+  if (diff < 3600000)  return Math.floor(diff/60000)   + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000)  + 'h ago';
+  if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago';
+  return new Date(ts).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+function escAttr(str) {
+  return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+checkCoachSession();
+</script>
+</body>
+</html>

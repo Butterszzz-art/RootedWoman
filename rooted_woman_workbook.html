@@ -6,6 +6,8 @@
 <title>The Rooted Woman Method</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
   :root {
     --sage: #7a9e7e;
@@ -1292,6 +1294,9 @@
         </div>
         <button class="btn-save" onclick="exportData()">↓ Export answers</button>
       </div>
+
+      <!-- Coach content: messages + programme (shown after unlock if Shadey has added content) -->
+      <div id="coach-content" style="display:none;margin-top:32px"></div>
     </div>
   </div>
 
@@ -2312,6 +2317,23 @@
 </div>
 
 <script>
+// ─── FIREBASE ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAZuVfKnZcGzS7N3uJT_JGdFsk3flwZNPM",
+  authDomain: "rooted-in-40.firebaseapp.com",
+  databaseURL: "https://rooted-in-40-default-rtdb.firebaseio.com",
+  projectId: "rooted-in-40",
+  storageBucket: "rooted-in-40.firebasestorage.app",
+  messagingSenderId: "898334778171",
+  appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
+};
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+} catch(e) { console.warn('Firebase init failed, offline mode:', e); }
+
+// ─── APP STATE ────────────────────────────────────────────────────────────────
 const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition'];
 const FREE_PAGES   = ['welcome','programme'];
 const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition'];
@@ -2320,28 +2342,182 @@ const ACCESS_CODE = 'ROOTED40';
 
 let isUnlocked  = false;
 let pendingPage = null;
+let clientCode  = null;
 
-function tryUnlock() {
+// ─── FIREBASE HELPERS ─────────────────────────────────────────────────────────
+async function registerClient(code) {
+  if (!db) return;
+  try {
+    const ref  = db.ref('clients/'+code+'/profile');
+    const snap = await ref.once('value');
+    const updates = { lastSeen: Date.now() };
+    if (!snap.val()?.createdAt) updates.createdAt = Date.now();
+    const name = localStorage.getItem('rwm-i-name');
+    const wa   = localStorage.getItem('rwm-i-wa');
+    if (name) updates.name = name;
+    if (wa)   updates.whatsapp = wa;
+    await ref.update(updates);
+  } catch(e) {}
+}
+
+let syncTimer = null;
+function syncToFirebase() {
+  if (!db || !clientCode) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    const textIds = [
+      'i-name','i-dob','i-occ','i-wa','i-referral',
+      'a-body','a-week','a-sleep','a-challenge',
+      'b-history','b-injury','b-medical',
+      'c-goal','c-why','c-blocker','c-success','c-feel',
+      'd-prog-detail','e-supps','f-commit','f-story','f-friend','f-support','g-extra',
+      'l1-selfimage','l1-story','l1-evidence-for','l1-evidence-against','l1-free',
+      'l1-vision','l1-words','l1-stopped','l1-consistent','l1-declaration','l1-declaration-time',
+      'l2-body-move','l2-body-fuel','l2-body-rest',
+      'l2-mind-stillness','l2-mind-intention','l2-mind-learning',
+      'l2-soul-practice','l2-soul-meaning','l2-soul-community',
+      'anc-1','anc-2','anc-3','anc-4','anc-5',
+      'l3-slide-trigger','l3-anchor-slipped','l3-told-myself','l3-need','l3-bestfriend',
+      'l3-first-anchor','l3-ritual','l3-accountability',
+      'cov-name','cov-anchor','cov-signed','cov-date',
+      'm1-strongest','m1-hardest','m1-proud','m1-different',
+      'm2-strongest','m2-hardest','m2-proud','m2-different',
+      'm3-strongest','m3-hardest','m3-proud','m3-different'
+    ];
+    const data = {};
+    textIds.forEach(id => {
+      const val = localStorage.getItem('rwm-'+id);
+      if (val && val.trim()) data[id] = val;
+    });
+    // Also update profile name/whatsapp when those fields are filled in
+    const name = data['i-name'], wa = data['i-wa'];
+    try {
+      await db.ref('clients/'+clientCode+'/data').update(data);
+      const profileUpdates = { lastSeen: Date.now() };
+      if (name) profileUpdates.name = name;
+      if (wa)   profileUpdates.whatsapp = wa;
+      await db.ref('clients/'+clientCode+'/profile').update(profileUpdates);
+    } catch(e) {}
+  }, 2000);
+}
+
+async function loadFromFirebase(code) {
+  if (!db) return;
+  try {
+    const snap = await db.ref('clients/'+code+'/data').once('value');
+    const data = snap.val() || {};
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) {
+        el.value = val;
+        localStorage.setItem('rwm-'+id, val);
+      }
+    });
+  } catch(e) {}
+}
+
+async function loadCoachContent(code) {
+  if (!db) return;
+  const container = document.getElementById('coach-content');
+  if (!container) return;
+  try {
+    const [msgsSnap, progSnap, profileSnap] = await Promise.all([
+      db.ref('messages/'+code).once('value'),
+      db.ref('programmes/'+code).once('value'),
+      db.ref('clients/'+code+'/profile').once('value')
+    ]);
+    const msgs    = msgsSnap.val()    || {};
+    const prog    = progSnap.val()    || {};
+    const profile = profileSnap.val() || {};
+
+    const msgList = Object.values(msgs).sort((a,b) => b.time - a.time).slice(0,3);
+    const hasMsgs = msgList.length > 0;
+
+    // Calculate current week
+    const createdAt = profile.createdAt || Date.now();
+    const daysSince = Math.floor((Date.now() - createdAt) / 86400000);
+    const week = Math.min(Math.max(Math.floor(daysSince/7)+1, 1), 5);
+    const weekData = prog['week'+week] || {};
+    const hasProg = Object.keys(weekData).length > 0;
+
+    if (!hasMsgs && !hasProg) { container.style.display = 'none'; return; }
+
+    const dayNames = ['mon','tue','wed','thu','fri','sat','sun'];
+    const dayLabels = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' };
+
+    let html = '';
+
+    if (hasMsgs) {
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:20px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);font-weight:400;margin-bottom:10px">From your coach</div>
+        ${msgList.map(m => `<div style="font-size:14px;color:var(--soil);font-weight:300;line-height:1.7;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">${escHtmlClient(m.text)}</div>`).join('')}
+      </div>`;
+    }
+
+    if (hasProg) {
+      const days = dayNames.map(day => {
+        const d = weekData[day];
+        if (!d || d.type === 'Rest') return `<div style="background:var(--warm-pale);border:1px solid var(--warm-light);border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);margin-bottom:4px">${dayLabels[day]}</div><div style="font-size:12px;color:var(--soil-hint)">Rest</div></div>`;
+        return `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);margin-bottom:4px">${dayLabels[day]}</div><div style="font-size:12px;font-weight:500;color:var(--soil);margin-bottom:4px">${escHtmlClient(d.title||d.type)}</div>${d.notes?`<div style="font-size:11px;color:var(--soil-muted);font-weight:300;white-space:pre-line;line-height:1.5">${escHtmlClient(d.notes)}</div>`:''}`;
+      }).join('');
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);font-weight:400;margin-bottom:6px">Your programme</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--soil);margin-bottom:16px">Week ${week}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days}</div>
+      </div>`;
+    }
+
+    container.innerHTML = html;
+    container.style.display = 'block';
+  } catch(e) { console.warn('Coach content load error:', e); }
+}
+
+function escHtmlClient(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+async function tryUnlock() {
   const input   = document.getElementById('unlock-input');
   const errorEl = document.getElementById('unlock-error');
   const paywall = document.getElementById('paywall');
+  const unlockBtn = document.querySelector('.unlock-row button');
 
   if (!input || !errorEl || !paywall) return;
 
   const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
+  if (!val) return;
 
-  if (val === ACCESS_CODE) {
-    try { localStorage.setItem('rwm-unlocked', '1'); } catch(e) {}
+  // Check hardcoded code first (works offline)
+  let valid = (val === ACCESS_CODE);
+
+  // Also check Firebase for dynamic per-client codes
+  if (!valid && db) {
+    try {
+      if (unlockBtn) { unlockBtn.textContent = 'Checking…'; unlockBtn.disabled = true; }
+      const snap = await db.ref('coach/codes/'+val).once('value');
+      const codeData = snap.val();
+      if (codeData && codeData.active) valid = true;
+    } catch(e) {}
+    if (unlockBtn) { unlockBtn.textContent = 'Unlock →'; unlockBtn.disabled = false; }
+  }
+
+  if (valid) {
+    clientCode = val;
+    try {
+      localStorage.setItem('rwm-unlocked', '1');
+      localStorage.setItem('rwm-client-code', val);
+    } catch(e) {}
     isUnlocked = true;
     input.classList.remove('error');
     errorEl.classList.remove('visible');
     paywall.style.display = 'none';
-    // Remove lock indicators from nav
     LOCKED_PAGES.forEach(p => {
       const nav = document.getElementById('nav-'+p);
       if (nav) nav.classList.remove('gated');
     });
-    // Navigate to the page that triggered the paywall, or welcome
+    registerClient(val);
+    loadFromFirebase(val).then(() => updateProgress());
+    loadCoachContent(val);
     const dest = pendingPage || 'welcome';
     pendingPage = null;
     showPage(dest);
@@ -2356,13 +2532,17 @@ function tryUnlock() {
 function checkUnlock() {
   try {
     isUnlocked = localStorage.getItem('rwm-unlocked') === '1';
+    clientCode = localStorage.getItem('rwm-client-code') || null;
   } catch(e) {}
   if (!isUnlocked) {
-    // Mark locked nav items
     LOCKED_PAGES.forEach(p => {
       const nav = document.getElementById('nav-'+p);
       if (nav) nav.classList.add('gated');
     });
+  } else if (clientCode) {
+    // Already unlocked from a previous visit — load coach content
+    registerClient(clientCode);
+    loadCoachContent(clientCode);
   }
 }
 
@@ -2707,6 +2887,7 @@ function autosave() {
   });
 
   updateProgress();
+  syncToFirebase();
 }
 
 function saveSection(section) {
