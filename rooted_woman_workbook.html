@@ -1069,6 +1069,17 @@
 
   .unlock-error.visible { display: block; }
 
+  /* LOCKED NAV ITEMS */
+  .nav-item.gated {
+    opacity: 0.5;
+  }
+  .nav-item.gated::after {
+    content: '🔒';
+    font-size: 10px;
+    margin-left: auto;
+    opacity: 0.6;
+  }
+
   /* SCROLLBAR */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -1086,9 +1097,10 @@
 </head>
 <body>
 
-<div class="paywall" id="paywall">
+<div class="paywall" id="paywall" style="display:none">
 
   <div class="paywall-hero">
+    <button onclick="closePaywall()" style="position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.12);border:none;color:rgba(255,255,255,0.7);font-size:22px;line-height:1;cursor:pointer;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'" title="Back to overview">×</button>
     <div class="eyebrow">Rooted in 40 · 40-day programme</div>
     <h1>For Women Who Are<br>Done Starting Over</h1>
     <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
@@ -2301,11 +2313,16 @@
 
 <script>
 const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition'];
+const FREE_PAGES   = ['welcome','programme'];
+const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition'];
 const COACH_EMAIL = 'shadeybahali@gmail.com';
 const ACCESS_CODE = 'ROOTED40';
 
+let isUnlocked  = false;
+let pendingPage = null;
+
 function tryUnlock() {
-  const input = document.getElementById('unlock-input');
+  const input   = document.getElementById('unlock-input');
   const errorEl = document.getElementById('unlock-error');
   const paywall = document.getElementById('paywall');
 
@@ -2315,9 +2332,19 @@ function tryUnlock() {
 
   if (val === ACCESS_CODE) {
     try { localStorage.setItem('rwm-unlocked', '1'); } catch(e) {}
+    isUnlocked = true;
     input.classList.remove('error');
     errorEl.classList.remove('visible');
     paywall.style.display = 'none';
+    // Remove lock indicators from nav
+    LOCKED_PAGES.forEach(p => {
+      const nav = document.getElementById('nav-'+p);
+      if (nav) nav.classList.remove('gated');
+    });
+    // Navigate to the page that triggered the paywall, or welcome
+    const dest = pendingPage || 'welcome';
+    pendingPage = null;
+    showPage(dest);
   } else {
     input.classList.add('error');
     errorEl.classList.add('visible');
@@ -2328,11 +2355,24 @@ function tryUnlock() {
 
 function checkUnlock() {
   try {
-    if (localStorage.getItem('rwm-unlocked') === '1') {
-      const paywall = document.getElementById('paywall');
-      if (paywall) paywall.style.display = 'none';
-    }
+    isUnlocked = localStorage.getItem('rwm-unlocked') === '1';
   } catch(e) {}
+  if (!isUnlocked) {
+    // Mark locked nav items
+    LOCKED_PAGES.forEach(p => {
+      const nav = document.getElementById('nav-'+p);
+      if (nav) nav.classList.add('gated');
+    });
+  }
+}
+
+function closePaywall() {
+  const paywall = document.getElementById('paywall');
+  if (paywall) paywall.style.display = 'none';
+  pendingPage = null;
+  // Make sure a free page is active
+  const active = PAGES.find(p => document.getElementById('page-'+p)?.classList.contains('active'));
+  if (!active || LOCKED_PAGES.includes(active)) showPage('welcome');
 }
 
 
@@ -2523,6 +2563,14 @@ function showEmailJSGuide() {
 
 
 function showPage(id) {
+  // Gate locked pages for non-unlocked users
+  if (!isUnlocked && LOCKED_PAGES.includes(id)) {
+    pendingPage = id;
+    const paywall = document.getElementById('paywall');
+    if (paywall) paywall.style.display = 'flex';
+    window.scrollTo({top:0, behavior:'smooth'});
+    return;
+  }
   PAGES.forEach(p => {
     document.getElementById('page-'+p).classList.remove('active');
     const nav = document.getElementById('nav-'+p);
