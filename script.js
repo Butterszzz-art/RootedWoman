@@ -121,7 +121,7 @@ async function loadCoachContent(code) {
     const weekData = prog['week'+week] || {};
     const hasProg = Object.keys(weekData).length > 0;
 
-    if (!hasMsgs && !hasProg) { container.style.display = 'none'; return; }
+    if (!hasMsgs && !hasProg) { container.classList.remove('visible'); return; }
 
     const dayNames = ['mon','tue','wed','thu','fri','sat','sun'];
     const dayLabels = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' };
@@ -149,7 +149,7 @@ async function loadCoachContent(code) {
     }
 
     container.innerHTML = html;
-    container.style.display = 'block';
+    container.classList.add('visible');
   } catch(e) { console.warn('Coach content load error:', e); }
 }
 

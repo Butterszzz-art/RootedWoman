@@ -1088,6 +1088,8 @@
   .mb-4  { margin-bottom: 4px; }
   .mb-5  { margin-bottom: 5px; }
   .mb-8  { margin-bottom: 8px; }
+  .mb-12 { margin-bottom: 12px; }
+  .mb-14 { margin-bottom: 14px; }
   .text-warm { color: var(--warm); }
 
   /* Section headings */
@@ -1467,6 +1469,16 @@
     z-index: 99;
   }
   .sidebar-overlay.open { display: block; }
+
+  /* SECTION HEADING MARGIN VARIANTS */
+  .section-heading-lg--wide  { margin: 36px 0 20px; }
+  .section-heading-lg--tight { margin: 0 0 8px; }
+  /* default section-heading-lg margin handled inline by --wide / --tight / no modifier = 0 0 20px */
+  .section-heading-lg { margin: 0 0 20px; }
+
+  /* COACH CONTENT PANEL */
+  .coach-content { display: none; margin-top: 32px; }
+  .coach-content.visible { display: block; }
 
   /* MOBILE */
   @media (max-width: 768px) {
