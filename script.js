@@ -1,3 +1,19 @@
+// ─── FIREBASE ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAZuVfKnZcGzS7N3uJT_JGdFsk3flwZNPM",
+  authDomain: "rooted-in-40.firebaseapp.com",
+  databaseURL: "https://rooted-in-40-default-rtdb.firebaseio.com",
+  projectId: "rooted-in-40",
+  storageBucket: "rooted-in-40.firebasestorage.app",
+  messagingSenderId: "898334778171",
+  appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
+};
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+} catch(e) { console.warn('Firebase init failed, offline mode:', e); }
+
 // ─── APP STATE ────────────────────────────────────────────────────────────────
 const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition','reflection'];
 const FREE_PAGES   = ['welcome','programme'];
@@ -7,263 +23,242 @@ const ACCESS_CODE = 'ROOTED40';
 
 let isUnlocked  = false;
 let pendingPage = null;
-let clientCode  = null;  // Supabase user UUID
-let currentUser = null;  // Supabase Auth user object
+let clientCode  = null;
 
-// ─── SUPABASE AUTH ────────────────────────────────────────────────────────────
-function switchAuthTab(tab) {
-  document.getElementById('auth-signin-form').style.display = tab === 'signin' ? '' : 'none';
-  document.getElementById('auth-signup-form').style.display = tab === 'signup' ? '' : 'none';
-  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
-  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-  document.querySelectorAll('.auth-error').forEach(el => { el.textContent = ''; el.style.display = 'none'; });
-}
-
-async function supabaseSignIn() {
-  const email = document.getElementById('signin-email').value.trim();
-  const pass  = document.getElementById('signin-password').value;
-  const errEl = document.getElementById('signin-error');
-  const btn   = document.getElementById('signin-btn');
-  if (!email || !pass) { showAuthError(errEl, 'Please enter your email and password.'); return; }
-  if (!sb) { offlineUnlock(); return; }
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  btn.disabled = false; btn.textContent = 'Sign in';
-  if (error) { showAuthError(errEl, error.message); return; }
-  await handleAuthSuccess(data.user);
-}
-
-async function supabaseSignUp() {
-  const email  = document.getElementById('signup-email').value.trim();
-  const code   = document.getElementById('signup-code').value.trim().toUpperCase();
-  const pass   = document.getElementById('signup-password').value;
-  const errEl  = document.getElementById('signup-error');
-  const btn    = document.getElementById('signup-btn');
-  if (!email || !code || !pass)  { showAuthError(errEl, 'Please fill in all fields.'); return; }
-  if (code !== ACCESS_CODE)       { showAuthError(errEl, 'Invalid invite code. Please check with your coach.'); return; }
-  if (pass.length < 6)           { showAuthError(errEl, 'Password must be at least 6 characters.'); return; }
-  if (!sb) { offlineUnlock(); return; }
-  btn.disabled = true; btn.textContent = 'Creating account…';
-  const { data, error } = await sb.auth.signUp({ email, password: pass });
-  btn.disabled = false; btn.textContent = 'Create account';
-  if (error) { showAuthError(errEl, error.message); return; }
-  if (!data.session) {
-    document.getElementById('auth-signin-form').style.display = 'none';
-    document.getElementById('auth-signup-form').style.display = 'none';
-    document.getElementById('auth-confirm-msg').style.display = '';
-    return;
-  }
-  await handleAuthSuccess(data.user);
-}
-
-async function supabaseSignOut() {
-  if (sb) { try { await sb.auth.signOut(); } catch(e) {} }
-  currentUser = null; clientCode = null; isUnlocked = false;
-  LOCKED_PAGES.forEach(p => {
-    const nav = document.getElementById('nav-'+p);
-    if (nav) nav.classList.add('gated');
-  });
-  showPage('welcome');
-}
-
-function showAuthError(el, msg) {
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = '';
-}
-
-async function handleAuthSuccess(user) {
-  currentUser = user;
-  clientCode  = user.id;
-  isUnlocked  = true;
-  document.getElementById('paywall').style.display = 'none';
-  LOCKED_PAGES.forEach(p => {
-    const nav = document.getElementById('nav-'+p);
-    if (nav) nav.classList.remove('gated');
-  });
-  if (sb) {
-    const { data: profile } = await sb.from('profiles').select('day_started, photo_url').eq('id', user.id).single();
-    if (profile?.day_started) {
-      localStorage.setItem('rwm-start-date', profile.day_started);
-    } else if (!localStorage.getItem('rwm-start-date')) {
-      const start = toDateStr(new Date());
-      localStorage.setItem('rwm-start-date', start);
-      try { await sb.from('profiles').upsert({ id: user.id, day_started: start }); } catch(e) {}
-    }
-    if (profile?.photo_url) {
-      const preview = document.getElementById('photo-preview');
-      if (preview) { preview.src = profile.photo_url; preview.style.display = 'block'; }
-      const uploadText = document.getElementById('photo-upload-text');
-      if (uploadText) uploadText.textContent = 'Change photo';
-    }
-    await loadFromSupabase();
-  } else if (!localStorage.getItem('rwm-start-date')) {
-    localStorage.setItem('rwm-start-date', toDateStr(new Date()));
-  }
-  updateProgress();
-  updateSidebarStats();
-  renderAnchorCheckin();
-  renderProgressDashboard();
-  const dest = pendingPage || 'welcome';
-  pendingPage = null;
-  showPage(dest);
-}
-
-async function checkSupabaseSession() {
-  if (!sb) {
-    isUnlocked = localStorage.getItem('rwm-offline-unlocked') === '1';
-    if (!isUnlocked) {
-      LOCKED_PAGES.forEach(p => {
-        const nav = document.getElementById('nav-'+p);
-        if (nav) nav.classList.add('gated');
-      });
-    }
-    return;
-  }
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    await handleAuthSuccess(session.user);
-  } else {
-    isUnlocked = false;
-    LOCKED_PAGES.forEach(p => {
-      const nav = document.getElementById('nav-'+p);
-      if (nav) nav.classList.add('gated');
-    });
-  }
-}
-
-// ─── OFFLINE FALLBACK ─────────────────────────────────────────────────────────
-function offlineUnlock() {
-  const code = prompt('Enter invite code for offline access:');
-  if (!code || code.trim().toUpperCase() !== ACCESS_CODE) { alert('Invalid invite code.'); return; }
-  localStorage.setItem('rwm-offline-unlocked', '1');
-  isUnlocked = true;
-  if (!localStorage.getItem('rwm-start-date')) localStorage.setItem('rwm-start-date', toDateStr(new Date()));
-  document.getElementById('paywall').style.display = 'none';
-  LOCKED_PAGES.forEach(p => {
-    const nav = document.getElementById('nav-'+p);
-    if (nav) nav.classList.remove('gated');
-  });
-  updateSidebarStats();
-  renderAnchorCheckin();
-  renderProgressDashboard();
-  showPage('welcome');
-}
-
-// ─── SUPABASE DATA SYNC ───────────────────────────────────────────────────────
-const TEXT_IDS = [
-  'i-name','i-dob','i-occ','i-wa','i-referral',
-  'a-body','a-week','a-sleep','a-challenge',
-  'b-history','b-injury','b-medical',
-  'c-goal','c-why','c-blocker','c-success','c-feel',
-  'd-prog-detail','e-supps','f-commit','f-story','f-friend','f-support','g-extra',
-  'l1-selfimage','l1-story','l1-evidence-for','l1-evidence-against','l1-free',
-  'l1-vision','l1-words','l1-stopped','l1-consistent','l1-declaration','l1-declaration-time',
-  'l2-body-move','l2-body-fuel','l2-body-rest',
-  'l2-mind-stillness','l2-mind-intention','l2-mind-learning',
-  'l2-soul-practice','l2-soul-meaning','l2-soul-community',
-  'anc-1','anc-2','anc-3','anc-4','anc-5',
-  'l3-slide-trigger','l3-anchor-slipped','l3-told-myself','l3-need','l3-bestfriend',
-  'l3-first-anchor','l3-ritual','l3-accountability',
-  'cov-name','cov-anchor','cov-signed','cov-date',
-  'm1-strongest','m1-hardest','m1-proud','m1-different',
-  'm2-strongest','m2-hardest','m2-proud','m2-different',
-  'm3-strongest','m3-hardest','m3-proud','m3-different',
-  'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
-];
-
-let _sbSyncTimer = null;
-function scheduleSupabaseSync() {
-  if (!sb || !clientCode) return;
-  clearTimeout(_sbSyncTimer);
-  _sbSyncTimer = setTimeout(syncToSupabase, 2000);
-}
-
-async function syncToSupabase() {
-  if (!sb || !clientCode) return;
-  const now  = new Date().toISOString();
-  const rows = TEXT_IDS
-    .map(id => ({ user_id: clientCode, field_id: id, value: localStorage.getItem('rwm-'+id) || '', updated_at: now }))
-    .filter(r => r.value.trim());
-  if (rows.length) { try { await sb.from('form_answers').upsert(rows); } catch(e) { console.warn('[Supabase] sync error', e); } }
-  const name = localStorage.getItem('rwm-i-name');
-  const wa   = localStorage.getItem('rwm-i-wa');
-  if (name || wa) {
-    const upd = { id: clientCode, updated_at: now };
-    if (name) upd.name = name;
-    if (wa)   upd.whatsapp = wa;
-    try { await sb.from('profiles').upsert(upd); } catch(e) {}
-  }
-}
-
-async function syncCheckinToSupabase(dateStr, anchorData) {
-  if (!sb || !clientCode) return;
+// ─── FIREBASE HELPERS ─────────────────────────────────────────────────────────
+async function registerClient(code) {
+  if (!db) return;
   try {
-    await sb.from('daily_checkins').upsert({
-      user_id: clientCode, date: dateStr,
-      anchor_data: anchorData, updated_at: new Date().toISOString()
-    });
-  } catch(e) { console.warn('[Supabase] checkin sync error', e); }
+    const ref  = db.ref('clients/'+code+'/profile');
+    const snap = await ref.once('value');
+    const updates = { lastSeen: Date.now() };
+    if (!snap.val()?.createdAt) updates.createdAt = Date.now();
+    const name = localStorage.getItem('rwm-i-name');
+    const wa   = localStorage.getItem('rwm-i-wa');
+    if (name) updates.name = name;
+    if (wa)   updates.whatsapp = wa;
+    await ref.update(updates);
+  } catch(e) {}
 }
 
-async function loadFromSupabase() {
-  if (!sb || !clientCode) return;
+let syncTimer = null;
+function syncToFirebase() {
+  if (!db || !clientCode) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    const textIds = [
+      'i-name','i-dob','i-occ','i-wa','i-referral',
+      'a-body','a-week','a-sleep','a-challenge',
+      'b-history','b-injury','b-medical',
+      'c-goal','c-why','c-blocker','c-success','c-feel',
+      'd-prog-detail','e-supps','f-commit','f-story','f-friend','f-support','g-extra',
+      'l1-selfimage','l1-story','l1-evidence-for','l1-evidence-against','l1-free',
+      'l1-vision','l1-words','l1-stopped','l1-consistent','l1-declaration','l1-declaration-time',
+      'l2-body-move','l2-body-fuel','l2-body-rest',
+      'l2-mind-stillness','l2-mind-intention','l2-mind-learning',
+      'l2-soul-practice','l2-soul-meaning','l2-soul-community',
+      'anc-1','anc-2','anc-3','anc-4','anc-5',
+      'l3-slide-trigger','l3-anchor-slipped','l3-told-myself','l3-need','l3-bestfriend',
+      'l3-first-anchor','l3-ritual','l3-accountability',
+      'cov-name','cov-anchor','cov-signed','cov-date',
+      'm1-strongest','m1-hardest','m1-proud','m1-different',
+      'm2-strongest','m2-hardest','m2-proud','m2-different',
+      'm3-strongest','m3-hardest','m3-proud','m3-different',
+      'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
+    ];
+    const data = {};
+    textIds.forEach(id => {
+      const val = localStorage.getItem('rwm-'+id);
+      if (val && val.trim()) data[id] = val;
+    });
+    // Also update profile name/whatsapp when those fields are filled in
+    const name = data['i-name'], wa = data['i-wa'];
+    try {
+      await db.ref('clients/'+clientCode+'/data').update(data);
+      const profileUpdates = { lastSeen: Date.now() };
+      if (name) profileUpdates.name = name;
+      if (wa)   profileUpdates.whatsapp = wa;
+      await db.ref('clients/'+clientCode+'/profile').update(profileUpdates);
+    } catch(e) {}
+  }, 2000);
+}
+
+async function loadFromFirebase(code) {
+  if (!db) return;
   try {
-    const [answersRes, checkinsRes] = await Promise.all([
-      sb.from('form_answers').select('field_id, value').eq('user_id', clientCode),
-      sb.from('daily_checkins').select('date, anchor_data').eq('user_id', clientCode)
+    const snap = await db.ref('clients/'+code+'/data').once('value');
+    const data = snap.val() || {};
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) {
+        el.value = val;
+        localStorage.setItem('rwm-'+id, val);
+      }
+    });
+  } catch(e) {}
+}
+
+async function loadCoachContent(code) {
+  if (!db) return;
+  const container = document.getElementById('coach-content');
+  if (!container) return;
+  try {
+    const [msgsSnap, progSnap, profileSnap] = await Promise.all([
+      db.ref('messages/'+code).once('value'),
+      db.ref('programmes/'+code).once('value'),
+      db.ref('clients/'+code+'/profile').once('value')
     ]);
-    if (answersRes.data) {
-      answersRes.data.forEach(({ field_id, value }) => {
-        if (value) {
-          localStorage.setItem('rwm-'+field_id, value);
-          const el = document.getElementById(field_id);
-          if (el) el.value = value;
-        }
-      });
-    }
-    if (checkinsRes.data) {
-      checkinsRes.data.forEach(({ date, anchor_data }) => {
-        try { localStorage.setItem('rwm-daily-'+date, JSON.stringify(anchor_data)); } catch(e) {}
-      });
-    }
-  } catch(e) { console.warn('[Supabase] load error', e); }
-}
+    const msgs    = msgsSnap.val()    || {};
+    const prog    = progSnap.val()    || {};
+    const profile = profileSnap.val() || {};
 
-// ─── PHOTO UPLOAD ─────────────────────────────────────────────────────────────
-async function handlePhotoUpload(input) {
-  const file      = input.files[0];
-  if (!file) return;
-  const statusEl  = document.getElementById('photo-status');
-  const previewEl = document.getElementById('photo-preview');
-  const textEl    = document.getElementById('photo-upload-text');
-  if (statusEl) { statusEl.textContent = 'Uploading…'; statusEl.className = 'photo-upload-status'; }
-  const localUrl = URL.createObjectURL(file);
-  if (previewEl) { previewEl.src = localUrl; previewEl.style.display = 'block'; }
-  if (!sb || !clientCode) {
-    if (statusEl) { statusEl.textContent = '(Offline — photo not saved to server)'; statusEl.className = 'photo-upload-status warn'; }
-    return;
-  }
-  const ext  = file.name.split('.').pop().toLowerCase();
-  const path = `${clientCode}/start.${ext}`;
-  const { error } = await sb.storage.from('client-photos').upload(path, file, { upsert: true });
-  if (error) {
-    if (statusEl) { statusEl.textContent = 'Upload failed: ' + error.message; statusEl.className = 'photo-upload-status error'; }
-    return;
-  }
-  try { await sb.from('profiles').upsert({ id: clientCode, photo_url: path, updated_at: new Date().toISOString() }); } catch(e) {}
-  if (statusEl) { statusEl.textContent = 'Photo saved ✓'; statusEl.className = 'photo-upload-status ok'; }
-  if (textEl) textEl.textContent = 'Change photo';
+    const msgList = Object.values(msgs).sort((a,b) => b.time - a.time).slice(0,3);
+    const hasMsgs = msgList.length > 0;
+
+    // Calculate current week
+    const createdAt = profile.createdAt || Date.now();
+    const daysSince = Math.floor((Date.now() - createdAt) / 86400000);
+    const week = Math.min(Math.max(Math.floor(daysSince/7)+1, 1), 5);
+    const weekData = prog['week'+week] || {};
+    const hasProg = Object.keys(weekData).length > 0;
+
+    if (!hasMsgs && !hasProg) { container.classList.remove('visible'); return; }
+
+    const dayNames = ['mon','tue','wed','thu','fri','sat','sun'];
+    const dayLabels = { mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu', fri:'Fri', sat:'Sat', sun:'Sun' };
+
+    let html = '';
+
+    if (hasMsgs) {
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:20px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);font-weight:400;margin-bottom:10px">From your coach</div>
+        ${msgList.map(m => `<div style="font-size:14px;color:var(--soil);font-weight:300;line-height:1.7;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">${escHtmlClient(m.text)}</div>`).join('')}
+      </div>`;
+    }
+
+    if (hasProg) {
+      const days = dayNames.map(day => {
+        const d = weekData[day];
+        if (!d || d.type === 'Rest') return `<div style="background:var(--warm-pale);border:1px solid var(--warm-light);border-radius:8px;padding:10px 12px;text-align:center"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);margin-bottom:4px">${dayLabels[day]}</div><div style="font-size:12px;color:var(--soil-hint)">Rest</div></div>`;
+        return `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);margin-bottom:4px">${dayLabels[day]}</div><div style="font-size:12px;font-weight:500;color:var(--soil);margin-bottom:4px">${escHtmlClient(d.title||d.type)}</div>${d.notes?`<div style="font-size:11px;color:var(--soil-muted);font-weight:300;white-space:pre-line;line-height:1.5">${escHtmlClient(d.notes)}</div>`:''}`;
+      }).join('');
+      html += `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warm);font-weight:400;margin-bottom:6px">Your programme</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--soil);margin-bottom:16px">Week ${week}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days}</div>
+      </div>`;
+    }
+
+    container.innerHTML = html;
+    container.classList.add('visible');
+  } catch(e) { console.warn('Coach content load error:', e); }
 }
 
 function escHtmlClient(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
+async function tryUnlock() {
+  const input   = document.getElementById('unlock-input');
+  const errorEl = document.getElementById('unlock-error');
+  const paywall = document.getElementById('paywall');
+  const unlockBtn = document.querySelector('.unlock-row button');
+
+  if (!input || !errorEl || !paywall) return;
+
+  const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
+  if (!val) return;
+
+  // Check hardcoded code first (works offline)
+  let valid = (val === ACCESS_CODE);
+
+  // Also check Firebase for dynamic per-client codes
+  if (!valid && db) {
+    try {
+      if (unlockBtn) { unlockBtn.textContent = 'Checking...'; unlockBtn.disabled = true; }
+      const snap = await db.ref('coach/codes/'+val).once('value');
+      const codeData = snap.val();
+      if (codeData && codeData.active) valid = true;
+    } catch(e) {}
+    if (unlockBtn) { unlockBtn.textContent = 'Unlock ->'; unlockBtn.disabled = false; }
+  }
+
+  if (valid) {
+    clientCode = val;
+    try {
+      localStorage.setItem('rwm-unlocked', '1');
+      localStorage.setItem('rwm-client-code', val);
+      if (!localStorage.getItem('rwm-start-date')) {
+        localStorage.setItem('rwm-start-date', toDateStr(new Date()));
+      }
+    } catch(e) {}
+    isUnlocked = true;
+    input.classList.remove('error');
+    errorEl.classList.remove('visible');
+    paywall.style.display = 'none';
+    LOCKED_PAGES.forEach(p => {
+      const nav = document.getElementById('nav-'+p);
+      if (nav) nav.classList.remove('gated');
+    });
+    registerClient(val);
+    loadFromFirebase(val).then(() => updateProgress());
+    loadCoachContent(val);
+    updateSidebarStats();
+    renderAnchorCheckin();
+    renderProgressDashboard();
+    const dest = pendingPage || 'welcome';
+    pendingPage = null;
+    showPage(dest);
+  } else {
+    input.classList.add('error');
+    errorEl.classList.add('visible');
+    input.select();
+    input.focus();
+  }
+}
+
+async function checkUnlock() {
+  try {
+    isUnlocked = localStorage.getItem('rwm-unlocked') === '1';
+    clientCode = localStorage.getItem('rwm-client-code') || null;
+  } catch(e) {}
+
+  // If we have a stored code, verify it is still active in Firebase
+  // (allows Shadey to revoke access; hardcoded ROOTED40 always passes)
+  if (isUnlocked && clientCode && clientCode !== ACCESS_CODE && db) {
+    try {
+      const snap = await db.ref('coach/codes/'+clientCode).once('value');
+      const data = snap.val();
+      if (!data || !data.active) {
+        // Code revoked -- lock the app
+        isUnlocked = false;
+        clientCode = null;
+        try { localStorage.removeItem('rwm-unlocked'); localStorage.removeItem('rwm-client-code'); } catch(e) {}
+      }
+    } catch(e) { /* Network error -- trust localStorage for offline use */ }
+  }
+
+  if (!isUnlocked) {
+    LOCKED_PAGES.forEach(p => {
+      const nav = document.getElementById('nav-'+p);
+      if (nav) nav.classList.add('gated');
+    });
+  } else {
+    if (!localStorage.getItem('rwm-start-date')) {
+      localStorage.setItem('rwm-start-date', toDateStr(new Date()));
+    }
+    if (clientCode) {
+      registerClient(clientCode);
+      loadCoachContent(clientCode);
+    }
+  }
+}
+
 function closePaywall() {
   const paywall = document.getElementById('paywall');
   if (paywall) paywall.style.display = 'none';
   pendingPage = null;
+  // Make sure a free page is active
   const active = PAGES.find(p => document.getElementById('page-'+p)?.classList.contains('active'));
   if (!active || LOCKED_PAGES.includes(active)) showPage('welcome');
 }
@@ -635,7 +630,7 @@ function autosave() {
   });
 
   updateProgress();
-  scheduleSupabaseSync();
+  syncToFirebase();
 }
 
 function saveSection(section) {
@@ -786,9 +781,9 @@ async function submitWaitlist() {
   btn.disabled = true;
   btn.textContent = 'Sending…';
 
-  // Store in Supabase so Shadey can see it in admin
-  if (sb) {
-    try { await sb.from('waitlist').insert({ name, whatsapp: wa }); } catch(e) {}
+  // Always store in Firebase so Shadey can see it in admin
+  if (db) {
+    try { await db.ref('waitlist').push({ name, whatsapp: wa, submittedAt: Date.now() }); } catch(e) {}
   }
 
   // Also email via EmailJS if keys are configured on this device
@@ -858,13 +853,8 @@ ${proud || '(left blank)'}`.trim();
 
   // Save locally
   localStorage.setItem('rwm-review-submitted', new Date().toISOString());
-  if (sb && clientCode) {
-    try {
-      await sb.from('reviews').upsert({
-        user_id: clientCode, rating, recommend,
-        changed_text: changed, proud_text: proud, submitted_at: new Date().toISOString()
-      });
-    } catch(e) {}
+  if (db && clientCode) {
+    try { await db.ref('reviews/' + clientCode).set({ rating, recommend, changed, proud, submittedAt: Date.now() }); } catch(e) {}
   }
 
   // Email if keys available
@@ -1089,7 +1079,6 @@ function saveTodayAnchor(num, checked) {
   const rec = getDailyRecord(todayStr);
   rec[num] = checked ? '1' : '0';
   try { localStorage.setItem('rwm-daily-' + todayStr, JSON.stringify(rec)); } catch(e) {}
-  syncCheckinToSupabase(todayStr, rec);
   // Refresh check-in UI inline (avoid full re-render so checkbox state is preserved)
   document.querySelectorAll('.anchor-check-item').forEach((el, i) => {
     const inp = el.querySelector('input');
@@ -1231,7 +1220,7 @@ document.querySelectorAll('input[type="radio"]').forEach(r => {
 });
 
 async function init() {
-  await checkSupabaseSession();
+  await checkUnlock();
   loadAll();
   renderTestimonials();
   // Restore language preference
