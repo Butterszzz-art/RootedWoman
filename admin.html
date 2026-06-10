@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Rooted in 40</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+:root {
+  --sage: #7a9e7e; --sage-light: #d4e5d6; --sage-pale: #f0f5f0;
+  --warm: #c4a882; --warm-light: #ede3d6; --warm-pale: #faf7f3;
+  --soil: #3d3530; --soil-muted: #7a6e68; --soil-hint: #b8afa9;
+  --cream: #fefcf8; --border: rgba(61,53,48,0.12); --border-strong: rgba(61,53,48,0.22);
+  --red: #b94a48; --red-light: #fde8e8;
+  --radius: 14px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--soil); min-height: 100vh; font-size: 15px; line-height: 1.65; }
+
+/* ─── LOGIN ─────────────────────────────────────────────────────────── */
+.login-screen {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--soil); padding: 24px;
+}
+.login-card {
+  background: var(--cream); border-radius: var(--radius); padding: 52px 48px;
+  max-width: 420px; width: 100%;
+}
+.login-eyebrow { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 14px; }
+.login-card h1 { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 400; color: var(--soil); line-height: 1.15; margin-bottom: 8px; }
+.login-card p  { font-size: 13.5px; color: var(--soil-muted); font-weight: 300; margin-bottom: 32px; line-height: 1.65; }
+.login-input {
+  width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 13px 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--soil);
+  background: #fff; letter-spacing: 2px; margin-bottom: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.login-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.12); }
+.login-input.error { border-color: var(--red); }
+.login-btn {
+  width: 100%; padding: 14px; background: var(--soil); color: var(--cream);
+  border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
+  font-size: 15px; cursor: pointer; transition: background 0.15s;
+}
+.login-btn:hover { background: #2a2420; }
+.login-error { margin-top: 10px; font-size: 13px; color: var(--red); font-weight: 300; display: none; }
+.login-error.visible { display: block; }
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────────── */
+.app { display: none; }
+.app.visible { display: flex; min-height: 100vh; }
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
+  background: var(--soil); color: var(--cream); display: flex;
+  flex-direction: column; z-index: 100; overflow-y: auto;
+}
+.sidebar-brand { padding: 28px 22px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-brand .eyebrow { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 5px; }
+.sidebar-brand h1 { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; line-height: 1.25; color: var(--cream); }
+.admin-badge { font-size: 10px; background: var(--warm); color: var(--soil); padding: 2px 9px; border-radius: 99px; display: inline-block; margin-top: 8px; letter-spacing: 0.5px; font-weight: 500; }
+.nav-section { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); font-weight: 400; padding: 20px 22px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 11px 22px;
+  cursor: pointer; font-size: 13.5px; color: rgba(255,255,255,0.6);
+  border-left: 2px solid transparent; transition: all 0.15s; font-weight: 300;
+}
+.nav-item:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.04); }
+.nav-item.active { color: var(--cream); border-left-color: var(--warm); background: rgba(255,255,255,0.06); font-weight: 400; }
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; padding: 16px 22px; border-top: 1px solid rgba(255,255,255,0.08); }
+.logout-btn { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: rgba(255,255,255,0.4); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; transition: color 0.15s; }
+.logout-btn:hover { color: rgba(255,255,255,0.7); }
+
+.main { margin-left: 240px; flex: 1; min-height: 100vh; }
+.page { display: none; }
+.page.active { display: block; }
+.page-header {
+  padding: 36px 48px 24px; border-bottom: 1px solid var(--border);
+  background: var(--cream); position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+}
+.page-header-left .tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin-bottom: 6px; }
+.page-header-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--soil); line-height: 1.15; }
+.page-content { padding: 36px 48px 80px; }
+
+/* ─── STAT CARDS ─────────────────────────────────────────────────────── */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+.stat-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; }
+.stat-card.warn { border-color: var(--red); background: var(--red-light); }
+.stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 8px; }
+.stat-value { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 500; color: var(--soil); line-height: 1; }
+.stat-card.warn .stat-value { color: var(--red); }
+.stat-sub { font-size: 12px; color: var(--soil-hint); font-weight: 300; margin-top: 5px; line-height: 1.4; }
+.stat-card.warn .stat-sub { color: var(--red); font-weight: 400; }
+
+/* ─── SECTION HEADING ────────────────────────────────────────────────── */
+.section-heading {
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--warm);
+  font-weight: 400; margin-bottom: 16px;
+}
+.section-divider { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-divider .section-heading { margin-bottom: 0; }
+
+/* ─── FILTER ROW ─────────────────────────────────────────────────────── */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 7px 16px; border-radius: 99px; font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px; cursor: pointer; border: 1px solid var(--border-strong);
+  background: #fff; color: var(--soil-muted); transition: all 0.15s; font-weight: 300;
+}
+.filter-btn:hover { border-color: var(--sage); color: var(--sage); }
+.filter-btn.active { background: var(--soil); color: var(--cream); border-color: var(--soil); font-weight: 400; }
+
+/* ─── CLIENT CARDS ───────────────────────────────────────────────────── */
+.client-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+.client-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.client-card-header {
+  display: flex; align-items: center; gap: 16px; padding: 20px 24px;
+  cursor: pointer; transition: background 0.15s;
+}
+.client-card-header:hover { background: var(--sage-pale); }
+.client-avatar {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--warm-light);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500;
+  color: var(--warm); flex-shrink: 0;
+}
+.client-name-block { flex: 1; min-width: 0; }
+.client-name { font-size: 16px; font-weight: 400; color: var(--soil); margin-bottom: 2px; }
+.client-code { font-size: 11px; color: var(--soil-hint); font-family: monospace; letter-spacing: 1.5px; }
+.client-meta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.client-date { font-size: 12px; color: var(--soil-muted); font-weight: 300; }
+.expand-icon { font-size: 12px; color: var(--soil-hint); transition: transform 0.2s; }
+.client-card.expanded .expand-icon { transform: rotate(180deg); }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px;
+  padding: 4px 12px; border-radius: 99px; font-weight: 400; cursor: default;
+}
+.status-badge.enquiry  { background: #f0f0ff; color: #5555bb; }
+.status-badge.active   { background: var(--sage-light); color: #3a6e3e; }
+.status-badge.completed{ background: var(--warm-light); color: #7a5e30; }
+.status-badge.alumni   { background: #f5f0ff; color: #7755aa; }
+.status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* CLIENT CARD BODY */
+.client-card-body { border-top: 1px solid var(--border); display: none; }
+.client-card.expanded .client-card-body { display: block; }
+.client-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.client-body-left { padding: 24px; border-right: 1px solid var(--border); }
+.client-body-right { padding: 24px; }
+
+/* INTAKE SUMMARY */
+.intake-summary { margin-bottom: 20px; }
+.intake-field { margin-bottom: 14px; }
+.intake-field-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 4px; }
+.intake-field-value { font-size: 14px; color: var(--soil); font-weight: 300; line-height: 1.6; }
+.intake-field-value.empty { color: var(--soil-hint); font-style: italic; }
+.readiness-dots { display: flex; gap: 4px; margin-top: 4px; }
+.readiness-dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--border-strong); }
+.readiness-dot.filled { background: var(--sage); border-color: var(--sage); }
+.view-full-btn {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 13px;
+  color: var(--sage); background: none; border: 1px solid var(--sage-light);
+  border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s; font-weight: 400;
+}
+.view-full-btn:hover { background: var(--sage-pale); }
+
+/* STATUS & NOTES */
+.status-section { margin-bottom: 20px; }
+.status-section-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 10px; }
+.status-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.status-option {
+  padding: 6px 14px; border-radius: 99px; font-size: 12px; cursor: pointer;
+  border: 1.5px solid var(--border); background: #fff; font-family: 'DM Sans', sans-serif;
+  color: var(--soil-muted); transition: all 0.15s; font-weight: 300;
+}
+.status-option:hover { border-color: var(--soil-muted); color: var(--soil); }
+.status-option.selected.enquiry  { background: #f0f0ff; border-color: #5555bb; color: #5555bb; font-weight: 400; }
+.status-option.selected.active   { background: var(--sage-light); border-color: var(--sage); color: #3a6e3e; font-weight: 400; }
+.status-option.selected.completed{ background: var(--warm-light); border-color: var(--warm); color: #7a5e30; font-weight: 400; }
+.status-option.selected.alumni   { background: #f5f0ff; border-color: #7755aa; color: #7755aa; font-weight: 400; }
+
+.notes-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); font-weight: 400; margin-bottom: 8px; }
+.notes-textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+  color: var(--soil); background: var(--cream); resize: vertical; min-height: 120px;
+  transition: border-color 0.15s; font-weight: 300; line-height: 1.65;
+}
+.notes-textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.1); }
+.notes-saved { font-size: 11px; color: var(--sage); margin-top: 5px; opacity: 0; transition: opacity 0.2s; }
+.notes-saved.visible { opacity: 1; }
+
+/* ─── SETTINGS PAGE ──────────────────────────────────────────────────── */
+.settings-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; max-width: 520px; }
+.settings-card + .settings-card { margin-top: 20px; }
+.settings-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: var(--soil); margin-bottom: 4px; }
+.settings-card p { font-size: 13px; color: var(--soil-muted); font-weight: 300; line-height: 1.65; margin-bottom: 20px; }
+.settings-field-label { font-size: 12px; font-weight: 400; color: var(--soil); margin-bottom: 6px; }
+.settings-input {
+  width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--soil);
+  background: #fff; transition: border-color 0.15s; margin-bottom: 12px;
+}
+.settings-input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.1); }
+.settings-input[type="number"] { max-width: 100px; }
+.btn-save-settings {
+  padding: 11px 24px; background: var(--soil); color: var(--cream); border: none;
+  border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-save-settings:hover { background: #2a2420; }
+.settings-saved { display: inline; font-size: 12px; color: var(--sage); margin-left: 12px; opacity: 0; transition: opacity 0.2s; }
+.settings-saved.visible { opacity: 1; }
+.danger-zone { border-color: var(--red); }
+.danger-zone h3 { color: var(--red); }
+
+/* ─── EMPTY STATE ────────────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 80px 40px; color: var(--soil-muted); }
+.empty-state-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--soil); margin-bottom: 8px; }
+.empty-state p { font-size: 14px; font-weight: 300; line-height: 1.65; max-width: 340px; margin: 0 auto; }
+
+/* ─── FULL INTAKE MODAL ──────────────────────────────────────────────── */
+.intake-modal-overlay {
+  position: fixed; inset: 0; background: rgba(61,53,48,0.55);
+  z-index: 1000; display: none; align-items: flex-start; justify-content: flex-end;
+  padding: 16px;
+}
+.intake-modal-overlay.open { display: flex; }
+.intake-modal {
+  background: #fff; border-radius: var(--radius); width: 100%; max-width: 680px;
+  max-height: calc(100vh - 32px); overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+}
+.intake-modal-header {
+  padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  position: sticky; top: 0; background: #fff; z-index: 1;
+}
+.intake-modal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: var(--soil); }
+.intake-modal-header p { font-size: 12px; color: var(--soil-muted); font-weight: 300; margin-top: 2px; }
+.modal-close-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; color: var(--soil-muted); cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+.modal-close-btn:hover { border-color: var(--soil-muted); color: var(--soil); }
+.intake-modal-body { padding: 24px 28px 32px; }
+.intake-section-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--warm); font-weight: 400; margin: 24px 0 14px; }
+.intake-section-title:first-child { margin-top: 0; }
+.intake-row { display: grid; grid-template-columns: 180px 1fr; gap: 12px; margin-bottom: 12px; align-items: baseline; }
+.intake-row-label { font-size: 12px; color: var(--soil-muted); font-weight: 300; }
+.intake-row-value { font-size: 14px; color: var(--soil); font-weight: 300; line-height: 1.6; }
+.intake-row-value.empty { color: var(--soil-hint); font-style: italic; }
+.intake-row-value pre { font-family: 'DM Sans', sans-serif; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-eyebrow">Rooted in 40</div>
+    <h1>Admin access</h1>
+    <p>This page is private to your coaching practice. It is not linked from the client app.</p>
+    <input class="login-input" type="password" id="admin-pw" placeholder="Enter admin password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="login-btn" onclick="adminLogin()">Sign in &rarr;</button>
+    <div class="login-error" id="admin-login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="eyebrow">Rooted in 40</div>
+      <h1>Admin<br>Panel</h1>
+      <span class="admin-badge">Private</span>
+    </div>
+
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="showAdminPage('dashboard')" id="anav-dashboard">
+      <span class="nav-icon">◉</span> Dashboard
+    </div>
+
+    <div class="nav-section">Clients</div>
+    <div class="nav-item" onclick="showAdminPage('clients')" id="anav-clients">
+      <span class="nav-icon">⊞</span> All clients
+    </div>
+
+    <div class="nav-section">Config</div>
+    <div class="nav-item" onclick="showAdminPage('settings')" id="anav-settings">
+      <span class="nav-icon">◈</span> Settings
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="adminLogout()">
+        <span>↩</span> Sign out
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="tag">Overview</div>
+          <h2>Dashboard</h2>
+        </div>
+        <button class="view-full-btn" onclick="loadClients()">↻ Refresh</button>
+      </div>
+      <div class="page-content">
+        <div class="stat-row" id="dash-stats">
+          <div class="stat-card">
+            <div class="stat-label">Active clients</div>
+            <div class="stat-value" id="dash-active">—</div>
+            <div class="stat-sub" id="dash-active-sub">Loading...</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total clients</div>
+            <div class="stat-value" id="dash-total">—</div>
+            <div class="stat-sub">All registered codes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Enquiries</div>
+            <div class="stat-value" id="dash-enquiry">—</div>
+            <div class="stat-sub">Awaiting intake</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Alumni</div>
+            <div class="stat-value" id="dash-alumni">—</div>
+            <div class="stat-sub">Completed programme</div>
+          </div>
+        </div>
+
+        <div class="section-heading">Recent activity</div>
+        <div id="dash-recent"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="tag">Clients</div>
+          <h2>All clients</h2>
+        </div>
+        <div class="filter-row" id="filter-row">
+          <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setFilter('enquiry',this)">Enquiry</button>
+          <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+          <button class="filter-btn" onclick="setFilter('completed',this)">Completed</button>
+          <button class="filter-btn" onclick="setFilter('alumni',this)">Alumni</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="client-grid" id="client-grid">
+          <div class="empty-state">
+            <div class="empty-state-icon">○</div>
+            <h3>Loading clients…</h3>
+            <p>Fetching client data from Firebase.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="tag">Configuration</div>
+          <h2>Settings</h2>
+        </div>
+      </div>
+      <div class="page-content">
+
+        <div class="settings-card">
+          <h3>Client capacity</h3>
+          <p>Set your maximum number of active clients. You will see a warning on the dashboard when you reach this limit. This is stored on your device only.</p>
+          <div class="settings-field-label">Maximum active clients</div>
+          <input class="settings-input" type="number" id="max-clients-input" min="1" max="50" value="6">
+          <br>
+          <button class="btn-save-settings" onclick="saveMaxClients()">Save</button>
+          <span class="settings-saved" id="max-saved">Saved</span>
+        </div>
+
+        <div class="settings-card">
+          <h3>Admin password</h3>
+          <p>Change the password used to access this admin page. The new password is stored in your browser's localStorage on this device.</p>
+          <div class="settings-field-label">New password</div>
+          <input class="settings-input" type="password" id="new-pw-input" placeholder="Enter new password" autocomplete="new-password">
+          <div class="settings-field-label">Confirm new password</div>
+          <input class="settings-input" type="password" id="confirm-pw-input" placeholder="Confirm new password" autocomplete="new-password">
+          <br>
+          <button class="btn-save-settings" onclick="changePassword()">Change password</button>
+          <span class="settings-saved" id="pw-saved">Updated</span>
+        </div>
+
+        <div class="settings-card danger-zone">
+          <h3>Data &amp; privacy</h3>
+          <p>Client status labels and your private coaching notes are stored only on this device and are never visible to clients. Intake answers and profiles are stored in Firebase and accessible to the client and anyone with coach access.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FULL INTAKE MODAL -->
+<div class="intake-modal-overlay" id="intake-modal-overlay" onclick="closeIntakeModal(event)">
+  <div class="intake-modal" id="intake-modal">
+    <div class="intake-modal-header">
+      <div>
+        <h3 id="im-name">Client intake</h3>
+        <p id="im-meta"></p>
+      </div>
+      <button class="modal-close-btn" onclick="closeIntakeModal()">Close ✕</button>
+    </div>
+    <div class="intake-modal-body" id="im-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── FIREBASE ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAZuVfKnZcGzS7N3uJT_JGdFsk3flwZNPM",
+  authDomain: "rooted-in-40.firebaseapp.com",
+  databaseURL: "https://rooted-in-40-default-rtdb.firebaseio.com",
+  projectId: "rooted-in-40",
+  storageBucket: "rooted-in-40.firebasestorage.app",
+  messagingSenderId: "898334778171",
+  appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
+};
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+} catch(e) { console.warn('Firebase init failed:', e); }
+
+// ─── AUTH ──────────────────────────────────────────────────────────────────────
+const DEFAULT_PW = 'SHADEY2024';
+
+function getAdminPw() {
+  return localStorage.getItem('rwm-admin-pw') || DEFAULT_PW;
+}
+
+function adminLogin() {
+  const input = document.getElementById('admin-pw');
+  const err   = document.getElementById('admin-login-error');
+  if (input.value === getAdminPw()) {
+    sessionStorage.setItem('rwm-admin-auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    loadClients();
+  } else {
+    input.classList.add('error');
+    err.classList.add('visible');
+    input.select();
+  }
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('rwm-admin-auth');
+  location.reload();
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem('rwm-admin-auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    loadClients();
+  }
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+const ADMIN_PAGES = ['dashboard','clients','settings'];
+
+function showAdminPage(id) {
+  ADMIN_PAGES.forEach(p => {
+    document.getElementById('page-'+p).classList.remove('active');
+    document.getElementById('anav-'+p).classList.remove('active');
+  });
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('anav-'+id).classList.add('active');
+  if (id === 'settings') loadSettings();
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────────────
+function loadSettings() {
+  const max = localStorage.getItem('rwm-admin-maxclients') || '6';
+  document.getElementById('max-clients-input').value = max;
+}
+
+function saveMaxClients() {
+  const val = parseInt(document.getElementById('max-clients-input').value) || 6;
+  localStorage.setItem('rwm-admin-maxclients', String(val));
+  flashSaved('max-saved');
+  updateDashboard();
+}
+
+function changePassword() {
+  const np = document.getElementById('new-pw-input').value;
+  const cp = document.getElementById('confirm-pw-input').value;
+  if (!np) return alert('Enter a new password.');
+  if (np !== cp) return alert('Passwords do not match.');
+  localStorage.setItem('rwm-admin-pw', np);
+  document.getElementById('new-pw-input').value = '';
+  document.getElementById('confirm-pw-input').value = '';
+  flashSaved('pw-saved');
+}
+
+function flashSaved(id) {
+  const el = document.getElementById(id);
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+// ─── CLIENT STATUS & NOTES ────────────────────────────────────────────────────
+const STATUSES = ['enquiry','active','completed','alumni'];
+const STATUS_LABELS = { enquiry:'Enquiry', active:'Active', completed:'Completed', alumni:'Alumni' };
+
+function getStatus(code) {
+  return localStorage.getItem('rwm-admin-status-' + code) || 'enquiry';
+}
+function setStatus(code, status) {
+  localStorage.setItem('rwm-admin-status-' + code, status);
+}
+function getNotes(code) {
+  return localStorage.getItem('rwm-admin-notes-' + code) || '';
+}
+function setNotes(code, text) {
+  localStorage.setItem('rwm-admin-notes-' + code, text);
+}
+
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+let allClients = [];
+let activeFilter = 'all';
+
+async function loadClients() {
+  if (!db) {
+    renderClientGrid([]);
+    return;
+  }
+  try {
+    const snap = await db.ref('clients').once('value');
+    const raw  = snap.val() || {};
+    allClients = Object.entries(raw).map(([code, val]) => ({
+      code,
+      profile: val.profile || {},
+      data:    val.data    || {}
+    }));
+    // Sort by most recent first
+    allClients.sort((a, b) => (b.profile.createdAt || 0) - (a.profile.createdAt || 0));
+    renderClientGrid(allClients);
+    updateDashboard();
+  } catch(e) {
+    console.error('Load clients error:', e);
+    renderClientGrid([]);
+  }
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function updateDashboard() {
+  const max     = parseInt(localStorage.getItem('rwm-admin-maxclients') || '6');
+  const active  = allClients.filter(c => getStatus(c.code) === 'active').length;
+  const total   = allClients.length;
+  const enquiry = allClients.filter(c => getStatus(c.code) === 'enquiry').length;
+  const alumni  = allClients.filter(c => getStatus(c.code) === 'alumni').length;
+
+  const activeCard = document.getElementById('dash-active').closest('.stat-card');
+  document.getElementById('dash-active').textContent  = active;
+  document.getElementById('dash-total').textContent   = total;
+  document.getElementById('dash-enquiry').textContent = enquiry;
+  document.getElementById('dash-alumni').textContent  = alumni;
+
+  const sub = document.getElementById('dash-active-sub');
+  if (active >= max) {
+    activeCard.classList.add('warn');
+    sub.textContent = 'Capacity reached — max ' + max;
+  } else {
+    activeCard.classList.remove('warn');
+    sub.textContent = (max - active) + ' slots remaining of ' + max;
+  }
+
+  // Recent activity: last 5 clients by lastSeen
+  const recent = [...allClients]
+    .sort((a,b) => (b.profile.lastSeen||0) - (a.profile.lastSeen||0))
+    .slice(0, 5);
+
+  const dashRecent = document.getElementById('dash-recent');
+  if (recent.length === 0) {
+    dashRecent.innerHTML = '<div class="empty-state"><div class="empty-state-icon">○</div><h3>No clients yet</h3><p>Clients appear here once they register with their access code.</p></div>';
+    return;
+  }
+  dashRecent.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      ${recent.map(c => {
+        const name   = c.data['i-name'] || c.profile.name || c.code;
+        const status = getStatus(c.code);
+        const seen   = c.profile.lastSeen ? fmtDate(c.profile.lastSeen) : 'Never';
+        return `<div style="display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer" onclick="showAdminPage('clients')">
+          <div class="client-avatar">${initials(name)}</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:400;color:var(--soil)">${esc(name)}</div>
+            <div style="font-size:11px;color:var(--soil-hint);font-family:monospace;letter-spacing:1px">${c.code}</div>
+          </div>
+          <div><span class="status-badge ${status}">${STATUS_LABELS[status]}</span></div>
+          <div style="font-size:12px;color:var(--soil-muted);font-weight:300">${seen}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─── CLIENT GRID ──────────────────────────────────────────────────────────────
+function setFilter(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderClientGrid(allClients);
+}
+
+function renderClientGrid(clients) {
+  const grid = document.getElementById('client-grid');
+  const visible = clients.filter(c =>
+    activeFilter === 'all' || getStatus(c.code) === activeFilter
+  );
+
+  if (visible.length === 0) {
+    grid.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">○</div>
+      <h3>${clients.length === 0 ? 'No clients yet' : 'No clients in this filter'}</h3>
+      <p>${clients.length === 0
+        ? 'Clients appear here once they unlock the app with their access code.'
+        : 'Switch to a different filter to see other clients.'}</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(c => buildClientCard(c)).join('');
+}
+
+function buildClientCard(c) {
+  const name      = c.data['i-name'] || c.profile.name || c.code;
+  const status    = getStatus(c.code);
+  const goal      = c.data['c-goal'] || '';
+  const why       = c.data['c-why']  || '';
+  const wa        = c.data['i-wa']   || '';
+  const createdAt = c.profile.createdAt ? fmtDate(c.profile.createdAt) : '—';
+  const notes     = getNotes(c.code);
+
+  return `<div class="client-card" id="card-${c.code}">
+    <div class="client-card-header" onclick="toggleCard('${c.code}')">
+      <div class="client-avatar">${initials(name)}</div>
+      <div class="client-name-block">
+        <div class="client-name">${esc(name)}</div>
+        <div class="client-code">${c.code}</div>
+      </div>
+      <div class="client-meta">
+        <div class="client-date">${createdAt}</div>
+        <span class="status-badge ${status}">${STATUS_LABELS[status]}</span>
+        <span class="expand-icon">▾</span>
+      </div>
+    </div>
+    <div class="client-card-body">
+      <div class="client-body-grid">
+        <div class="client-body-left">
+          <div class="intake-summary">
+            <div class="intake-field">
+              <div class="intake-field-label">Goal</div>
+              <div class="intake-field-value ${goal ? '' : 'empty'}">${goal ? esc(truncate(goal,160)) : 'Not filled in yet'}</div>
+            </div>
+            <div class="intake-field">
+              <div class="intake-field-label">Why now</div>
+              <div class="intake-field-value ${why ? '' : 'empty'}">${why ? esc(truncate(why,120)) : 'Not filled in yet'}</div>
+            </div>
+            <div class="intake-field">
+              <div class="intake-field-label">WhatsApp</div>
+              <div class="intake-field-value ${wa ? '' : 'empty'}">${wa ? esc(wa) : 'Not filled in yet'}</div>
+            </div>
+            <div class="intake-field">
+              <div class="intake-field-label">Last seen</div>
+              <div class="intake-field-value">${c.profile.lastSeen ? fmtDate(c.profile.lastSeen) : '—'}</div>
+            </div>
+          </div>
+          <button class="view-full-btn" onclick="openIntakeModal('${c.code}')">View full intake &rarr;</button>
+        </div>
+        <div class="client-body-right">
+          <div class="status-section">
+            <div class="status-section-label">Client status</div>
+            <div class="status-options">
+              ${STATUSES.map(s => `<button class="status-option ${getStatus(c.code) === s ? 'selected '+s : ''}" onclick="updateStatus('${c.code}','${s}',this)">${STATUS_LABELS[s]}</button>`).join('')}
+            </div>
+          </div>
+          <div class="notes-label">Private coaching notes</div>
+          <textarea class="notes-textarea" id="notes-${c.code}" placeholder="Observations, concerns, next session focus…" onblur="saveNotes('${c.code}')">${esc(notes)}</textarea>
+          <div class="notes-saved" id="notes-saved-${c.code}">Notes saved</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(code) {
+  const card = document.getElementById('card-' + code);
+  card.classList.toggle('expanded');
+}
+
+function updateStatus(code, status, btn) {
+  setStatus(code, status);
+  // Update button highlights in this card
+  btn.closest('.status-options').querySelectorAll('.status-option').forEach(b => {
+    b.className = 'status-option';
+    const s = b.textContent.toLowerCase().replace(' ','');
+    const mapped = STATUSES.find(x => STATUS_LABELS[x].toLowerCase() === b.textContent.trim().toLowerCase());
+    if (mapped === status) b.classList.add('selected', status);
+  });
+  // Update badge in card header
+  const card = document.getElementById('card-' + code);
+  const badge = card.querySelector('.status-badge');
+  if (badge) { badge.className = 'status-badge ' + status; badge.textContent = STATUS_LABELS[status]; }
+  updateDashboard();
+}
+
+function saveNotes(code) {
+  const ta = document.getElementById('notes-' + code);
+  if (!ta) return;
+  setNotes(code, ta.value);
+  const saved = document.getElementById('notes-saved-' + code);
+  if (saved) { saved.classList.add('visible'); setTimeout(() => saved.classList.remove('visible'), 1800); }
+}
+
+// ─── FULL INTAKE MODAL ────────────────────────────────────────────────────────
+function openIntakeModal(code) {
+  const client = allClients.find(c => c.code === code);
+  if (!client) return;
+  const d = client.data;
+  const name = d['i-name'] || client.profile.name || code;
+
+  document.getElementById('im-name').textContent = name;
+  document.getElementById('im-meta').textContent =
+    'Code: ' + code + (client.profile.createdAt ? '  ·  Registered: ' + fmtDate(client.profile.createdAt) : '');
+
+  const sections = [
+    { title: 'Personal details', rows: [
+      ['Name', 'i-name'], ['Date of birth','i-dob'], ['Occupation','i-occ'],
+      ['WhatsApp','i-wa'], ['How they heard','i-referral']
+    ]},
+    { title: 'A — Starting point', rows: [
+      ['Relationship with body','a-body'], ['Typical week','a-week'],
+      ['Sleep hours','a-sleep'], ['Biggest challenge','a-challenge']
+    ]},
+    { title: 'B — Training history', rows: [
+      ['Training history','b-history'], ['Injury / pain','b-injury'],
+      ['Medical conditions','b-medical']
+    ]},
+    { title: 'C — Goals', rows: [
+      ['Goal for 40 days','c-goal'], ['Why now','c-why'],
+      ['What stopped before','c-blocker'], ['Success at Day 40','c-success'],
+      ['How body will feel','c-feel']
+    ]},
+    { title: 'D — Training schedule', rows: [
+      ['Programme detail','d-prog-detail']
+    ]},
+    { title: 'E — Lifestyle', rows: [
+      ['Supplements detail','e-supps']
+    ]},
+    { title: 'F — Mindset & readiness', rows: [
+      ['Commitment sentence','f-commit'], ['Consistency story','f-story'],
+      ['Advice to a friend','f-friend'], ['What would help','f-support']
+    ]},
+    { title: 'G — Anything else', rows: [
+      ['Additional info','g-extra']
+    ]}
+  ];
+
+  document.getElementById('im-body').innerHTML = sections.map(s => `
+    <div class="intake-section-title">${s.title}</div>
+    ${s.rows.map(([label, key]) => {
+      const val = (d[key] || '').trim();
+      return `<div class="intake-row">
+        <div class="intake-row-label">${label}</div>
+        <div class="intake-row-value ${val ? '' : 'empty'}">${val ? '<pre>' + esc(val) + '</pre>' : 'Not filled'}</div>
+      </div>`;
+    }).join('')}
+  `).join('');
+
+  document.getElementById('intake-modal-overlay').classList.add('open');
+}
+
+function closeIntakeModal(e) {
+  if (!e || e.target === document.getElementById('intake-modal-overlay')) {
+    document.getElementById('intake-modal-overlay').classList.remove('open');
+  }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function truncate(str, max) {
+  return str.length > max ? str.slice(0, max) + '…' : str;
+}
+function initials(name) {
+  const parts = String(name).trim().split(/\s+/);
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('admin-pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') adminLogin();
+  document.getElementById('admin-pw').classList.remove('error');
+  document.getElementById('admin-login-error').classList.remove('visible');
+});
+checkAuth();
+</script>
+</body>
+</html>
