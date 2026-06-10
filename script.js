@@ -15,9 +15,9 @@ try {
 } catch(e) { console.warn('Firebase init failed, offline mode:', e); }
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition'];
+const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition','reflection'];
 const FREE_PAGES   = ['welcome','programme'];
-const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition'];
+const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition','reflection'];
 const COACH_EMAIL = 'shadeybahali@gmail.com';
 const ACCESS_CODE = 'ROOTED40';
 
@@ -63,7 +63,8 @@ function syncToFirebase() {
       'cov-name','cov-anchor','cov-signed','cov-date',
       'm1-strongest','m1-hardest','m1-proud','m1-different',
       'm2-strongest','m2-hardest','m2-proud','m2-different',
-      'm3-strongest','m3-hardest','m3-proud','m3-different'
+      'm3-strongest','m3-hardest','m3-proud','m3-different',
+      'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
     ];
     const data = {};
     textIds.forEach(id => {
@@ -187,6 +188,9 @@ async function tryUnlock() {
     try {
       localStorage.setItem('rwm-unlocked', '1');
       localStorage.setItem('rwm-client-code', val);
+      if (!localStorage.getItem('rwm-start-date')) {
+        localStorage.setItem('rwm-start-date', toDateStr(new Date()));
+      }
     } catch(e) {}
     isUnlocked = true;
     input.classList.remove('error');
@@ -199,6 +203,9 @@ async function tryUnlock() {
     registerClient(val);
     loadFromFirebase(val).then(() => updateProgress());
     loadCoachContent(val);
+    updateSidebarStats();
+    renderAnchorCheckin();
+    renderProgressDashboard();
     const dest = pendingPage || 'welcome';
     pendingPage = null;
     showPage(dest);
@@ -236,9 +243,14 @@ async function checkUnlock() {
       const nav = document.getElementById('nav-'+p);
       if (nav) nav.classList.add('gated');
     });
-  } else if (clientCode) {
-    registerClient(clientCode);
-    loadCoachContent(clientCode);
+  } else {
+    if (!localStorage.getItem('rwm-start-date')) {
+      localStorage.setItem('rwm-start-date', toDateStr(new Date()));
+    }
+    if (clientCode) {
+      registerClient(clientCode);
+      loadCoachContent(clientCode);
+    }
   }
 }
 
@@ -465,6 +477,14 @@ function showPage(id) {
     window.scrollTo({top:0, behavior:'smooth'});
     return;
   }
+  // Reflection page requires day 40
+  if (id === 'reflection' && isUnlocked && getDayNumber() < 40) {
+    const day = getDayNumber();
+    openModal('loading', 'Almost there',
+      `The Day 40 Reflection unlocks on your final day. You are on <strong>Day ${day} of 40</strong> — keep going.`,
+      [{label:'Keep going', cls:'btn-save', fn: closeModal}]);
+    return;
+  }
   PAGES.forEach(p => {
     document.getElementById('page-'+p).classList.remove('active');
     const nav = document.getElementById('nav-'+p);
@@ -518,7 +538,8 @@ function loadAll() {
     'cov-name','cov-anchor','cov-signed','cov-date',
     'm1-strongest','m1-hardest','m1-proud','m1-different',
     'm2-strongest','m2-hardest','m2-proud','m2-different',
-    'm3-strongest','m3-hardest','m3-proud','m3-different'
+    'm3-strongest','m3-hardest','m3-proud','m3-different',
+    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
   ];
 
   textIds.forEach(id => {
@@ -559,6 +580,11 @@ function loadAll() {
   checkEJSReady();
 
   updateProgress();
+  if (isUnlocked) {
+    updateSidebarStats();
+    renderAnchorCheckin();
+    renderProgressDashboard();
+  }
 }
 
 function autosave() {
@@ -579,7 +605,8 @@ function autosave() {
     'cov-name','cov-anchor','cov-signed','cov-date',
     'm1-strongest','m1-hardest','m1-proud','m1-different',
     'm2-strongest','m2-hardest','m2-proud','m2-different',
-    'm3-strongest','m3-hardest','m3-proud','m3-different'
+    'm3-strongest','m3-hardest','m3-proud','m3-different',
+    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
   ];
 
   textIds.forEach(id => {
@@ -704,6 +731,280 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
+// ─── DAY TRACKER & STREAK ─────────────────────────────────────────────────────
+function toDateStr(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getStartDate() {
+  let d = localStorage.getItem('rwm-start-date');
+  if (!d) {
+    d = toDateStr(new Date());
+    try { localStorage.setItem('rwm-start-date', d); } catch(e) {}
+  }
+  return d;
+}
+
+function getDayNumber() {
+  const start = new Date(getStartDate() + 'T00:00:00');
+  const today = new Date(toDateStr(new Date()) + 'T00:00:00');
+  const diff = Math.floor((today - start) / 86400000) + 1;
+  return Math.min(Math.max(diff, 1), 40);
+}
+
+function getDailyRecord(dateStr) {
+  try { return JSON.parse(localStorage.getItem('rwm-daily-' + dateStr) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function dayHasAnchor(dateStr) {
+  const rec = getDailyRecord(dateStr);
+  return Object.values(rec).some(v => v === '1');
+}
+
+function getStreak() {
+  const d = new Date();
+  // If today has no anchors yet, start from yesterday so streak isn't broken mid-day
+  if (!dayHasAnchor(toDateStr(d))) d.setDate(d.getDate() - 1);
+  let streak = 0;
+  while (streak < 40) {
+    if (!dayHasAnchor(toDateStr(d))) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+function getDaysActive() {
+  const start = new Date(getStartDate() + 'T00:00:00');
+  const today = new Date(toDateStr(new Date()) + 'T00:00:00');
+  const total = Math.min(Math.floor((today - start) / 86400000) + 1, 40);
+  let active = 0;
+  for (let i = 0; i < total; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    if (dayHasAnchor(toDateStr(d))) active++;
+  }
+  return active;
+}
+
+function getWeeklyStats() {
+  const start = new Date(getStartDate() + 'T00:00:00');
+  const today = new Date(toDateStr(new Date()) + 'T00:00:00');
+  const total = Math.min(Math.floor((today - start) / 86400000) + 1, 40);
+  const weeks = [];
+  for (let w = 0; w < Math.ceil(total / 7); w++) {
+    let ticks = 0, possible = 0;
+    for (let d = 0; d < 7; d++) {
+      const offset = w * 7 + d;
+      if (offset >= total) break;
+      const date = new Date(start);
+      date.setDate(date.getDate() + offset);
+      const rec = getDailyRecord(toDateStr(date));
+      ticks += Object.values(rec).filter(v => v === '1').length;
+      possible += 5;
+    }
+    weeks.push({ week: w + 1, rate: possible > 0 ? ticks / possible : 0 });
+  }
+  return weeks;
+}
+
+// ─── SIDEBAR STATS ────────────────────────────────────────────────────────────
+function updateSidebarStats() {
+  const statsEl = document.getElementById('sidebar-stats');
+  if (!statsEl || !isUnlocked) return;
+  statsEl.style.display = '';
+
+  const dayNum = getDayNumber();
+  const streak = getStreak();
+
+  const numEl = document.getElementById('day-number');
+  if (numEl) numEl.textContent = dayNum;
+
+  const ringFill = document.getElementById('ring-fill');
+  if (ringFill) {
+    const circ = 2 * Math.PI * 28;
+    ringFill.style.strokeDasharray = circ;
+    ringFill.style.strokeDashoffset = circ * (1 - dayNum / 40);
+  }
+
+  const streakBadge = document.getElementById('streak-badge');
+  const streakCount = document.getElementById('streak-count');
+  if (streakCount) streakCount.textContent = streak;
+  if (streakBadge) streakBadge.style.display = streak > 0 ? '' : 'none';
+
+  // Show reflection nav item when client reaches day 35+ as a teaser, fully at 40
+  const refNav = document.getElementById('nav-reflection');
+  const refLabel = document.getElementById('nav-label-reflection');
+  if (refNav && refLabel) {
+    if (dayNum >= 35) {
+      refNav.style.display = '';
+      refLabel.style.display = '';
+      if (dayNum < 40) refNav.classList.add('gated');
+      else refNav.classList.remove('gated');
+    }
+  }
+}
+
+// ─── DAILY ANCHOR CHECK-IN ───────────────────────────────────────────────────
+function renderAnchorCheckin() {
+  const widget = document.getElementById('anchor-checkin');
+  const list   = document.getElementById('anchor-checkin-list');
+  if (!widget || !list || !isUnlocked) return;
+  widget.style.display = '';
+
+  const todayStr = toDateStr(new Date());
+  const rec = getDailyRecord(todayStr);
+
+  list.innerHTML = [1,2,3,4,5].map(n => {
+    const label = (localStorage.getItem('rwm-anc-' + n) || '').trim() || 'Anchor ' + n;
+    const done  = rec[n] === '1';
+    return `<label class="anchor-check-item${done ? ' done' : ''}">
+      <input type="checkbox" ${done ? 'checked' : ''} onchange="saveTodayAnchor(${n}, this.checked)">
+      <span class="anchor-check-box"></span>
+      <span class="anchor-check-label">${escHtmlClient(label)}</span>
+    </label>`;
+  }).join('');
+}
+
+function saveTodayAnchor(num, checked) {
+  const todayStr = toDateStr(new Date());
+  const rec = getDailyRecord(todayStr);
+  rec[num] = checked ? '1' : '0';
+  try { localStorage.setItem('rwm-daily-' + todayStr, JSON.stringify(rec)); } catch(e) {}
+  // Refresh check-in UI inline (avoid full re-render so checkbox state is preserved)
+  document.querySelectorAll('.anchor-check-item').forEach((el, i) => {
+    const inp = el.querySelector('input');
+    if (inp && inp.checked) el.classList.add('done');
+    else el.classList.remove('done');
+  });
+  updateSidebarStats();
+  renderProgressDashboard();
+}
+
+// ─── PROGRESS DASHBOARD ───────────────────────────────────────────────────────
+function renderProgressDashboard() {
+  const dash = document.getElementById('prog-dashboard');
+  if (!dash || !isUnlocked) return;
+  dash.style.display = '';
+
+  const streak    = getStreak();
+  const daysActive = getDaysActive();
+  const weeks     = getWeeklyStats();
+  const totalRate = weeks.length > 0
+    ? weeks.reduce((s, w) => s + w.rate, 0) / weeks.length : 0;
+
+  const el = id => document.getElementById(id);
+  if (el('dash-days'))   el('dash-days').textContent   = daysActive;
+  if (el('dash-streak')) el('dash-streak').textContent = streak;
+  if (el('dash-rate'))   el('dash-rate').textContent   = Math.round(totalRate * 100) + '%';
+
+  const chart = el('weekly-chart');
+  if (chart) {
+    chart.innerHTML = weeks.length === 0
+      ? '<p class="chart-empty">Start checking in your anchors each day to see weekly progress here.</p>'
+      : `<div class="chart-label">Weekly anchor completion</div>
+         <div class="bar-chart">
+           ${weeks.map(w => `<div class="bar-col">
+             <div class="bar-wrap"><div class="bar-fill" style="height:${Math.round(w.rate*100)}%"></div></div>
+             <div class="bar-label">Wk ${w.week}</div>
+           </div>`).join('')}
+         </div>`;
+  }
+
+  const sectComp = el('section-completion');
+  if (sectComp) {
+    const sections = [
+      { label:'Client Intake',      keys:['rwm-i-name','rwm-a-body','rwm-c-goal','rwm-c-why'] },
+      { label:'Layer 1 · Identity', keys:['rwm-l1-selfimage','rwm-l1-vision','rwm-l1-declaration','rwm-l1-words'] },
+      { label:'Layer 2 · Rhythm',   keys:['rwm-l2-body-move','rwm-l2-mind-stillness','rwm-anc-1','rwm-anc-2','rwm-anc-3'] },
+      { label:'Layer 3 · Recovery', keys:['rwm-l3-slide-trigger','rwm-l3-ritual','rwm-cov-name'] },
+      { label:'90-Day Check-ins',   keys:['rwm-m1-strongest','rwm-m1-proud'] },
+    ];
+    sectComp.innerHTML = `<div class="chart-label" style="margin-top:24px">Workbook sections</div>
+      <div class="section-list">
+        ${sections.map(s => {
+          const filled = s.keys.filter(k => (localStorage.getItem(k)||'').trim().length > 2).length;
+          const done    = filled === s.keys.length;
+          const partial = filled > 0 && !done;
+          const cls     = done ? 'done' : partial ? 'partial' : '';
+          const status  = done ? 'Complete' : partial ? `${filled}/${s.keys.length}` : 'Not started';
+          return `<div class="section-row ${cls}">
+            <span class="section-dot"></span>
+            <span class="section-row-label">${s.label}</span>
+            <span class="section-row-status">${status}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+}
+
+// ─── DAY 40 REFLECTION EMAIL ──────────────────────────────────────────────────
+function buildReflectionText() {
+  const get  = id => (localStorage.getItem('rwm-' + id) || '').trim();
+  const name = get('i-name') || 'Client';
+  return `
+DAY 40 REFLECTION -- THE ROOTED WOMAN METHOD
+============================================
+Submitted: ${new Date().toLocaleString('en-GB')}
+Client: ${name}
+
+1. What has changed most for you in the last 40 days?
+${get('r40-changed')}
+
+2. What are you most proud of?
+${get('r40-proud')}
+
+3. Which anchor became your strongest?
+${get('r40-anchor')}
+
+4. What do you want to carry forward?
+${get('r40-carry')}
+
+5. What does the next chapter look like?
+${get('r40-next')}
+`.trim();
+}
+
+async function submitReflectionEmail() {
+  autosave();
+  const name = localStorage.getItem('rwm-i-name') || 'Client';
+  const {pk, sid, tid, ready} = checkEJSReady();
+
+  if (!ready) {
+    openModal('error', 'Setup not complete',
+      'Please fill in your EmailJS keys in the Client Intake page before sending.',
+      [{label:'OK', cls:'btn-save', fn: closeModal}]);
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-reflection');
+  if (btn) btn.disabled = true;
+  openModal('loading', 'Sending your reflection...', 'Please wait a moment.', []);
+
+  try {
+    emailjs.init({publicKey: pk});
+    await emailjs.send(sid, tid, {
+      to_email:    COACH_EMAIL,
+      to_name:     'Coach',
+      from_name:   name,
+      client_name: name,
+      client_wa:   localStorage.getItem('rwm-i-wa') || '--',
+      intake_text: buildReflectionText(),
+    });
+    localStorage.setItem('rwm-reflection-submitted', new Date().toISOString());
+    openModal('success', 'Reflection sent!',
+      `Your Day 40 reflection has been sent to your coach at <strong>${COACH_EMAIL}</strong>.<br><br>Congratulations on completing the 40-day programme. This is only the beginning.`,
+      [{label:'Close', cls:'btn-save', fn: closeModal}]);
+  } catch(err) {
+    openModal('error', 'Something went wrong',
+      `Could not send: <code>${err.text || err.message || 'unknown'}</code>`,
+      [{label:'Try again', cls:'btn-save', fn: () => { closeModal(); if (btn) btn.disabled = false; }},
+       {label:'Close',     cls:'btn-ghost', fn: () => { closeModal(); if (btn) btn.disabled = false; }}]);
+  }
+}
+
+// ─── STARTUP ──────────────────────────────────────────────────────────────────
 document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
   cb.addEventListener('change', autosave);
 });
@@ -711,5 +1012,8 @@ document.querySelectorAll('input[type="radio"]').forEach(r => {
   r.addEventListener('change', autosave);
 });
 
-checkUnlock();
-loadAll();
+async function init() {
+  await checkUnlock();
+  loadAll();
+}
+init();

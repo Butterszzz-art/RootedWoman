@@ -146,6 +146,28 @@
     <span class="dot"></span> Nutrition Guide
   </div>
 
+  <div class="nav-section-label" id="nav-label-reflection" style="display:none">Milestone</div>
+  <div class="nav-item" onclick="showPage('reflection')" id="nav-reflection" style="display:none">
+    <span class="dot"></span> Day 40 Reflection
+  </div>
+
+  <!-- Day counter + streak (shown after unlock) -->
+  <div class="sidebar-stats" id="sidebar-stats" style="display:none">
+    <div class="day-ring-wrap">
+      <svg class="day-ring" viewBox="0 0 70 70" aria-hidden="true">
+        <circle class="day-ring-bg" cx="35" cy="35" r="28"/>
+        <circle class="day-ring-fill" id="ring-fill" cx="35" cy="35" r="28"/>
+      </svg>
+      <div class="day-ring-label">
+        <span class="day-ring-number" id="day-number">1</span>
+        <span class="day-ring-of">of 40</span>
+      </div>
+    </div>
+    <div class="streak-badge" id="streak-badge" style="display:none">
+      <span>🔥</span> <span id="streak-count">0</span>-day streak
+    </div>
+  </div>
+
   <div class="sidebar-footer">
     <div class="progress-label">
       <span>Progress</span>
@@ -205,12 +227,42 @@
         </div>
       </div>
 
+      <!-- Daily anchor check-in (shown after unlock) -->
+      <div class="anchor-checkin" id="anchor-checkin" style="display:none">
+        <div class="tag">Today</div>
+        <h3>Daily Anchor Check-in</h3>
+        <p>Which of your anchors did you complete today?</p>
+        <div id="anchor-checkin-list"></div>
+      </div>
+
+      <!-- Progress dashboard (shown after unlock) -->
+      <div class="prog-dashboard" id="prog-dashboard" style="display:none">
+        <div class="tag">Your Progress</div>
+        <h3>40-Day Overview</h3>
+        <div class="dashboard-grid">
+          <div class="dash-stat">
+            <div class="dash-stat-num" id="dash-days">0</div>
+            <div class="dash-stat-label">Days active</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-num" id="dash-streak">0</div>
+            <div class="dash-stat-label">Current streak</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-num" id="dash-rate">0%</div>
+            <div class="dash-stat-label">Anchor rate</div>
+          </div>
+        </div>
+        <div id="weekly-chart"></div>
+        <div id="section-completion"></div>
+      </div>
+
       <div class="export-section mt-32">
         <div>
           <h4>Save your progress</h4>
           <p>Your answers are stored in your browser. Use the export button to download a summary at any time.</p>
         </div>
-        <button class="btn-save" onclick="exportData()">Down Export answers</button>
+        <button class="btn-save" onclick="exportData()">Export answers</button>
       </div>
 
       <!-- Coach content: messages + programme (shown after unlock if Shadey has added content) -->
@@ -1216,6 +1268,54 @@
       <div class="closing-quote">
         <div class="closing-quote__text">"You do not need to eat perfectly.<br>You need to eat better than you did yesterday."</div>
         <div class="closing-quote__attr">The Rooted Woman Method</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REFLECTION -->
+  <div class="page" id="page-reflection">
+    <div class="section-header">
+      <div class="tag">Day 40 · Milestone</div>
+      <h2>You made it.<br>Now reflect.</h2>
+      <p>Forty days of practice. Not perfection — practice. Take 20 minutes to answer these questions honestly. Your answers will be sent to your coach.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="field-group">
+        <label class="field-label" for="r40-changed">1. What has changed most for you in the last 40 days — in your body, your mind, or the way you see yourself?</label>
+        <textarea class="field-input" id="r40-changed" rows="5" placeholder="Be specific. Think about how you felt on Day 1 versus today." oninput="autosave()"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="r40-proud">2. What are you most proud of from these 40 days?</label>
+        <textarea class="field-input" id="r40-proud" rows="5" placeholder="It does not have to be a big thing. The small wins matter most." oninput="autosave()"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="r40-anchor">3. Which anchor became your strongest? What made it stick?</label>
+        <textarea class="field-input" id="r40-anchor" rows="5" placeholder="Think about the habit or practice that felt most natural by the end." oninput="autosave()"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="r40-carry">4. What do you want to carry forward from these 40 days?</label>
+        <textarea class="field-input" id="r40-carry" rows="5" placeholder="Which of the three layers — Identity, Rhythm, or Recovery — will you keep returning to?" oninput="autosave()"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="r40-next">5. What does the next chapter of your health journey look like?</label>
+        <textarea class="field-input" id="r40-next" rows="5" placeholder="You have built a foundation. Where do you go from here?" oninput="autosave()"></textarea>
+      </div>
+
+      <div class="closing-quote">
+        <div class="closing-quote__text">"The goal was never 40 days.<br>The goal was becoming someone who no longer needs to start over."</div>
+        <div class="closing-quote__attr">The Rooted Woman Method</div>
+      </div>
+
+      <div id="status-reflection" class="save-status">Saved</div>
+      <div class="form-actions">
+        <button class="btn-save" onclick="saveSection('reflection')">Save reflection</button>
+        <button class="btn-primary" id="btn-submit-reflection" onclick="submitReflectionEmail()">Send to coach &rarr;</button>
       </div>
 
     </div>

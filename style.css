@@ -1480,6 +1480,267 @@
   .coach-content { display: none; margin-top: 32px; }
   .coach-content.visible { display: block; }
 
+  /* ── DAY RING & STREAK ────────────────────────────────────────────── */
+  .sidebar-stats {
+    padding: 20px 20px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .day-ring-wrap {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    margin-bottom: 8px;
+  }
+  .day-ring {
+    width: 70px;
+    height: 70px;
+    transform: rotate(-90deg);
+  }
+  .day-ring-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 5;
+  }
+  .day-ring-fill {
+    fill: none;
+    stroke: var(--sage);
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+  .day-ring-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+  .day-ring-number {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--soil);
+    line-height: 1;
+  }
+  .day-ring-of {
+    display: block;
+    font-size: 9px;
+    color: var(--soil-muted, #888);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+  .streak-badge {
+    font-size: 12px;
+    color: var(--soil);
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  /* ── ANCHOR CHECK-IN ──────────────────────────────────────────────── */
+  .anchor-checkin {
+    margin: 32px 0;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+  }
+  .anchor-checkin h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--soil);
+    margin: 8px 0 4px;
+  }
+  .anchor-checkin p {
+    font-size: 14px;
+    color: var(--soil-muted, #888);
+    margin: 0 0 20px;
+    font-weight: 300;
+  }
+  .anchor-check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .anchor-check-item:last-child { border-bottom: none; }
+  .anchor-check-item input[type="checkbox"] { display: none; }
+  .anchor-check-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .anchor-check-item.done .anchor-check-box {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+  .anchor-check-item.done .anchor-check-box::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+  }
+  .anchor-check-label {
+    font-size: 15px;
+    color: var(--soil);
+    font-weight: 300;
+    line-height: 1.5;
+    transition: opacity 0.2s;
+  }
+  .anchor-check-item.done .anchor-check-label {
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+
+  /* ── PROGRESS DASHBOARD ───────────────────────────────────────────── */
+  .prog-dashboard {
+    margin: 32px 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    background: #fff;
+  }
+  .prog-dashboard h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--soil);
+    margin: 8px 0 24px;
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .dash-stat {
+    text-align: center;
+    padding: 16px 8px;
+    background: var(--cream);
+    border-radius: 8px;
+  }
+  .dash-stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--soil);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .dash-stat-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--soil-muted, #888);
+  }
+  .chart-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--warm);
+    margin-bottom: 10px;
+  }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 80px;
+    margin-bottom: 8px;
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+  .bar-wrap {
+    flex: 1;
+    width: 100%;
+    background: var(--cream);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+  }
+  .bar-fill {
+    width: 100%;
+    background: var(--sage);
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+    transition: height 0.4s ease;
+  }
+  .bar-label {
+    font-size: 10px;
+    color: var(--soil-muted, #888);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+  }
+  .chart-empty {
+    font-size: 13px;
+    color: var(--soil-muted, #888);
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .section-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .section-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--cream);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .section-row.done    { background: #f0f7f1; border-color: var(--sage); }
+  .section-row.partial { background: #fdf8f2; border-color: var(--warm); }
+  .section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .section-row.done .section-dot    { background: var(--sage); }
+  .section-row.partial .section-dot { background: var(--warm); }
+  .section-row-label {
+    flex: 1;
+    font-size: 13px;
+    color: var(--soil);
+    font-weight: 300;
+  }
+  .section-row-status {
+    font-size: 11px;
+    color: var(--soil-muted, #888);
+    letter-spacing: 0.5px;
+  }
+  .section-row.done .section-row-status    { color: var(--sage); }
+  .section-row.partial .section-row-status { color: var(--warm); }
+
   /* MOBILE */
   @media (max-width: 768px) {
     .hamburger { display: flex; }
