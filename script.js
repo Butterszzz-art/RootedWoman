@@ -251,6 +251,7 @@ async function checkUnlock() {
       registerClient(clientCode);
       loadCoachContent(clientCode);
     }
+    showPage('welcome');
   }
 }
 
