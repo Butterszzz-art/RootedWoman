@@ -7,95 +7,68 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 </head>
 <body>
 
 <div class="paywall" id="paywall" style="display:none">
+  <div class="auth-card">
+    <button onclick="closePaywall()" class="paywall-close-btn" title="Back to overview">&times;</button>
 
-  <div class="paywall-hero">
-    <button onclick="closePaywall()" class="paywall-close-btn" title="Back to overview">x</button>
-    <div class="eyebrow">Rooted in 40 - 40-day programme</div>
-    <h1>For Women Who Are<br>Done Starting Over</h1>
-    <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
-  </div>
-
-  <div class="paywall-body">
-
-    <div class="paywall-intro">
-      <p>Bon dia 🌸</p>
-      <p>You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.</p>
-      <p>I built all of that into a programme. It's called <strong>Rooted in 40</strong>.</p>
-      <p class="sign">— Shadey</p>
+    <div class="auth-brand">
+      <div class="eyebrow">Rooted in 40</div>
+      <h2>Your workbook</h2>
+      <p>Sign in to access your full workbook, or create an account with your invite code.</p>
     </div>
 
-    <div class="paywall-what">
-      <h2>What you get</h2>
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign in</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">New account</button>
     </div>
 
-    <div class="paywall-includes">
-      <div class="paywall-include-item">
-        <div class="ico">🌸</div>
-        <div>
-          <h4>2 Coaching sessions</h4>
-          <p>Day 1 kick-off + midpoint check-in with Shadey personally.</p>
-        </div>
+    <!-- Sign in form -->
+    <div id="auth-signin-form">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" type="email" id="auth-email-in" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter') supabaseSignIn()">
       </div>
-      <div class="paywall-include-item">
-        <div class="ico">💪</div>
-        <div>
-          <h4>5 Personal training sessions</h4>
-          <p>One session every weekend, training with Shadey directly.</p>
-        </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" type="password" id="auth-pw-in" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter') supabaseSignIn()">
       </div>
-      <div class="paywall-include-item">
-        <div class="ico">📋</div>
-        <div>
-          <h4>Full 5-week training schedule</h4>
-          <p>A personalised plan so you always know what to do and when.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">🏋️</div>
-        <div>
-          <h4>Gym orientation on Day 1</h4>
-          <p>So you never feel lost or intimidated in the gym again.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">📲</div>
-        <div>
-          <h4>Twice-weekly WhatsApp check-ins</h4>
-          <p>Video guidance for every solo session. You are never doing this alone.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">📖</div>
-        <div>
-          <h4>The Rooted Woman Method Workbook</h4>
-          <p>The full identity, rhythm, and recovery system — this workbook.</p>
-        </div>
+      <div class="auth-error" id="auth-error-in"></div>
+      <button class="auth-btn" id="auth-btn-in" onclick="supabaseSignIn()">Sign in &rarr;</button>
+      <div class="auth-offline-hint" id="offline-hint" style="display:none">
+        Supabase not configured — <a href="#" onclick="offlineUnlock(); return false">use access code offline</a>
       </div>
     </div>
 
-    <div class="paywall-price">
-      <div class="price-tag">Investment</div>
-      <div class="amount">AWG 500</div>
-      <div class="period">for the full 40 days</div>
-      <div class="spots">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
-      <a href="https://wa.me/2977300112" target="_blank" class="wa-btn">📱 WhatsApp Shadey · +297 730 0112</a>
-      <div class="paywall-price-note">If something in you is saying yes — reach out and let's talk 🌸</div>
+    <!-- Sign up form -->
+    <div id="auth-signup-form" style="display:none">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" type="email" id="auth-email-up" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Invite code <span class="auth-hint">(from Shadey)</span></label>
+        <input class="auth-input" type="text" id="auth-code-up" placeholder="e.g. ROOTED40" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:2px">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Create a password</label>
+        <input class="auth-input" type="password" id="auth-pw-up" placeholder="At least 8 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter') supabaseSignUp()">
+      </div>
+      <div class="auth-error" id="auth-error-up"></div>
+      <button class="auth-btn" id="auth-btn-up" onclick="supabaseSignUp()">Create account &rarr;</button>
+      <p class="auth-fine-print">After creating your account you may need to confirm your email before signing in.</p>
     </div>
 
-    <div class="paywall-unlock">
-      <h3>Already joined? Enter your access code</h3>
-      <p>After payment, Shadey will send you a personal access code that unlocks your full workbook, intake questionnaire, and nutrition guide.</p>
-      <div class="unlock-row">
-        <input type="text" id="unlock-input" placeholder="Enter code..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') tryUnlock()">
-        <button onclick="tryUnlock()">Unlock</button>
-      </div>
-      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
+    <!-- Offline / confirm state -->
+    <div id="auth-confirm-msg" style="display:none" class="auth-confirm">
+      <div>📬</div>
+      <strong>Check your email</strong>
+      <p>We sent a confirmation link to your address. Click it, then come back here and sign in.</p>
     </div>
 
   </div>
@@ -309,6 +282,20 @@
 
       <hr class="divider">
       <h3 class="section-heading">A — Your Starting Point</h3>
+
+      <div class="field-group">
+        <label class="field-label">Starting photo <span class="field-hint">(optional)</span></label>
+        <div class="field-hint">A private reference for you and Shadey. Stored securely — never shared.</div>
+        <div class="photo-upload-wrap" id="photo-upload-wrap">
+          <label class="photo-upload-label" for="photo-upload-input">
+            <span class="photo-upload-icon">📷</span>
+            <span class="photo-upload-text" id="photo-upload-text">Choose photo</span>
+          </label>
+          <input type="file" id="photo-upload-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handlePhotoUpload(this)">
+          <img class="photo-preview" id="photo-preview" alt="Starting photo preview" style="display:none">
+          <div class="photo-upload-status" id="photo-status"></div>
+        </div>
+      </div>
 
       <div class="field-group">
         <label class="field-label">How would you describe your current relationship with your body?</label>

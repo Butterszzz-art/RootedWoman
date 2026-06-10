@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin · Rooted in 40</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 <style>
 :root {
   --sage: #7a9e7e; --sage-light: #d4e5d6; --sage-pale: #f0f5f0;
@@ -264,9 +264,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <div class="login-eyebrow">Rooted in 40</div>
     <h1>Admin access</h1>
     <p>This page is private to your coaching practice. It is not linked from the client app.</p>
-    <input class="login-input" type="password" id="admin-pw" placeholder="Enter admin password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button class="login-btn" onclick="adminLogin()">Sign in &rarr;</button>
-    <div class="login-error" id="admin-login-error">Incorrect password. Please try again.</div>
+    <input class="login-input" type="email" id="admin-email" placeholder="Coach email address" autocomplete="email" style="letter-spacing:normal;margin-bottom:12px" onkeydown="if(event.key==='Enter')document.getElementById('admin-pw').focus()">
+    <input class="login-input" type="password" id="admin-pw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="login-btn" id="admin-login-btn" onclick="adminLogin()">Sign in &rarr;</button>
+    <div class="login-error" id="admin-login-error">Incorrect email or password.</div>
   </div>
 </div>
 
@@ -452,55 +453,55 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 </div>
 
 <script>
-// ─── FIREBASE ─────────────────────────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyAZuVfKnZcGzS7N3uJT_JGdFsk3flwZNPM",
-  authDomain: "rooted-in-40.firebaseapp.com",
-  databaseURL: "https://rooted-in-40-default-rtdb.firebaseio.com",
-  projectId: "rooted-in-40",
-  storageBucket: "rooted-in-40.firebasestorage.app",
-  messagingSenderId: "898334778171",
-  appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
-};
-let db = null;
-try {
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-} catch(e) { console.warn('Firebase init failed:', e); }
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+async function adminLogin() {
+  const emailEl = document.getElementById('admin-email');
+  const pwEl    = document.getElementById('admin-pw');
+  const errEl   = document.getElementById('admin-login-error');
+  const btn     = document.getElementById('admin-login-btn');
+  const email   = emailEl.value.trim();
+  const pass    = pwEl.value;
+  errEl.classList.remove('visible');
 
-// ─── AUTH ──────────────────────────────────────────────────────────────────────
-const DEFAULT_PW = 'SHADEY2024';
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; errEl.classList.add('visible'); return; }
+  if (!sb) { errEl.textContent = 'Supabase not configured — set credentials in supabase.js.'; errEl.classList.add('visible'); return; }
 
-function getAdminPw() {
-  return localStorage.getItem('rwm-admin-pw') || DEFAULT_PW;
-}
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Sign in →';
 
-function adminLogin() {
-  const input = document.getElementById('admin-pw');
-  const err   = document.getElementById('admin-login-error');
-  if (input.value === getAdminPw()) {
-    sessionStorage.setItem('rwm-admin-auth', '1');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    loadClients();
-  } else {
-    input.classList.add('error');
-    err.classList.add('visible');
-    input.select();
+  if (error) { emailEl.classList.add('error'); pwEl.classList.add('error'); errEl.textContent = error.message; errEl.classList.add('visible'); return; }
+
+  // Verify this user is an admin
+  const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', data.user.id).single();
+  if (!profile?.is_admin) {
+    await sb.auth.signOut();
+    errEl.textContent = 'This account does not have admin access.';
+    errEl.classList.add('visible');
+    return;
   }
+
+  showApp();
 }
 
-function adminLogout() {
-  sessionStorage.removeItem('rwm-admin-auth');
+async function adminLogout() {
+  if (sb) { try { await sb.auth.signOut(); } catch(e) {} }
   location.reload();
 }
 
-function checkAuth() {
-  if (sessionStorage.getItem('rwm-admin-auth') === '1') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    loadClients();
-  }
+async function checkAuth() {
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).single();
+  if (profile?.is_admin) showApp();
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  loadClients();
+  subscribeToChanges();
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
@@ -568,21 +569,51 @@ function setNotes(code, text) {
 let allClients = [];
 let activeFilter = 'all';
 
+function subscribeToChanges() {
+  if (!sb) return;
+  sb.channel('admin-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => loadClients())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'form_answers' }, () => loadClients())
+    .subscribe();
+}
+
 async function loadClients() {
-  if (!db) {
-    renderClientGrid([]);
-    return;
-  }
+  if (!sb) { renderClientGrid([]); return; }
   try {
-    const snap = await db.ref('clients').once('value');
-    const raw  = snap.val() || {};
-    allClients = Object.entries(raw).map(([code, val]) => ({
-      code,
-      profile: val.profile || {},
-      data:    val.data    || {}
+    const KEY_FIELDS = ['i-name','i-wa','i-referral','c-goal','c-why'];
+
+    const [profilesRes, answersRes] = await Promise.all([
+      sb.from('profiles').select('id,name,whatsapp,is_admin,day_started,photo_url,created_at').eq('is_admin', false),
+      sb.from('form_answers').select('user_id,field_id,value').in('field_id', KEY_FIELDS)
+    ]);
+
+    const answersByUser = {};
+    (answersRes.data || []).forEach(({ user_id, field_id, value }) => {
+      if (!answersByUser[user_id]) answersByUser[user_id] = {};
+      answersByUser[user_id][field_id] = value;
+    });
+
+    // Fetch signed photo URLs in parallel
+    const profiles = profilesRes.data || [];
+    const photoUrls = {};
+    await Promise.all(profiles.map(async p => {
+      if (p.photo_url) {
+        const { data } = await sb.storage.from('client-photos').createSignedUrl(p.photo_url, 3600);
+        if (data?.signedUrl) photoUrls[p.id] = data.signedUrl;
+      }
     }));
-    // Sort by most recent first
-    allClients.sort((a, b) => (b.profile.createdAt || 0) - (a.profile.createdAt || 0));
+
+    allClients = profiles.map(p => ({
+      id:          p.id,
+      name:        p.name || '',
+      whatsapp:    p.whatsapp || '',
+      day_started: p.day_started || null,
+      photo_url:   photoUrls[p.id] || null,
+      created_at:  p.created_at,
+      answers:     answersByUser[p.id] || {}
+    }));
+
+    allClients.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     renderClientGrid(allClients);
     updateDashboard();
   } catch(e) {
@@ -594,10 +625,10 @@ async function loadClients() {
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function updateDashboard() {
   const max     = parseInt(localStorage.getItem('rwm-admin-maxclients') || '6');
-  const active  = allClients.filter(c => getStatus(c.code) === 'active').length;
+  const active  = allClients.filter(c => getStatus(c.id) === 'active').length;
   const total   = allClients.length;
-  const enquiry = allClients.filter(c => getStatus(c.code) === 'enquiry').length;
-  const alumni  = allClients.filter(c => getStatus(c.code) === 'alumni').length;
+  const enquiry = allClients.filter(c => getStatus(c.id) === 'enquiry').length;
+  const alumni  = allClients.filter(c => getStatus(c.id) === 'alumni').length;
 
   const activeCard = document.getElementById('dash-active').closest('.stat-card');
   document.getElementById('dash-active').textContent  = active;
@@ -616,30 +647,26 @@ function updateDashboard() {
 
   renderReferralChart();
 
-  // Recent activity: last 5 clients by lastSeen
-  const recent = [...allClients]
-    .sort((a,b) => (b.profile.lastSeen||0) - (a.profile.lastSeen||0))
-    .slice(0, 5);
-
+  const recent = allClients.slice(0, 5);
   const dashRecent = document.getElementById('dash-recent');
   if (recent.length === 0) {
-    dashRecent.innerHTML = '<div class="empty-state"><div class="empty-state-icon">○</div><h3>No clients yet</h3><p>Clients appear here once they register with their access code.</p></div>';
+    dashRecent.innerHTML = '<div class="empty-state"><div class="empty-state-icon">○</div><h3>No clients yet</h3><p>Clients appear here once they create an account.</p></div>';
     return;
   }
   dashRecent.innerHTML = `
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
       ${recent.map(c => {
-        const name   = c.data['i-name'] || c.profile.name || c.code;
-        const status = getStatus(c.code);
-        const seen   = c.profile.lastSeen ? fmtDate(c.profile.lastSeen) : 'Never';
+        const name   = c.answers['i-name'] || c.name || '—';
+        const status = getStatus(c.id);
+        const joined = c.created_at ? fmtDate(c.created_at) : 'Never';
         return `<div style="display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer" onclick="showAdminPage('clients')">
-          <div class="client-avatar">${initials(name)}</div>
+          ${c.photo_url ? `<img src="${c.photo_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">` : `<div class="client-avatar">${initials(name)}</div>`}
           <div style="flex:1">
             <div style="font-size:15px;font-weight:400;color:var(--soil)">${esc(name)}</div>
-            <div style="font-size:11px;color:var(--soil-hint);font-family:monospace;letter-spacing:1px">${c.code}</div>
+            <div style="font-size:11px;color:var(--soil-hint)">${c.answers['i-wa'] || c.whatsapp || ''}</div>
           </div>
           <div><span class="status-badge ${status}">${STATUS_LABELS[status]}</span></div>
-          <div style="font-size:12px;color:var(--soil-muted);font-weight:300">${seen}</div>
+          <div style="font-size:12px;color:var(--soil-muted);font-weight:300">${joined}</div>
         </div>`;
       }).join('')}
     </div>`;
@@ -656,7 +683,7 @@ function setFilter(filter, btn) {
 function renderClientGrid(clients) {
   const grid = document.getElementById('client-grid');
   const visible = clients.filter(c =>
-    activeFilter === 'all' || getStatus(c.code) === activeFilter
+    activeFilter === 'all' || getStatus(c.id) === activeFilter
   );
 
   if (visible.length === 0) {
@@ -674,20 +701,23 @@ function renderClientGrid(clients) {
 }
 
 function buildClientCard(c) {
-  const name      = c.data['i-name'] || c.profile.name || c.code;
-  const status    = getStatus(c.code);
-  const goal      = c.data['c-goal'] || '';
-  const why       = c.data['c-why']  || '';
-  const wa        = c.data['i-wa']   || '';
-  const createdAt = c.profile.createdAt ? fmtDate(c.profile.createdAt) : '—';
-  const notes     = getNotes(c.code);
+  const name      = c.answers['i-name'] || c.name || '—';
+  const status    = getStatus(c.id);
+  const goal      = c.answers['c-goal'] || '';
+  const why       = c.answers['c-why']  || '';
+  const wa        = c.answers['i-wa']   || c.whatsapp || '';
+  const createdAt = c.created_at ? fmtDate(c.created_at) : '—';
+  const notes     = getNotes(c.id);
+  const safeId    = c.id.replace(/-/g, '_');
 
-  return `<div class="client-card" id="card-${c.code}">
-    <div class="client-card-header" onclick="toggleCard('${c.code}')">
-      <div class="client-avatar">${initials(name)}</div>
+  return `<div class="client-card" id="card-${safeId}">
+    <div class="client-card-header" onclick="toggleCard('${safeId}')">
+      ${c.photo_url
+        ? `<img src="${c.photo_url}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0" alt="">`
+        : `<div class="client-avatar">${initials(name)}</div>`}
       <div class="client-name-block">
         <div class="client-name">${esc(name)}</div>
-        <div class="client-code">${c.code}</div>
+        <div class="client-code">${c.day_started ? 'Started ' + fmtDate(c.day_started) : 'Not started'}</div>
       </div>
       <div class="client-meta">
         <div class="client-date">${createdAt}</div>
@@ -711,68 +741,70 @@ function buildClientCard(c) {
               <div class="intake-field-label">WhatsApp</div>
               <div class="intake-field-value ${wa ? '' : 'empty'}">${wa ? esc(wa) : 'Not filled in yet'}</div>
             </div>
-            <div class="intake-field">
-              <div class="intake-field-label">Last seen</div>
-              <div class="intake-field-value">${c.profile.lastSeen ? fmtDate(c.profile.lastSeen) : '—'}</div>
-            </div>
           </div>
-          <button class="view-full-btn" onclick="openIntakeModal('${c.code}')">View full intake &rarr;</button>
+          <button class="view-full-btn" onclick="openIntakeModal('${c.id}')">View full intake &rarr;</button>
         </div>
         <div class="client-body-right">
           <div class="status-section">
             <div class="status-section-label">Client status</div>
             <div class="status-options">
-              ${STATUSES.map(s => `<button class="status-option ${getStatus(c.code) === s ? 'selected '+s : ''}" onclick="updateStatus('${c.code}','${s}',this)">${STATUS_LABELS[s]}</button>`).join('')}
+              ${STATUSES.map(s => `<button class="status-option ${getStatus(c.id) === s ? 'selected '+s : ''}" onclick="updateStatus('${c.id}','${s}',this)">${STATUS_LABELS[s]}</button>`).join('')}
             </div>
           </div>
           <div class="notes-label">Private coaching notes</div>
-          <textarea class="notes-textarea" id="notes-${c.code}" placeholder="Observations, concerns, next session focus…" onblur="saveNotes('${c.code}')">${esc(notes)}</textarea>
-          <div class="notes-saved" id="notes-saved-${c.code}">Notes saved</div>
+          <textarea class="notes-textarea" id="notes-${safeId}" placeholder="Observations, concerns, next session focus…" onblur="saveNotes('${c.id}')">${esc(notes)}</textarea>
+          <div class="notes-saved" id="notes-saved-${safeId}">Notes saved</div>
         </div>
       </div>
     </div>
   </div>`;
 }
 
-function toggleCard(code) {
-  const card = document.getElementById('card-' + code);
+function toggleCard(safeId) {
+  const card = document.getElementById('card-' + safeId);
   card.classList.toggle('expanded');
 }
 
-function updateStatus(code, status, btn) {
-  setStatus(code, status);
-  // Update button highlights in this card
+function updateStatus(id, status, btn) {
+  setStatus(id, status);
   btn.closest('.status-options').querySelectorAll('.status-option').forEach(b => {
     b.className = 'status-option';
-    const s = b.textContent.toLowerCase().replace(' ','');
     const mapped = STATUSES.find(x => STATUS_LABELS[x].toLowerCase() === b.textContent.trim().toLowerCase());
     if (mapped === status) b.classList.add('selected', status);
   });
-  // Update badge in card header
-  const card = document.getElementById('card-' + code);
-  const badge = card.querySelector('.status-badge');
+  const safeId = id.replace(/-/g, '_');
+  const card   = document.getElementById('card-' + safeId);
+  const badge  = card?.querySelector('.status-badge');
   if (badge) { badge.className = 'status-badge ' + status; badge.textContent = STATUS_LABELS[status]; }
   updateDashboard();
 }
 
-function saveNotes(code) {
-  const ta = document.getElementById('notes-' + code);
+function saveNotes(id) {
+  const safeId = id.replace(/-/g, '_');
+  const ta     = document.getElementById('notes-' + safeId);
   if (!ta) return;
-  setNotes(code, ta.value);
-  const saved = document.getElementById('notes-saved-' + code);
+  setNotes(id, ta.value);
+  const saved = document.getElementById('notes-saved-' + safeId);
   if (saved) { saved.classList.add('visible'); setTimeout(() => saved.classList.remove('visible'), 1800); }
 }
 
 // ─── FULL INTAKE MODAL ────────────────────────────────────────────────────────
-function openIntakeModal(code) {
-  const client = allClients.find(c => c.code === code);
+async function openIntakeModal(id) {
+  const client = allClients.find(c => c.id === id);
   if (!client) return;
-  const d = client.data;
-  const name = d['i-name'] || client.profile.name || code;
 
+  // Load all answers for this user from Supabase if configured
+  let d = { ...client.answers };
+  if (sb) {
+    const { data } = await sb.from('form_answers').select('field_id,value').eq('user_id', id);
+    if (data) data.forEach(({ field_id, value }) => { d[field_id] = value; });
+  }
+
+  const name = d['i-name'] || client.name || '—';
   document.getElementById('im-name').textContent = name;
   document.getElementById('im-meta').textContent =
-    'Code: ' + code + (client.profile.createdAt ? '  ·  Registered: ' + fmtDate(client.profile.createdAt) : '');
+    'Registered: ' + (client.created_at ? fmtDate(client.created_at) : '—') +
+    (client.day_started ? '  ·  Started: ' + fmtDate(client.day_started) : '');
 
   const sections = [
     { title: 'Personal details', rows: [
@@ -845,11 +877,11 @@ function fmtDate(ts) {
 async function loadWaitlist() {
   const el = document.getElementById('waitlist-entries');
   if (!el) return;
-  if (!db) { el.innerHTML = '<div class="empty-state"><h3>Offline</h3><p>Firebase unavailable.</p></div>'; return; }
+  if (!sb) { el.innerHTML = '<div class="empty-state"><h3>Offline</h3><p>Supabase not configured.</p></div>'; return; }
   try {
-    const snap = await db.ref('waitlist').once('value');
-    const raw  = snap.val() || {};
-    const entries = Object.values(raw).sort((a, b) => b.submittedAt - a.submittedAt);
+    const { data, error } = await sb.from('waitlist').select('name,whatsapp,submitted_at').order('submitted_at', { ascending: false });
+    if (error) throw error;
+    const entries = data || [];
     if (entries.length === 0) {
       el.innerHTML = `<div class="empty-state">
         <div class="empty-state-icon">✉</div>
@@ -871,7 +903,7 @@ async function loadWaitlist() {
           ${entries.map((e, i) => `<tr style="${i < entries.length - 1 ? 'border-bottom:1px solid var(--border)' : ''}">
             <td style="padding:14px 20px;font-size:14px;color:var(--soil);font-weight:400">${esc(e.name || '—')}</td>
             <td style="padding:14px 20px;font-size:14px;color:var(--soil-muted);font-weight:300">${esc(e.whatsapp || '—')}</td>
-            <td style="padding:14px 20px;font-size:13px;color:var(--soil-hint);font-weight:300">${e.submittedAt ? fmtDate(e.submittedAt) : '—'}</td>
+            <td style="padding:14px 20px;font-size:13px;color:var(--soil-hint);font-weight:300">${e.submitted_at ? fmtDate(e.submitted_at) : '—'}</td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -889,7 +921,7 @@ function renderReferralChart() {
   // Aggregate i-referral values across all clients
   const counts = {};
   allClients.forEach(c => {
-    const raw = (c.data['i-referral'] || '').trim();
+    const raw = (c.answers['i-referral'] || '').trim();
     if (!raw) return;
     // Normalise: lowercase, collapse whitespace, cap at 40 chars for display
     const key = raw.toLowerCase().replace(/\s+/g, ' ').slice(0, 40);
@@ -922,8 +954,11 @@ function renderReferralChart() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-document.getElementById('admin-pw').addEventListener('keydown', e => {
-  if (e.key === 'Enter') adminLogin();
+document.getElementById('admin-email').addEventListener('input', () => {
+  document.getElementById('admin-email').classList.remove('error');
+  document.getElementById('admin-login-error').classList.remove('visible');
+});
+document.getElementById('admin-pw').addEventListener('input', () => {
   document.getElementById('admin-pw').classList.remove('error');
   document.getElementById('admin-login-error').classList.remove('visible');
 });
