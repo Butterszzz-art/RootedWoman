@@ -2529,18 +2529,33 @@ async function tryUnlock() {
   }
 }
 
-function checkUnlock() {
+async function checkUnlock() {
   try {
     isUnlocked = localStorage.getItem('rwm-unlocked') === '1';
     clientCode = localStorage.getItem('rwm-client-code') || null;
   } catch(e) {}
+
+  // If we have a stored code, verify it is still active in Firebase
+  // (allows Shadey to revoke access; hardcoded ROOTED40 always passes)
+  if (isUnlocked && clientCode && clientCode !== ACCESS_CODE && db) {
+    try {
+      const snap = await db.ref('coach/codes/'+clientCode).once('value');
+      const data = snap.val();
+      if (!data || !data.active) {
+        // Code revoked — lock the app
+        isUnlocked = false;
+        clientCode = null;
+        try { localStorage.removeItem('rwm-unlocked'); localStorage.removeItem('rwm-client-code'); } catch(e) {}
+      }
+    } catch(e) { /* Network error — trust localStorage for offline use */ }
+  }
+
   if (!isUnlocked) {
     LOCKED_PAGES.forEach(p => {
       const nav = document.getElementById('nav-'+p);
       if (nav) nav.classList.add('gated');
     });
   } else if (clientCode) {
-    // Already unlocked from a previous visit — load coach content
     registerClient(clientCode);
     loadCoachContent(clientCode);
   }
