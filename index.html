@@ -1,9 +1,1239 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0;url=rooted_woman_workbook.html">
-  <link rel="canonical" href="rooted_woman_workbook.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rooted Woman Method</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
-<body></body>
+<body>
+
+<div class="paywall" id="paywall" style="display:none">
+
+  <div class="paywall-hero">
+    <button onclick="closePaywall()" class="paywall-close-btn" title="Back to overview">x</button>
+    <div class="eyebrow">Rooted in 40 - 40-day programme</div>
+    <h1>For Women Who Are<br>Done Starting Over</h1>
+    <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
+  </div>
+
+  <div class="paywall-body">
+
+    <div class="paywall-intro">
+      <p>Bon dia 🌸</p>
+      <p>You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.</p>
+      <p>I built all of that into a programme. It's called <strong>Rooted in 40</strong>.</p>
+      <p class="sign">— Shadey</p>
+    </div>
+
+    <div class="paywall-what">
+      <h2>What you get</h2>
+    </div>
+
+    <div class="paywall-includes">
+      <div class="paywall-include-item">
+        <div class="ico">🌸</div>
+        <div>
+          <h4>2 Coaching sessions</h4>
+          <p>Day 1 kick-off + midpoint check-in with Shadey personally.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">💪</div>
+        <div>
+          <h4>5 Personal training sessions</h4>
+          <p>One session every weekend, training with Shadey directly.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📋</div>
+        <div>
+          <h4>Full 5-week training schedule</h4>
+          <p>A personalised plan so you always know what to do and when.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">🏋️</div>
+        <div>
+          <h4>Gym orientation on Day 1</h4>
+          <p>So you never feel lost or intimidated in the gym again.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📲</div>
+        <div>
+          <h4>Twice-weekly WhatsApp check-ins</h4>
+          <p>Video guidance for every solo session. You are never doing this alone.</p>
+        </div>
+      </div>
+      <div class="paywall-include-item">
+        <div class="ico">📖</div>
+        <div>
+          <h4>The Rooted Woman Method Workbook</h4>
+          <p>The full identity, rhythm, and recovery system — this workbook.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="paywall-price">
+      <div class="price-tag">Investment</div>
+      <div class="amount">AWG 500</div>
+      <div class="period">for the full 40 days</div>
+      <div class="spots">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
+      <a href="https://wa.me/2977300112" target="_blank" class="wa-btn">📱 WhatsApp Shadey · +297 730 0112</a>
+      <div class="paywall-price-note">If something in you is saying yes — reach out and let's talk 🌸</div>
+    </div>
+
+    <div class="paywall-unlock">
+      <h3>Already joined? Enter your access code</h3>
+      <p>After payment, Shadey will send you a personal access code that unlocks your full workbook, intake questionnaire, and nutrition guide.</p>
+      <div class="unlock-row">
+        <input type="text" id="unlock-input" placeholder="Enter code..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') tryUnlock()">
+        <button onclick="tryUnlock()">Unlock</button>
+      </div>
+      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
+    </div>
+
+  </div>
+</div>
+
+<button class="hamburger" id="hamburger-btn" aria-label="Open menu" onclick="toggleSidebar()">
+  <span></span><span></span><span></span>
+</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="eyebrow">Rooted in 40</div>
+    <h1>The Rooted<br>Woman Method</h1>
+  </div>
+
+  <div class="nav-section-label">Programme</div>
+  <div class="nav-item active" onclick="showPage('welcome')" id="nav-welcome">
+    <span class="dot"></span> Overview
+  </div>
+  <div class="nav-item" onclick="showPage('programme')" id="nav-programme">
+    <span class="dot"></span> About Rooted in 40
+  </div>
+
+  <div class="nav-section-label">Part 1</div>
+  <div class="nav-item" onclick="showPage('intake')" id="nav-intake">
+    <span class="dot"></span> Client Intake
+  </div>
+
+  <div class="nav-section-label">Part 2 — The Method</div>
+  <div class="nav-item" onclick="showPage('layer1')" id="nav-layer1">
+    <span class="dot"></span> Layer 1 · Identity
+  </div>
+  <div class="nav-item" onclick="showPage('layer2')" id="nav-layer2">
+    <span class="dot"></span> Layer 2 · Rhythm
+  </div>
+  <div class="nav-item" onclick="showPage('layer3')" id="nav-layer3">
+    <span class="dot"></span> Layer 3 · Recovery
+  </div>
+
+  <div class="nav-section-label">Part 3</div>
+  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin">
+    <span class="dot"></span> 90-Day Check-ins
+  </div>
+
+  <div class="nav-section-label">Resources</div>
+  <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition">
+    <span class="dot"></span> Nutrition Guide
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- WELCOME -->
+  <div class="page active" id="page-welcome">
+    <div class="section-header">
+      <div class="tag">Welcome</div>
+      <h2>A Blueprint for Women<br>Done Starting Over</h2>
+      <p>Work through each section honestly. Come back to the method whenever you fall — that is not failure, it is Layer 3.</p>
+    </div>
+    <div class="section-content">
+      <div class="welcome-card">
+        <h3>This is not a programme you finish.<br>It is a practice you return to.</h3>
+        <p>This workbook has two parts. The first is your intake questionnaire — complete this before your first coaching session. The second is the Rooted Woman Method — three layers that address the real reason consistency is hard.</p>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-tile" onclick="showPage('intake')">
+          <div class="tile-tag">Part 1</div>
+          <h4>Client Intake</h4>
+          <p>Your starting point — physically, mentally, and emotionally. Complete before your first session.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer1')">
+          <div class="tile-tag">Layer 1</div>
+          <h4>Identity</h4>
+          <p>Who am I becoming? Rewrite the story your brain tells about who you are.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer2')">
+          <div class="tile-tag">Layer 2</div>
+          <h4>Rhythm</h4>
+          <p>What are my non-negotiables? Build anchors that bend with life but always come back.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('layer3')">
+          <div class="tile-tag">Layer 3</div>
+          <h4>Recovery</h4>
+          <p>How do I return without shame? The return is built in — because falling is part of the practice.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('nutrition')">
+          <div class="tile-tag">Resource</div>
+          <h4>Nutrition Guide</h4>
+          <p>Simple, sustainable habits. No calorie counting — just the basics applied consistently.</p>
+        </div>
+        <div class="overview-tile" onclick="showPage('programme')">
+          <div class="tile-tag">Programme</div>
+          <h4>About Rooted in 40</h4>
+          <p>Everything included in the 40-day experience, and how to get started.</p>
+        </div>
+      </div>
+
+      <div class="export-section mt-32">
+        <div>
+          <h4>Save your progress</h4>
+          <p>Your answers are stored in your browser. Use the export button to download a summary at any time.</p>
+        </div>
+        <button class="btn-save" onclick="exportData()">Down Export answers</button>
+      </div>
+
+      <!-- Coach content: messages + programme (shown after unlock if Shadey has added content) -->
+      <div id="coach-content" style="display:none;margin-top:32px"></div>
+    </div>
+  </div>
+
+  <!-- INTAKE -->
+  <div class="page" id="page-intake">
+    <div class="section-header">
+      <div class="tag">Part 1 · Before your first session</div>
+      <h2>Client Intake<br>Questionnaire</h2>
+      <p>Take 20-30 minutes in a quiet space. Be honest. The more specific you are, the better your coach can support you.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="field-row two">
+        <div class="field-group mb-0">
+          <label class="field-label">Full name</label>
+          <input type="text" id="i-name" placeholder="Your full name" oninput="autosave()">
+        </div>
+        <div class="field-group mb-0">
+          <label class="field-label">Date of birth</label>
+          <input type="date" id="i-dob" oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="field-row two mt-16">
+        <div class="field-group mb-0">
+          <label class="field-label">Occupation</label>
+          <input type="text" id="i-occ" placeholder="Your occupation" oninput="autosave()">
+        </div>
+        <div class="field-group mb-0">
+          <label class="field-label">WhatsApp number</label>
+          <input type="tel" id="i-wa" placeholder="+297 ..." oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="field-group mt-16">
+        <label class="field-label">How did you hear about Rooted in 40?</label>
+        <input type="text" id="i-referral" placeholder="Friend, Instagram, Google ..." oninput="autosave()">
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">A — Your Starting Point</h3>
+
+      <div class="field-group">
+        <label class="field-label">How would you describe your current relationship with your body?</label>
+        <div class="field-hint">Be honest — there is no wrong answer here.</div>
+        <textarea class="large" id="a-body" oninput="autosave()" placeholder="Write freely..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What does a typical week look like for you right now?</label>
+        <div class="field-hint">Work, family, routine, stress levels — give the real picture.</div>
+        <textarea id="a-week" oninput="autosave()" placeholder="Work, family, routine, stress..."></textarea>
+      </div>
+
+      <div class="field-row two">
+        <div class="field-group mb-0">
+          <label class="field-label">Average hours of sleep per night</label>
+          <input type="text" id="a-sleep" placeholder="e.g. 6-7 hours" oninput="autosave()">
+        </div>
+        <div class="field-group mb-0">
+          <label class="field-label">Energy levels day-to-day</label>
+          <div class="field-hint">1 = exhausted · 5 = great</div>
+          <div class="rating-group" id="r-energy"></div>
+        </div>
+      </div>
+
+      <div class="field-group mt-20">
+        <label class="field-label">What is the biggest challenge you face when trying to take care of yourself?</label>
+        <textarea id="a-challenge" oninput="autosave()" placeholder="Be specific..."></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">B — Training History</h3>
+
+      <div class="field-group">
+        <label class="field-label">Have you trained in a gym before?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="never" onchange="autosave()"><span>Never — this will be my first time</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="few" onchange="autosave()"><span>A few times, but not consistently</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="past" onchange="autosave()"><span>Yes, I trained regularly in the past</span></label>
+          <label class="checkbox-item"><input type="radio" name="gym-history" value="current" onchange="autosave()"><span>Yes, I currently train regularly</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">If you have trained before — what did you do and when did you stop?</label>
+        <textarea class="small" id="b-history" oninput="autosave()" placeholder="Or write 'never trained'..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Which of these movements have you done before?</label>
+        <div class="checkbox-group columns">
+          <label class="checkbox-item"><input type="checkbox" id="mv-hip" onchange="autosave()"><span>Hip thrust / glute bridge</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-squat" onchange="autosave()"><span>Squat (barbell or bodyweight)</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-rdl" onchange="autosave()"><span>Romanian deadlift / stiff leg</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-legpress" onchange="autosave()"><span>Leg press</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-lat" onchange="autosave()"><span>Lat pulldown</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-shoulder" onchange="autosave()"><span>Dumbbell shoulder press</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-row" onchange="autosave()"><span>Machine row</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="mv-none" onchange="autosave()"><span>None of the above</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Do you have any injuries, pain, or physical limitations?</label>
+        <div class="checkbox-group checkbox-group--row" style="margin-bottom:14px">
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="injury" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="injury" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="injury" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <textarea class="small" id="b-injury" oninput="autosave()" placeholder="If yes — describe the injury and area of the body..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Any medical condition that affects exercise?</label>
+        <div class="checkbox-group checkbox-group--row" style="margin-bottom:14px">
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="medical" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="medical" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="medical" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <textarea class="small" id="b-medical" oninput="autosave()" placeholder="If yes — please describe..."></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">C — Your Goals</h3>
+
+      <div class="field-group">
+        <label class="field-label">What do you most want to change or achieve in these 40 days?</label>
+        <textarea id="c-goal" oninput="autosave()" placeholder="Be as specific as you can..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Why is this important to you right now?</label>
+        <div class="field-hint">What is the deeper reason?</div>
+        <textarea id="c-why" oninput="autosave()" placeholder="The deeper reason..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What has stopped you from achieving this before?</label>
+        <textarea id="c-blocker" oninput="autosave()" placeholder="Be honest with yourself..."></textarea>
+      </div>
+
+      <div class="inline-pair">
+        <div>
+          <label class="field-label">What would success look like at the end of Day 40?</label>
+          <textarea id="c-success" oninput="autosave()" placeholder="Paint the picture..."></textarea>
+        </div>
+        <div>
+          <label class="field-label">How will you feel differently in your body?</label>
+          <textarea id="c-feel" oninput="autosave()" placeholder="Describe the feeling..."></textarea>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">D — Your Training Schedule</h3>
+
+      <div class="field-group">
+        <label class="field-label">Which days can you train independently?</label>
+        <div class="checkbox-group columns">
+          <label class="checkbox-item"><input type="checkbox" id="d-mon" onchange="autosave()"><span>Monday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-tue" onchange="autosave()"><span>Tuesday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-wed" onchange="autosave()"><span>Wednesday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-thu" onchange="autosave()"><span>Thursday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-fri" onchange="autosave()"><span>Friday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-sat" onchange="autosave()"><span>Saturday</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="d-sun" onchange="autosave()"><span>Sunday</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How much time per solo training session?</label>
+        <div class="checkbox-group checkbox-group--row-wrap">
+          <label class="checkbox-item"><input type="radio" name="session-time" value="30" onchange="autosave()"><span>30 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="45" onchange="autosave()"><span>45 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="60" onchange="autosave()"><span>60 min</span></label>
+          <label class="checkbox-item"><input type="radio" name="session-time" value="60+" onchange="autosave()"><span>60+ min</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">For your training programme, which do you prefer?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="coach" onchange="autosave()"><span>I want my coach to design my full programme</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="app" onchange="autosave()"><span>I use a workout app and would like coaching support alongside it</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="own" onchange="autosave()"><span>I have my own programme and want coaching support</span></label>
+          <label class="checkbox-item"><input type="radio" name="prog-pref" value="unsure" onchange="autosave()"><span>I'm not sure yet — I want to discuss with my coach</span></label>
+        </div>
+        <textarea class="small mt-16" id="d-prog-detail" oninput="autosave()" placeholder="If you use an app or have an existing programme, describe it here..."></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">E — Lifestyle &amp; Daily Habits</h3>
+
+      <div class="field-group">
+        <label class="field-label">How would you describe your current eating habits?</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="radio" name="eating" value="well" onchange="autosave()"><span>I eat fairly well most of the time</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="weekends" onchange="autosave()"><span>I eat well during the week but lose control on weekends</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="inconsistent" onchange="autosave()"><span>I struggle with consistency — I eat well then fall off</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="skip" onchange="autosave()"><span>I tend to skip meals or eat on the go</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="takeaway" onchange="autosave()"><span>I eat mostly takeaway, processed, or fast food</span></label>
+          <label class="checkbox-item"><input type="radio" name="eating" value="unaware" onchange="autosave()"><span>I'm not sure — I don't pay much attention to what I eat</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How much water do you drink per day on average?</label>
+        <div class="checkbox-group checkbox-group--row-wrap">
+          <label class="checkbox-item"><input type="radio" name="water" value="&lt;1" onchange="autosave()"><span>Less than 1 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value="1-1.5" onchange="autosave()"><span>1-1.5 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value="1.5-2" onchange="autosave()"><span>1.5-2 L</span></label>
+          <label class="checkbox-item"><input type="radio" name="water" value="&gt;2" onchange="autosave()"><span>More than 2 L</span></label>
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field-group mb-0">
+          <label class="field-label">Stress levels on a typical week</label>
+          <div class="field-hint">1 = very low · 5 = very high</div>
+          <div class="rating-group" id="r-stress"></div>
+        </div>
+        <div class="field-group mb-0">
+          <label class="field-label">Consistency with self-care habits</label>
+          <div class="field-hint">1 = not at all · 5 = very consistent</div>
+          <div class="rating-group" id="r-selfcare"></div>
+        </div>
+      </div>
+
+      <div class="field-group mt-20">
+        <label class="field-label">Do you currently take any supplements or vitamins?</label>
+        <div class="checkbox-group checkbox-group--row" style="margin-bottom:12px">
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="supps" value="yes" onchange="autosave()"><span>Yes</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="supps" value="no" onchange="autosave()"><span>No</span></label>
+          <label class="checkbox-item checkbox-item--flex"><input type="radio" name="supps" value="sometimes" onchange="autosave()"><span>Sometimes</span></label>
+        </div>
+        <input type="text" id="e-supps" placeholder="If yes — which ones..." oninput="autosave()">
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">F — Mindset &amp; Readiness</h3>
+
+      <div class="field-group">
+        <label class="field-label">Finish this sentence: When I think about committing to 40 days of this programme, I feel...</label>
+        <textarea id="f-commit" oninput="autosave()" placeholder="..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What is the story you most often tell yourself about why you cannot stay consistent?</label>
+        <textarea id="f-story" oninput="autosave()" placeholder="Be honest..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What would you tell your best friend if she was about to start this programme and was nervous?</label>
+        <textarea id="f-friend" oninput="autosave()" placeholder="What would you say to her?"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">On a scale of 1-5, how ready are you to commit fully to these 40 days?</label>
+        <div class="rating-group" id="r-ready"></div>
+        <div class="rating-labels rating-labels--narrow"><span>Not at all</span><span>Very much</span></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What would make you feel even more ready or supported?</label>
+        <textarea class="small" id="f-support" oninput="autosave()" placeholder="What would help?"></textarea>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading">G — Anything Else</h3>
+
+      <div class="field-group">
+        <label class="field-label">Is there anything else you want your coach to know before your first session?</label>
+        <div class="field-hint">Anything about your life, your history, your fears, or your hopes that feels important to share.</div>
+        <textarea class="large" id="g-extra" oninput="autosave()" placeholder="This is your space..."></textarea>
+      </div>
+
+      <!-- EMAILJS SETUP BANNER -->
+      <div class="setup-banner" id="setup-banner">
+        <div class="setup-icon">⚙️</div>
+        <div>
+          <h4>One-time EmailJS setup required</h4>
+          <p>To send emails automatically, create a free account at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a>, connect your Gmail, and create an email template. Then paste your three keys below. <a href="#" onclick="showEmailJSGuide(); return false;">How to set this up</a></p>
+          <div class="config-fields">
+            <input type="text" id="ejs-public-key" placeholder="Public Key (e.g. abc123XYZ)" oninput="saveEJSConfig()">
+            <input type="text" id="ejs-service-id" placeholder="Service ID (e.g. service_xxxxxx)" oninput="saveEJSConfig()">
+            <input type="text" id="ejs-template-id" placeholder="Template ID (e.g. template_xxxxxx)" oninput="saveEJSConfig()" class="config-field-full">
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-section">
+        <div>
+          <h4>Ready to send to your coach?</h4>
+          <p>This will email your completed intake questionnaire to shadeybahali@gmail.com.</p>
+        </div>
+        <button class="btn-submit" id="btn-submit-email" onclick="submitIntakeEmail()">Send to coach</button>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('intake'); showPage('layer1')">Continue to Layer 1</button>
+        <button class="btn-ghost" onclick="saveSection('intake')">Save progress</button>
+        <span class="save-status" id="status-intake">Saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <div class="page" id="page-layer1">
+    <div class="section-header">
+      <div class="tag">Layer 1 · Body · Mind · Soul</div>
+      <h2>Identity</h2>
+      <p>Who am I becoming? The work starts here — not with a new habit, but with a new story about who you are.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.1</div>
+          <div>
+            <h3>The Self-Image Audit</h3>
+            <p>Answer honestly. No one is watching.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Finish this sentence: When it comes to taking care of myself, I am someone who...</label>
+          <textarea id="l1-selfimage" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The story I most often tell myself about why I cannot stay consistent is...</label>
+          <textarea id="l1-story" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">Evidence I use to support that story</label>
+            <textarea id="l1-evidence-for" oninput="autosave()" placeholder="What proves this story to you?"></textarea>
+          </div>
+          <div>
+            <label class="field-label">Evidence that contradicts that story</label>
+            <textarea id="l1-evidence-against" oninput="autosave()" placeholder="What shows it might not be true?"></textarea>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">If that story were not true, who would I be free to become?</label>
+          <textarea id="l1-free" oninput="autosave()" placeholder="Imagine her..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.2</div>
+          <div>
+            <h3>Vision Casting</h3>
+            <p>Your brain cannot pursue a destination it cannot picture. Make her real.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Describe the version of you who is fully rooted.</label>
+          <div class="field-hint">What does her morning look like? How does she feel in her body? How does she respond when life gets hard?</div>
+          <textarea class="large" id="l1-vision" oninput="autosave()" placeholder="Describe her in detail..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What three words describe how she feels on the inside?</label>
+          <input type="text" id="l1-words" oninput="autosave()" placeholder="e.g. Grounded, Calm, Powerful">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What has she stopped tolerating? What has she stopped saying to herself?</label>
+          <textarea id="l1-stopped" oninput="autosave()" placeholder="She no longer..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What does she do consistently that you currently struggle to do?</label>
+          <textarea id="l1-consistent" oninput="autosave()" placeholder="She consistently..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">1.3</div>
+          <div>
+            <h3>Your Daily Declaration</h3>
+            <p>A statement of identity written in the present tense, as if it is already true.</p>
+          </div>
+        </div>
+
+        <div class="declaration-box">
+          <p class="ex">"I am a woman who chooses herself. I move my body because I respect it, not punish it. I return to my practice without guilt because returning is part of the practice. I am becoming more rooted every day."</p>
+          <label>Your declaration — make it specific to you. Make it feel almost too bold.</label>
+          <textarea class="large" id="l1-declaration" oninput="autosave()" placeholder="I am a woman who..."></textarea>
+        </div>
+
+        <div class="time-row">
+          <span>I will say my declaration every day at:</span>
+          <input type="time" id="l1-declaration-time" oninput="autosave()">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer1'); showPage('layer2')">Continue to Layer 2</button>
+        <button class="btn-ghost" onclick="saveSection('layer1')">Save progress</button>
+        <span class="save-status" id="status-layer1">Saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div class="page" id="page-layer2">
+    <div class="section-header">
+      <div class="tag">Layer 2</div>
+      <h2>Rhythm</h2>
+      <p>What are my non-negotiables? A rhythm bends with life but keeps coming back — like a heartbeat.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>Your rhythm is made up of anchors: 3-5 commitments you return to regardless of what is happening around you. Anchors are small enough to do on your hardest day. That is the test.</p>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.1</div>
+          <div><h3>Your Body Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one form of movement I will do even on my hardest day</label>
+          <div class="field-hint">Be specific — not 'exercise' but '20 minutes of walking'</div>
+          <textarea class="small" id="l2-body-move" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one non-negotiable I have about how I fuel my body</label>
+          <textarea class="small" id="l2-body-fuel" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one thing I will protect for rest and recovery</label>
+          <textarea class="small" id="l2-body-rest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.2</div>
+          <div><h3>Your Mind Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My daily stillness practice</label>
+          <div class="field-hint">Meditation, prayer, breathwork, quiet coffee — even 5 minutes counts</div>
+          <textarea class="small" id="l2-mind-stillness" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">How I set my intention for the day</label>
+          <textarea class="small" id="l2-mind-intention" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What I am currently reading, listening to, or learning that feeds my mind</label>
+          <textarea class="small" id="l2-mind-learning" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.3</div>
+          <div><h3>Your Soul Anchors</h3></div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My spiritual or reflective practice</label>
+          <div class="field-hint">Prayer, journaling, nature, gratitude, study</div>
+          <textarea class="small" id="l2-soul-practice" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What gives me the deepest sense of meaning and purpose right now</label>
+          <textarea class="small" id="l2-soul-meaning" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The community or connection that keeps me accountable and held</label>
+          <textarea class="small" id="l2-soul-community" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">2.4</div>
+          <div>
+            <h3>My Anchor Board</h3>
+            <p>Your 5 anchors — the commitments that define your rhythm.</p>
+          </div>
+        </div>
+
+        <table class="anchor-table">
+          <tr>
+            <td><strong>1</strong> Body anchor</td>
+            <td><input type="text" id="anc-1" oninput="autosave()" placeholder="Your first body anchor..."></td>
+          </tr>
+          <tr>
+            <td><strong>2</strong> Body anchor</td>
+            <td><input type="text" id="anc-2" oninput="autosave()" placeholder="Your second body anchor..."></td>
+          </tr>
+          <tr>
+            <td><strong>3</strong> Mind anchor</td>
+            <td><input type="text" id="anc-3" oninput="autosave()" placeholder="Your mind anchor..."></td>
+          </tr>
+          <tr>
+            <td><strong>4</strong> Soul anchor</td>
+            <td><input type="text" id="anc-4" oninput="autosave()" placeholder="Your first soul anchor..."></td>
+          </tr>
+          <tr>
+            <td><strong>5</strong> Soul anchor</td>
+            <td><input type="text" id="anc-5" oninput="autosave()" placeholder="Your second soul anchor..."></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer2'); showPage('layer3')">Continue to Layer 3</button>
+        <button class="btn-ghost" onclick="saveSection('layer2')">Save progress</button>
+        <span class="save-status" id="status-layer2">Saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div class="page" id="page-layer3">
+    <div class="section-header">
+      <div class="tag">Layer 3</div>
+      <h2>Recovery</h2>
+      <p>How do I return — without shame? Recovery is not the failure mode. It is built into the practice.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>"The return is the practice. Every time you come back, you are strengthening the root."</p>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.1</div>
+          <div>
+            <h3>The Fall Audit</h3>
+            <p>Complete this AFTER a slide — not in the moment, but when you have a quiet 15 minutes.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What was happening in my life when I started to slide?</label>
+          <div class="field-hint">Go deeper than 'I was busy' — what was the emotional or circumstantial trigger?</div>
+          <textarea class="large" id="l3-slide-trigger" oninput="autosave()" placeholder="The deeper context was..."></textarea>
+        </div>
+
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">Which anchor slipped first?</label>
+            <textarea class="small" id="l3-anchor-slipped" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+          <div>
+            <label class="field-label">What did I tell myself when it slipped?</label>
+            <textarea class="small" id="l3-told-myself" oninput="autosave()" placeholder="The story I told myself..."></textarea>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What need was I trying to meet through the behaviour that replaced my anchors?</label>
+          <div class="field-hint">Rest? Comfort? Escape? Numbing?</div>
+          <textarea id="l3-need" oninput="autosave()" placeholder="I was seeking..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">What would I tell my best friend if she described this exact situation to me?</label>
+          <textarea id="l3-bestfriend" oninput="autosave()" placeholder="I would say to her..."></textarea>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.2</div>
+          <div>
+            <h3>The Return Ritual</h3>
+            <p>Design your return sequence now — before you need it.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The first anchor I will always return to (even after the longest slide)</label>
+          <textarea class="small" id="l3-first-anchor" oninput="autosave()" placeholder="Always, I return to..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">My return ritual — what I do in the first 24 hours after deciding to come back</label>
+          <textarea id="l3-ritual" oninput="autosave()" placeholder="First, I will... Then..."></textarea>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">The one person I will tell when I am returning</label>
+          <div class="field-hint">Accountability without shame.</div>
+          <input type="text" id="l3-accountability" oninput="autosave()" placeholder="Name or relationship...">
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <div class="exercise-header">
+          <div class="exercise-num">3.3</div>
+          <div>
+            <h3>The Self-Covenant</h3>
+            <p>A commitment you make to yourself — to be returned to, not broken over.</p>
+          </div>
+        </div>
+
+        <div class="covenant-block">
+          <p>I, <input type="text" id="cov-name" oninput="autosave()" placeholder="your name" class="covenant-input">, commit to choosing myself. I will show up for my body, my mind, and my soul — not perfectly, but consistently. When I fall, I will not use it as proof that I cannot do this.</p>
+          <p><strong>I will return. The return is the practice.</strong></p>
+          <p>My anchor, always, is: <input type="text" id="cov-anchor" oninput="autosave()" placeholder="your anchor" class="covenant-input covenant-input--wide"></p>
+          <div class="inline-pair mt-20 mb-0">
+            <div class="field-group mb-0">
+              <label class="field-label">Signed</label>
+              <input type="text" id="cov-signed" oninput="autosave()" placeholder="Your signature...">
+            </div>
+            <div class="field-group mb-0">
+              <label class="field-label">Date</label>
+              <input type="date" id="cov-date" oninput="autosave()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('layer3'); showPage('checkin')">Continue to 90-Day Check-in</button>
+        <button class="btn-ghost" onclick="saveSection('layer3')">Save progress</button>
+        <span class="save-status" id="status-layer3">Saved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECK-IN -->
+  <div class="page" id="page-checkin">
+    <div class="section-header">
+      <div class="tag">Part 3 · Monthly review</div>
+      <h2>90-Day Check-In Guide</h2>
+      <p>Use this at the end of each month. You are not grading yourself. You are getting to know yourself.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="month-card">
+        <h3>Month 1 <span class="month-badge">Day 1-30</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m1-strongest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m1-hardest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m1-proud" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m1-different" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-card">
+        <h3>Month 2 <span class="month-badge">Day 31-60</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m2-strongest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m2-hardest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m2-proud" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m2-different" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-card">
+        <h3>Month 3 <span class="month-badge">Day 61-90</span></h3>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been strongest this month?</label>
+          <textarea class="small" id="m3-strongest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Which anchor has been hardest to keep, and what does that tell me?</label>
+          <textarea id="m3-hardest" oninput="autosave()" placeholder="..."></textarea>
+        </div>
+        <div class="inline-pair">
+          <div>
+            <label class="field-label">One thing I am proud of from this month</label>
+            <textarea class="small" id="m3-proud" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+          <div>
+            <label class="field-label">One thing I want to do differently next month</label>
+            <textarea class="small" id="m3-different" oninput="autosave()" placeholder="..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block mt-32">
+        <p>"You are not starting over. You are starting from experience."</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-save" onclick="saveSection('checkin'); exportData()">Export all answers</button>
+        <button class="btn-ghost" onclick="saveSection('checkin')">Save progress</button>
+        <span class="save-status" id="status-checkin">Saved</span>
+      </div>
+    </div>
+  </div>
+
+<!-- PROGRAMME PAGE -->
+  <div class="page" id="page-programme">
+    <div class="section-header">
+      <div class="tag">Rooted in 40 · 40-day programme</div>
+      <h2>For Women Who Are<br>Done Starting Over</h2>
+      <p>A coaching and training experience built around the Rooted Woman Method — with guidance, accountability, and personal training.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="welcome-card welcome-card--gradient">
+        <h3 class="prog-hero-heading">Bon dia 🌸</h3>
+        <p class="prog-hero-body">You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.<br><br>I built all of that into a programme. It's called <strong class="text-warm">Rooted in 40</strong>.</p>
+      </div>
+
+      <h3 class="section-heading-lg" style="margin:36px 0 20px">What you get</h3>
+
+      <div class="feature-grid">
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">🌸</div>
+          <div>
+            <div class="field-label mb-4">2 Coaching sessions</div>
+            <p class="feature-desc">Day 1 kick-off + midpoint check-in with Shadey personally.</p>
+          </div>
+        </div>
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">💪</div>
+          <div>
+            <div class="field-label mb-4">5 Personal training sessions</div>
+            <p class="feature-desc">One session every weekend, training with Shadey directly.</p>
+          </div>
+        </div>
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">📋</div>
+          <div>
+            <div class="field-label mb-4">Full 5-week training schedule</div>
+            <p class="feature-desc">A personalised plan so you always know what to do and when.</p>
+          </div>
+        </div>
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">🏋️</div>
+          <div>
+            <div class="field-label mb-4">Gym orientation on Day 1</div>
+            <p class="feature-desc">So you never feel lost or intimidated in the gym again.</p>
+          </div>
+        </div>
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">📲</div>
+          <div>
+            <div class="field-label mb-4">Twice-weekly WhatsApp check-ins</div>
+            <p class="feature-desc">Video guidance for every solo session. You are never doing this alone.</p>
+          </div>
+        </div>
+        <div class="exercise-card feature-card">
+          <div class="feature-icon">📖</div>
+          <div>
+            <div class="field-label mb-4">The Rooted Woman Method Workbook</div>
+            <p class="feature-desc">The full identity, rhythm, and recovery system — this workbook.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-block">
+        <div class="price-block__tag">Investment</div>
+        <div class="price-block__amount">AWG 500</div>
+        <div class="price-block__period">for the full 40 days</div>
+        <div class="price-block__note">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
+      </div>
+
+      <div class="cta-block">
+        <div class="cta-block__heading">If something in you is saying yes —</div>
+        <div class="cta-block__sub">reach out on WhatsApp and let's talk. 🌸</div>
+        <a href="https://wa.me/2977300112" target="_blank" class="wa-link">
+          📱 WhatsApp Shadey · +297 730 0112
+        </a>
+        <div class="cta-block__attr">Saludos, Shadey</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NUTRITION PAGE -->
+  <div class="page" id="page-nutrition">
+    <div class="section-header">
+      <div class="tag">Resources · Nutrition Guide</div>
+      <h2>Nutrition Basics</h2>
+      <p>Simple habits that make a real difference. No calorie counting. No complicated plans. No perfection required.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="quote-block">
+        <p>You do not need a perfect diet. You need a sustainable one. Read through the whole guide first. Then pick two or three habits to start with. Add more as those become natural.</p>
+      </div>
+
+      <h3 class="section-heading-lg" style="margin:0 0 20px">Section 1 — Your Quick Wins</h3>
+      <p class="section-intro">Start here. These habits alone will change how you feel. Highest impact, lowest effort — no special food required.</p>
+
+      <div class="quick-wins-list">
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">💧</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 1 — Drink 2 litres of water every day</div>
+            <p class="section-intro" style="margin-bottom:0">Most people are dehydrated and don't know it. Fatigue, headaches, hunger, poor focus, and cravings are often simply your body asking for water. Start your morning with a large glass before coffee or food. Finish 1.5 litres before 3pm — the rest comes easily.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🥤</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 2 — Eliminate sugary drinks and sodas</div>
+            <p class="section-intro" style="margin-bottom:0">Sodas, fruit juices, energy drinks, and sweetened coffees are some of the biggest sources of hidden sugar. They spike your blood sugar, which leads to energy crashes and cravings. Replace with water, sparkling water, unsweetened herbal tea, or black coffee. Start by eliminating one per day.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🍔</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 3 — Reduce junk food and fast food</div>
+            <p class="section-intro" style="margin-bottom:0">Fast food is engineered to make you want more — this is not a willpower problem. You don't need to eliminate it forever. If you currently eat fast food 5 times per week, reduce to 3. Then 2. Then 1. Small reductions done consistently beat dramatic cuts that don't last.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🍳</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 4 — Reduce fried food</div>
+            <p class="section-intro" style="margin-bottom:0">Frying dramatically increases calorie content and introduces fats that contribute to inflammation and low energy. When you cook at home, choose grilling or baking. When eating out, choose grilled where possible. Make a better choice more often than not.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🛒</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 5 — Reduce processed and packaged food</div>
+            <p class="section-intro" style="margin-bottom:0">A simple rule: if a product has more than 5 ingredients, or ingredients you can't pronounce, eat it less often. Replace packaged snacks with whole foods: fruit, nuts, boiled eggs, vegetables with hummus.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🥣</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 6 — Eat a real breakfast</div>
+            <p class="section-intro" style="margin-bottom:0">Skipping breakfast sets your blood sugar on a rollercoaster for the rest of the day. A breakfast with protein keeps you fuller longer and gives you stable energy. Easy options: 2 eggs with vegetables, Greek yoghurt with fruit, oats with nuts, or a protein smoothie.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🥩</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 7 — Include protein in every meal</div>
+            <p class="section-intro" style="margin-bottom:0">Protein is the building block of muscle and keeps you fuller for longer. Good sources: chicken, fish, eggs, Greek yoghurt, legumes, cottage cheese, tofu. You don't need to count grams — just make sure it's on the plate.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🥦</div>
+          <div>
+            <div class="field-label mb-5">Quick Win 8 — Add vegetables to at least two meals per day</div>
+            <p class="section-intro" style="margin-bottom:0">Vegetables keep your digestive system healthy, help you feel full, and stabilise blood sugar. You don't need to eat salad every day. Add spinach to eggs, put cucumber and tomato on the side of your lunch, roast a tray of vegetables for dinner. Small additions add up.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg" style="margin:0 0 20px">Section 2 — Eat More of This</h3>
+
+      <div class="food-grid">
+        <div class="food-card">
+          <div class="food-icon">🍗</div>
+          <div class="field-label mb-4">Lean protein</div>
+          <p class="feature-desc">Chicken, fish, eggs, legumes, Greek yoghurt, tofu</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🍠</div>
+          <div class="field-label mb-4">Complex carbs</div>
+          <p class="feature-desc">Sweet potato, oats, brown rice, quinoa, whole grain bread</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🥑</div>
+          <div class="field-label mb-4">Healthy fats</div>
+          <p class="feature-desc">Avocado, olive oil, nuts, seeds, fatty fish like salmon</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🍌</div>
+          <div class="field-label mb-4">Fruits</div>
+          <p class="feature-desc">Banana, mango, berries, papaya, citrus — whole fruit, not juice</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🥗</div>
+          <div class="field-label mb-4">Vegetables</div>
+          <p class="feature-desc">Any and all — the more colour variety, the better</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">💧</div>
+          <div class="field-label mb-4">Water</div>
+          <p class="feature-desc">2 litres minimum per day. More if you are training.</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg" style="margin:0 0 8px">Section 3 — Reduce or Avoid</h3>
+      <p class="section-intro">Not forever. Just less often than before. Progress is the goal, not perfection.</p>
+
+      <div class="avoid-list">
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Sugary drinks and sodas — Fanta, Pepsi, fruit juice, energy drinks, sweetened iced tea</span>
+        </div>
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Fried food — anything deep-fried or pan-fried in large amounts of oil</span>
+        </div>
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Junk food and fast food — burgers, hot dogs, chips, fried chicken, pizza</span>
+        </div>
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Packaged and processed snacks — crisps, cookies, flavoured crackers, instant noodles</span>
+        </div>
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Excess sugar — sweets, desserts, sugary cereals, flavoured yoghurts with added sugar</span>
+        </div>
+        <div class="avoid-item">
+          <span class="avoid-x">x</span>
+          <span class="avoid-text">Alcohol — it disrupts sleep, recovery, and hormonal balance. If you drink, drink less.</span>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>A useful question before eating: Does this food give me energy, or take it from me? Answer honestly and choose accordingly.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg" style="margin:0 0 20px">Section 4 — Practical Tips</h3>
+      <p class="section-intro">Knowing what to eat is the easy part. These tips bridge the gap between knowing and doing.</p>
+
+      <div class="tips-grid">
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">🥡 Meal preparation</div>
+          <p class="tip-desc">You don't need to meal prep for hours on Sunday. Even 30 minutes makes a difference. Boil eggs, wash and cut vegetables, cook a batch of rice. Having ready food removes the decision and the temptation.</p>
+        </div>
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">🛒 Never shop hungry</div>
+          <p class="tip-desc">Grocery shopping on an empty stomach leads to buying food you didn't plan to buy. Eat first, then shop. And write a list before you go.</p>
+        </div>
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">⚖️ The 80/20 approach</div>
+          <p class="tip-desc">Eat well 80% of the time. The other 20% is life — a birthday, a dinner out, a craving. This is not failure. This is balance. Make a good choice more often than a poor one.</p>
+        </div>
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">🔍 Read labels</div>
+          <p class="tip-desc">Start noticing the sugar content on labels. If sugar is listed in the first three ingredients, or if the product has more than 10g of sugar per 100g, choose a different option or eat it less often.</p>
+        </div>
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">🍽️ Eat slowly</div>
+          <p class="tip-desc">Your brain takes about 20 minutes to register that your stomach is full. Put down your fork between bites. Eat without your phone. Chew properly. These small things make a significant difference over time.</p>
+        </div>
+        <div class="exercise-card tip-card">
+          <div class="field-label mb-8">🕐 Don't skip meals</div>
+          <p class="tip-desc">Skipping meals to compensate slows your metabolism, increases cravings, and almost always leads to overeating later. Eat regular meals. Keep portions sensible. Stay consistent.</p>
+        </div>
+      </div>
+
+      <div class="closing-quote">
+        <div class="closing-quote__text">"You do not need to eat perfectly.<br>You need to eat better than you did yesterday."</div>
+        <div class="closing-quote__attr">The Rooted Woman Method</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">x</button>
+    <div class="modal-icon" id="modal-icon"></div>
+    <h3 id="modal-title">Sending your intake...</h3>
+    <p id="modal-body">Please wait a moment while your answers are sent to your coach.</p>
+    <div class="modal-btn-row" id="modal-btns"></div>
+  </div>
+</div>
+
+</div>
+
+<script src="script.js" defer></script>
+</body>
 </html>
