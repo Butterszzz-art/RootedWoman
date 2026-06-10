@@ -291,6 +291,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     </div>
 
     <div class="nav-section">Config</div>
+    <div class="nav-item" onclick="showAdminPage('waitlist')" id="anav-waitlist">
+      <span class="nav-icon">✉</span> Waitlist
+    </div>
     <div class="nav-item" onclick="showAdminPage('settings')" id="anav-settings">
       <span class="nav-icon">◈</span> Settings
     </div>
@@ -339,6 +342,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
         <div class="section-heading">Recent activity</div>
         <div id="dash-recent"></div>
+
+        <div class="section-heading" style="margin-top:36px">Referral sources</div>
+        <div id="referral-chart"></div>
       </div>
     </div>
 
@@ -363,6 +369,26 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             <div class="empty-state-icon">○</div>
             <h3>Loading clients…</h3>
             <p>Fetching client data from Firebase.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WAITLIST -->
+    <div class="page" id="page-waitlist">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="tag">Enquiries</div>
+          <h2>Waitlist</h2>
+        </div>
+        <button class="view-full-btn" onclick="loadWaitlist()">↻ Refresh</button>
+      </div>
+      <div class="page-content">
+        <div id="waitlist-entries">
+          <div class="empty-state">
+            <div class="empty-state-icon">✉</div>
+            <h3>Loading…</h3>
+            <p>Fetching waitlist signups from Firebase.</p>
           </div>
         </div>
       </div>
@@ -478,7 +504,7 @@ function checkAuth() {
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const ADMIN_PAGES = ['dashboard','clients','settings'];
+const ADMIN_PAGES = ['dashboard','clients','waitlist','settings'];
 
 function showAdminPage(id) {
   ADMIN_PAGES.forEach(p => {
@@ -488,6 +514,7 @@ function showAdminPage(id) {
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('anav-'+id).classList.add('active');
   if (id === 'settings') loadSettings();
+  if (id === 'waitlist') loadWaitlist();
 }
 
 // ─── SETTINGS ─────────────────────────────────────────────────────────────────
@@ -586,6 +613,8 @@ function updateDashboard() {
     activeCard.classList.remove('warn');
     sub.textContent = (max - active) + ' slots remaining of ' + max;
   }
+
+  renderReferralChart();
 
   // Recent activity: last 5 clients by lastSeen
   const recent = [...allClients]
@@ -812,6 +841,86 @@ function initials(name) {
 function fmtDate(ts) {
   return new Date(ts).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
 }
+// ─── WAITLIST ─────────────────────────────────────────────────────────────────
+async function loadWaitlist() {
+  const el = document.getElementById('waitlist-entries');
+  if (!el) return;
+  if (!db) { el.innerHTML = '<div class="empty-state"><h3>Offline</h3><p>Firebase unavailable.</p></div>'; return; }
+  try {
+    const snap = await db.ref('waitlist').once('value');
+    const raw  = snap.val() || {};
+    const entries = Object.values(raw).sort((a, b) => b.submittedAt - a.submittedAt);
+    if (entries.length === 0) {
+      el.innerHTML = `<div class="empty-state">
+        <div class="empty-state-icon">✉</div>
+        <h3>No signups yet</h3>
+        <p>Waitlist entries appear here once someone submits the form on the programme page.</p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--warm-pale)">
+            <th style="padding:12px 20px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);font-weight:400;border-bottom:1px solid var(--border)">Name</th>
+            <th style="padding:12px 20px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);font-weight:400;border-bottom:1px solid var(--border)">WhatsApp</th>
+            <th style="padding:12px 20px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soil-muted);font-weight:400;border-bottom:1px solid var(--border)">Signed up</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${entries.map((e, i) => `<tr style="${i < entries.length - 1 ? 'border-bottom:1px solid var(--border)' : ''}">
+            <td style="padding:14px 20px;font-size:14px;color:var(--soil);font-weight:400">${esc(e.name || '—')}</td>
+            <td style="padding:14px 20px;font-size:14px;color:var(--soil-muted);font-weight:300">${esc(e.whatsapp || '—')}</td>
+            <td style="padding:14px 20px;font-size:13px;color:var(--soil-hint);font-weight:300">${e.submittedAt ? fmtDate(e.submittedAt) : '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  } catch(err) {
+    el.innerHTML = `<div class="empty-state"><h3>Error</h3><p>${esc(String(err))}</p></div>`;
+  }
+}
+
+// ─── REFERRAL CHART ───────────────────────────────────────────────────────────
+function renderReferralChart() {
+  const el = document.getElementById('referral-chart');
+  if (!el) return;
+
+  // Aggregate i-referral values across all clients
+  const counts = {};
+  allClients.forEach(c => {
+    const raw = (c.data['i-referral'] || '').trim();
+    if (!raw) return;
+    // Normalise: lowercase, collapse whitespace, cap at 40 chars for display
+    const key = raw.toLowerCase().replace(/\s+/g, ' ').slice(0, 40);
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  if (entries.length === 0) {
+    el.innerHTML = `<div style="font-size:13px;color:var(--soil-hint);font-style:italic;font-weight:300;padding:12px 0">
+      No referral data yet — this fills in as clients complete their intake.
+    </div>`;
+    return;
+  }
+
+  const max = entries[0][1];
+  el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-top:0">
+    ${entries.map(([source, count]) => {
+      const pct = Math.round((count / max) * 100);
+      const displaySource = source.charAt(0).toUpperCase() + source.slice(1);
+      return `<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div style="width:160px;font-size:13px;color:var(--soil);font-weight:300;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(displaySource)}">${esc(displaySource)}</div>
+        <div style="flex:1;background:var(--cream);border-radius:4px;height:22px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:var(--sage);border-radius:4px;transition:width 0.4s ease;min-width:4px"></div>
+        </div>
+        <div style="width:28px;text-align:right;font-size:13px;font-weight:500;color:var(--soil);flex-shrink:0">${count}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 document.getElementById('admin-pw').addEventListener('keydown', e => {
   if (e.key === 'Enter') adminLogin();

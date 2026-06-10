@@ -539,7 +539,8 @@ function loadAll() {
     'm1-strongest','m1-hardest','m1-proud','m1-different',
     'm2-strongest','m2-hardest','m2-proud','m2-different',
     'm3-strongest','m3-hardest','m3-proud','m3-different',
-    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
+    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next',
+    'rev-changed','rev-proud'
   ];
 
   textIds.forEach(id => {
@@ -606,7 +607,8 @@ function autosave() {
     'm1-strongest','m1-hardest','m1-proud','m1-different',
     'm2-strongest','m2-hardest','m2-proud','m2-different',
     'm3-strongest','m3-hardest','m3-proud','m3-different',
-    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next'
+    'r40-changed','r40-proud','r40-anchor','r40-carry','r40-next',
+    'rev-changed','rev-proud'
   ];
 
   textIds.forEach(id => {
@@ -729,6 +731,211 @@ function exportData() {
   a.download = 'rooted-woman-method-' + (localStorage.getItem('rwm-i-name') || 'answers').toLowerCase().replace(/\s+/g,'-') + '.txt';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ─── TESTIMONIALS ─────────────────────────────────────────────────────────────
+// To add more: copy any object and push it into this array.
+const TESTIMONIALS = [
+  {
+    name: 'M.B.',
+    result: 'Lost 6 kg in 40 days — and kept it off',
+    quote: 'I have tried everything. Diets, gym challenges, apps. Nothing stuck until Rooted in 40. For the first time I understood why I kept stopping — and how to come back without beating myself up.'
+  },
+  {
+    name: 'K.T.',
+    result: 'From 0 to 4 gym sessions a week',
+    quote: 'The anchors changed my life. I used to be all or nothing. Now when I miss a day I know exactly what to do — go back to my first anchor and start again. No shame. Just practice.'
+  },
+  {
+    name: 'S.R.',
+    result: 'More energy, better sleep, clearer mind',
+    quote: 'This is not a fitness programme. It is a self-understanding programme that happens to involve fitness. Shadey sees things in you that you cannot see yourself yet.'
+  }
+];
+
+function renderTestimonials() {
+  const el = document.getElementById('testimonials-container');
+  if (!el) return;
+  el.innerHTML = TESTIMONIALS.map(t => `
+    <div class="testimonial-card">
+      <div class="testimonial-quote">&ldquo;${escHtmlClient(t.quote)}&rdquo;</div>
+      <div class="testimonial-footer">
+        <div class="testimonial-name">${escHtmlClient(t.name)}</div>
+        <div class="testimonial-result">${escHtmlClient(t.result)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── WAITLIST ─────────────────────────────────────────────────────────────────
+async function submitWaitlist() {
+  const nameEl = document.getElementById('wl-name');
+  const waEl   = document.getElementById('wl-wa');
+  const btn    = document.getElementById('wl-btn');
+  const errEl  = document.getElementById('wl-error');
+  const name   = (nameEl ? nameEl.value : '').trim();
+  const wa     = (waEl   ? waEl.value   : '').trim();
+
+  errEl.style.display = (!name || !wa) ? 'block' : 'none';
+  if (!name || !wa) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  // Always store in Firebase so Shadey can see it in admin
+  if (db) {
+    try { await db.ref('waitlist').push({ name, whatsapp: wa, submittedAt: Date.now() }); } catch(e) {}
+  }
+
+  // Also email via EmailJS if keys are configured on this device
+  const { pk, sid, tid, ready } = checkEJSReady();
+  if (ready) {
+    try {
+      emailjs.init({ publicKey: pk });
+      await emailjs.send(sid, tid, {
+        to_email:    COACH_EMAIL,
+        to_name:     'Shadey',
+        from_name:   name,
+        client_name: name,
+        client_wa:   wa,
+        intake_text: `NEW WAITLIST SIGNUP — ROOTED IN 40\n\nName: ${name}\nWhatsApp: ${wa}\nDate: ${new Date().toLocaleString('en-GB')}`,
+      });
+    } catch(e) { console.warn('Waitlist email error:', e); }
+  }
+
+  document.getElementById('waitlist-form').style.display = 'none';
+  document.getElementById('wl-thanks').style.display = '';
+}
+
+// ─── DAY 40 REVIEW ────────────────────────────────────────────────────────────
+function selectReviewRating(val) {
+  localStorage.setItem('rwm-rev-rating', String(val));
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < val);
+  });
+}
+
+function selectRecommend(val) {
+  localStorage.setItem('rwm-rev-recommend', val);
+  ['yes','maybe','no'].forEach(v => {
+    document.getElementById('rec-' + v).classList.toggle('active', v === val);
+  });
+}
+
+async function submitReview() {
+  const rating    = localStorage.getItem('rwm-rev-rating') || '';
+  const recommend = localStorage.getItem('rwm-rev-recommend') || '';
+  const changed   = (document.getElementById('rev-changed')?.value || '').trim();
+  const proud     = (document.getElementById('rev-proud')?.value   || '').trim();
+
+  if (!rating) {
+    openModal('error', 'Rating required',
+      'Please tap a star to give an overall rating before submitting.',
+      [{ label: 'OK', cls: 'btn-save', fn: closeModal }]);
+    return;
+  }
+
+  const btn  = document.getElementById('btn-submit-review');
+  if (btn) btn.disabled = true;
+
+  const name = localStorage.getItem('rwm-i-name') || 'Client';
+  const body = `DAY 40 PROGRAMME REVIEW — ROOTED IN 40
+=========================================
+Submitted: ${new Date().toLocaleString('en-GB')}
+Client: ${name}
+Overall rating: ${rating}/5
+Would recommend: ${recommend || '(not answered)'}
+
+One thing that changed:
+${changed || '(left blank)'}
+
+One thing they are proud of:
+${proud || '(left blank)'}`.trim();
+
+  // Save locally
+  localStorage.setItem('rwm-review-submitted', new Date().toISOString());
+  if (db && clientCode) {
+    try { await db.ref('reviews/' + clientCode).set({ rating, recommend, changed, proud, submittedAt: Date.now() }); } catch(e) {}
+  }
+
+  // Email if keys available
+  const { pk, sid, tid, ready } = checkEJSReady();
+  if (ready) {
+    try {
+      emailjs.init({ publicKey: pk });
+      await emailjs.send(sid, tid, {
+        to_email: COACH_EMAIL, to_name: 'Coach',
+        from_name: name, client_name: name,
+        client_wa: localStorage.getItem('rwm-i-wa') || '--',
+        intake_text: body,
+      });
+    } catch(e) { console.warn('Review email error:', e); }
+  }
+
+  document.getElementById('review-form').style.display = 'none';
+  document.getElementById('review-thanks').style.display = '';
+}
+
+// ─── LANGUAGE TOGGLE (EN / PAP) ───────────────────────────────────────────────
+const TRANSLATIONS = {
+  en: {
+    'nav-programme-label': 'Programme',
+    'nav-welcome':         'Overview',
+    'nav-programme':       'About Rooted in 40',
+    'nav-part1-label':     'Part 1',
+    'nav-intake':          'Client Intake',
+    'nav-part2-label':     'Part 2 — The Method',
+    'nav-layer1':          'Layer 1 · Identity',
+    'nav-layer2':          'Layer 2 · Rhythm',
+    'nav-layer3':          'Layer 3 · Recovery',
+    'nav-part3-label':     'Part 3',
+    'nav-checkin':         '90-Day Check-ins',
+    'nav-resources-label': 'Resources',
+    'nav-nutrition':       'Nutrition Guide',
+    'nav-milestone-label': 'Milestone',
+    'nav-reflection':      'Day 40 Reflection',
+    'sidebar-progress':    'Progress',
+    'day-of-40':           'of 40',
+    'btn-waitlist':        'Join the waitlist',
+  },
+  pap: {
+    'nav-programme-label': 'Programa',
+    'nav-welcome':         'Panorama',
+    'nav-programme':       'Riba Rooted in 40',
+    'nav-part1-label':     'Parti 1',
+    'nav-intake':          'Formulario Inicial',
+    'nav-part2-label':     'Parti 2 — E Metodo',
+    'nav-layer1':          'Capa 1 · Identidad',
+    'nav-layer2':          'Capa 2 · Ritmo',
+    'nav-layer3':          'Capa 3 · Rekuperacion',
+    'nav-part3-label':     'Parti 3',
+    'nav-checkin':         'Check-in di 90 Dia',
+    'nav-resources-label': 'Recursonan',
+    'nav-nutrition':       'Guia di Nutricion',
+    'nav-milestone-label': 'Hito',
+    'nav-reflection':      'Reflexion Dia 40',
+    'sidebar-progress':    'Progreso',
+    'day-of-40':           'di 40',
+    'btn-waitlist':        'Inscribi riba lista',
+  }
+};
+
+let currentLang = 'en';
+
+function applyLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('rwm-lang', lang); } catch(e) {}
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  const toggle = document.getElementById('lang-toggle');
+  if (toggle) toggle.textContent = lang === 'en' ? 'PAP' : 'EN';
+  document.documentElement.lang = lang === 'pap' ? 'pap' : 'en';
+}
+
+function toggleLang() {
+  applyLang(currentLang === 'en' ? 'pap' : 'en');
 }
 
 // ─── DAY TRACKER & STREAK ─────────────────────────────────────────────────────
@@ -1015,5 +1222,21 @@ document.querySelectorAll('input[type="radio"]').forEach(r => {
 async function init() {
   await checkUnlock();
   loadAll();
+  renderTestimonials();
+  // Restore language preference
+  const savedLang = localStorage.getItem('rwm-lang') || 'en';
+  applyLang(savedLang);
+  // Restore review state if already submitted
+  if (localStorage.getItem('rwm-review-submitted')) {
+    const rf = document.getElementById('review-form');
+    const rt = document.getElementById('review-thanks');
+    if (rf) rf.style.display = 'none';
+    if (rt) rt.style.display = '';
+  }
+  // Restore review rating and recommend selections
+  const savedRating = localStorage.getItem('rwm-rev-rating');
+  if (savedRating) selectReviewRating(parseInt(savedRating));
+  const savedRec = localStorage.getItem('rwm-rev-recommend');
+  if (savedRec) selectRecommend(savedRec);
 }
 init();
