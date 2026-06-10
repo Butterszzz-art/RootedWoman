@@ -3,7 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Rooted Woman Method</title>
+<title>Rooted in 40 · The Rooted Woman Method</title>
+<meta name="description" content="A 40-day coaching and training programme for women who are done starting over. Identity, rhythm, and knowing how to return — without shame.">
+
+<!-- Open Graph / WhatsApp / Instagram -->
+<meta property="og:type"        content="website">
+<meta property="og:url"         content="https://butterszzz-art.github.io/RootedWoman/">
+<meta property="og:title"       content="Rooted in 40">
+<meta property="og:description" content="A 40-day coaching and training programme for women who are done starting over. Identity, rhythm, and knowing how to return — without shame.">
+<meta property="og:image"       content="https://butterszzz-art.github.io/RootedWoman/og-image.jpg">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale"      content="en_US">
+<meta name="twitter:card"       content="summary_large_image">
+
+<!-- Performance: preconnect to font origins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
@@ -15,7 +31,7 @@
 <div class="paywall" id="paywall" style="display:none">
 
   <div class="paywall-hero">
-    <button onclick="closePaywall()" class="paywall-close-btn" title="Back to overview">x</button>
+    <button onclick="closePaywall()" class="paywall-close-btn" aria-label="Close">×</button>
     <div class="eyebrow">Rooted in 40 - 40-day programme</div>
     <h1>For Women Who Are<br>Done Starting Over</h1>
     <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
@@ -92,8 +108,8 @@
       <h3>Already joined? Enter your access code</h3>
       <p>After payment, Shadey will send you a personal access code that unlocks your full workbook, intake questionnaire, and nutrition guide.</p>
       <div class="unlock-row">
-        <input type="text" id="unlock-input" placeholder="Enter code..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') tryUnlock()">
-        <button onclick="tryUnlock()">Unlock</button>
+        <input type="text" id="unlock-input" placeholder="Enter code..." autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
+        <button onclick="tryUnlock()" aria-label="Unlock workbook">Unlock</button>
       </div>
       <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
     </div>
@@ -113,41 +129,41 @@
   </div>
 
   <div class="nav-section-label" data-i18n="nav-programme-label">Programme</div>
-  <div class="nav-item active" onclick="showPage('welcome')" id="nav-welcome">
+  <div class="nav-item active" onclick="showPage('welcome')" id="nav-welcome" role="button" tabindex="0" aria-label="Overview">
     <span class="dot"></span><span data-i18n="nav-welcome">Overview</span>
   </div>
-  <div class="nav-item" onclick="showPage('programme')" id="nav-programme">
+  <div class="nav-item" onclick="showPage('programme')" id="nav-programme" role="button" tabindex="0" aria-label="About Rooted in 40">
     <span class="dot"></span><span data-i18n="nav-programme">About Rooted in 40</span>
   </div>
 
   <div class="nav-section-label" data-i18n="nav-part1-label">Part 1</div>
-  <div class="nav-item" onclick="showPage('intake')" id="nav-intake">
+  <div class="nav-item" onclick="showPage('intake')" id="nav-intake" role="button" tabindex="0" aria-label="Client Intake">
     <span class="dot"></span><span data-i18n="nav-intake">Client Intake</span>
   </div>
 
   <div class="nav-section-label" data-i18n="nav-part2-label">Part 2 — The Method</div>
-  <div class="nav-item" onclick="showPage('layer1')" id="nav-layer1">
+  <div class="nav-item" onclick="showPage('layer1')" id="nav-layer1" role="button" tabindex="0" aria-label="Layer 1 · Identity">
     <span class="dot"></span><span data-i18n="nav-layer1">Layer 1 · Identity</span>
   </div>
-  <div class="nav-item" onclick="showPage('layer2')" id="nav-layer2">
+  <div class="nav-item" onclick="showPage('layer2')" id="nav-layer2" role="button" tabindex="0" aria-label="Layer 2 · Rhythm">
     <span class="dot"></span><span data-i18n="nav-layer2">Layer 2 · Rhythm</span>
   </div>
-  <div class="nav-item" onclick="showPage('layer3')" id="nav-layer3">
+  <div class="nav-item" onclick="showPage('layer3')" id="nav-layer3" role="button" tabindex="0" aria-label="Layer 3 · Recovery">
     <span class="dot"></span><span data-i18n="nav-layer3">Layer 3 · Recovery</span>
   </div>
 
   <div class="nav-section-label" data-i18n="nav-part3-label">Part 3</div>
-  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin">
+  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin" role="button" tabindex="0" aria-label="90-Day Check-ins">
     <span class="dot"></span><span data-i18n="nav-checkin">90-Day Check-ins</span>
   </div>
 
   <div class="nav-section-label" data-i18n="nav-resources-label">Resources</div>
-  <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition">
+  <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition" role="button" tabindex="0" aria-label="Nutrition Guide">
     <span class="dot"></span><span data-i18n="nav-nutrition">Nutrition Guide</span>
   </div>
 
   <div class="nav-section-label" id="nav-label-reflection" data-i18n="nav-milestone-label" style="display:none">Milestone</div>
-  <div class="nav-item" onclick="showPage('reflection')" id="nav-reflection" style="display:none">
+  <div class="nav-item" onclick="showPage('reflection')" id="nav-reflection" role="button" tabindex="0" aria-label="Day 40 Reflection" style="display:none">
     <span class="dot"></span><span data-i18n="nav-reflection">Day 40 Reflection</span>
   </div>
 
@@ -176,7 +192,7 @@
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
-    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" title="Switch language / Cambia idioma">PAP</button>
+    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Switch language / Cambia idioma">PAP</button>
   </div>
 </div>
 
@@ -1087,8 +1103,8 @@
         <div class="waitlist-block__sub">Leave your name and WhatsApp number and Shadey will reach out when the next round opens.</div>
         <div id="waitlist-form">
           <div class="waitlist-fields">
-            <input class="field-input" type="text" id="wl-name" placeholder="Your name" autocomplete="name">
-            <input class="field-input" type="tel" id="wl-wa" placeholder="WhatsApp number (e.g. +297 …)" autocomplete="tel">
+            <input class="field-input" type="text" id="wl-name" placeholder="Your name" autocomplete="name" aria-label="Your name">
+            <input class="field-input" type="tel" id="wl-wa" placeholder="WhatsApp number (e.g. +297 …)" autocomplete="tel" aria-label="WhatsApp number">
           </div>
           <div class="unlock-error" id="wl-error" style="display:none">Please fill in both your name and WhatsApp number.</div>
           <button class="btn-primary" id="wl-btn" onclick="submitWaitlist()" data-i18n="btn-waitlist">Join the waitlist</button>
@@ -1349,11 +1365,11 @@
         <div class="review-field">
           <div class="field-label">Overall rating</div>
           <div class="review-stars" id="review-stars" role="group" aria-label="Rating 1 to 5">
-            <button class="star-btn" type="button" data-val="1" onclick="selectReviewRating(1)">★</button>
-            <button class="star-btn" type="button" data-val="2" onclick="selectReviewRating(2)">★</button>
-            <button class="star-btn" type="button" data-val="3" onclick="selectReviewRating(3)">★</button>
-            <button class="star-btn" type="button" data-val="4" onclick="selectReviewRating(4)">★</button>
-            <button class="star-btn" type="button" data-val="5" onclick="selectReviewRating(5)">★</button>
+            <button class="star-btn" type="button" data-val="1" onclick="selectReviewRating(1)" aria-label="1 star">★</button>
+            <button class="star-btn" type="button" data-val="2" onclick="selectReviewRating(2)" aria-label="2 stars">★</button>
+            <button class="star-btn" type="button" data-val="3" onclick="selectReviewRating(3)" aria-label="3 stars">★</button>
+            <button class="star-btn" type="button" data-val="4" onclick="selectReviewRating(4)" aria-label="4 stars">★</button>
+            <button class="star-btn" type="button" data-val="5" onclick="selectReviewRating(5)" aria-label="5 stars">★</button>
           </div>
         </div>
 
@@ -1399,6 +1415,12 @@
   </div>
 </div>
 
+</div>
+
+<!-- Consent banner (feature 29) -->
+<div class="consent-banner" id="consent-banner" role="dialog" aria-label="Data storage notice" aria-live="polite" style="display:none">
+  <p class="consent-text">This app saves your answers and daily check-ins in your browser using localStorage — nothing is sent to any server without your action.</p>
+  <button class="consent-btn" onclick="acceptConsent()" aria-label="Acknowledge and close data storage notice">Got it</button>
 </div>
 
 <script src="script.js" defer></script>

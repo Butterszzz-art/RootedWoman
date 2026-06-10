@@ -1219,9 +1219,31 @@ document.querySelectorAll('input[type="radio"]').forEach(r => {
   r.addEventListener('change', autosave);
 });
 
+// Keyboard navigation for div-based nav items
+document.querySelectorAll('.nav-item[role="button"]').forEach(el => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+  });
+});
+
+// ─── CONSENT BANNER ───────────────────────────────────────────────────────────
+function showConsent() {
+  const banner = document.getElementById('consent-banner');
+  if (!banner) return;
+  if (localStorage.getItem('rwm-consent') === '1') return;
+  banner.style.display = 'flex';
+}
+
+function acceptConsent() {
+  try { localStorage.setItem('rwm-consent', '1'); } catch(e) {}
+  const banner = document.getElementById('consent-banner');
+  if (banner) banner.style.display = 'none';
+}
+
 async function init() {
   await checkUnlock();
   loadAll();
+  showConsent();
   renderTestimonials();
   // Restore language preference
   const savedLang = localStorage.getItem('rwm-lang') || 'en';

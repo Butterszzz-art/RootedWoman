@@ -1895,4 +1895,64 @@
 
     /* Covenant inputs full width on mobile */
     .covenant-input, .covenant-input--wide { width: 100%; }
+
+    .consent-banner { bottom: 16px; width: calc(100% - 32px); flex-direction: column; align-items: flex-start; gap: 12px; }
+    .consent-btn { width: 100%; text-align: center; }
   }
+
+/* ─── CONSENT BANNER ─────────────────────────────────────────────────────────── */
+.consent-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 560px;
+  background: var(--soil);
+  color: var(--cream);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 9000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  animation: consent-slide-up 0.3s ease;
+}
+
+@keyframes consent-slide-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.consent-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(254,252,248,0.82);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.consent-btn {
+  flex-shrink: 0;
+  padding: 9px 20px;
+  background: var(--sage);
+  color: var(--cream);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.consent-btn:hover { background: #6a8e6e; }
+
+/* Keyboard focus ring for div-based nav items */
+.nav-item:focus-visible {
+  outline: 2px solid var(--warm);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
