@@ -2159,3 +2159,164 @@
   font-size: 11px;
   color: rgba(61,53,48,0.4);
 }
+
+/* ── LANDING VIEW ─────────────────────────────────────────────────────────── */
+#view-landing {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+.landing-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+}
+
+.landing-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--soil);
+  letter-spacing: 0.5px;
+}
+
+.landing-hero {
+  background: var(--soil);
+  color: var(--cream);
+  padding: 72px 24px 64px;
+  text-align: center;
+}
+
+.landing-hero .eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--warm);
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.landing-hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 8vw, 58px);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--cream);
+  margin-bottom: 20px;
+}
+
+.landing-hero p {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(254,252,248,0.7);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.landing-body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.landing-letter {
+  background: var(--soil);
+  color: var(--cream);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  margin-bottom: 48px;
+}
+
+.landing-letter p {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: rgba(254,252,248,0.85);
+  margin-bottom: 14px;
+}
+
+.landing-letter p:last-child { margin-bottom: 0; }
+
+.landing-letter .sign {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--warm);
+  margin-top: 20px;
+}
+
+.landing-section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--soil);
+  margin: 48px 0 20px;
+}
+
+/* Login / code entry section */
+.landing-login {
+  margin-top: 64px;
+  padding-top: 48px;
+}
+
+.landing-login__rule {
+  width: 48px;
+  height: 1px;
+  background: var(--warm);
+  margin-bottom: 32px;
+}
+
+.landing-login__heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--soil);
+  margin-bottom: 8px;
+}
+
+.landing-login__sub {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(61,53,48,0.6);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* Sidebar footer actions row */
+.sidebar-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sign-out-btn {
+  background: none;
+  border: none;
+  color: rgba(254,252,248,0.4);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.sign-out-btn:hover { color: rgba(254,252,248,0.75); }
+
+/* Portal view fills viewport like the old layout */
+#view-portal {
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .landing-hero { padding: 56px 20px 48px; }
+  .landing-body { padding: 32px 20px 64px; }
+  .landing-letter { padding: 24px 20px; }
+  .landing-login { margin-top: 48px; }
+}

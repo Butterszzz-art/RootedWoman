@@ -28,94 +28,90 @@
 </head>
 <body>
 
-<div class="paywall" id="paywall" style="display:none">
+<!-- ═══════════════════════════════════════════════════
+     VIEW 1 · LANDING  (public, shown before login)
+═══════════════════════════════════════════════════ -->
+<div id="view-landing">
 
-  <div class="paywall-hero">
-    <button onclick="closePaywall()" class="paywall-close-btn" aria-label="Close">×</button>
-    <div class="eyebrow">Rooted in 40 - 40-day programme</div>
+  <div class="landing-header">
+    <div class="landing-brand">Rooted in 40</div>
+  </div>
+
+  <div class="landing-hero">
+    <div class="eyebrow">40-day coaching programme</div>
     <h1>For Women Who Are<br>Done Starting Over</h1>
     <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
   </div>
 
-  <div class="paywall-body">
+  <div class="landing-body">
 
-    <div class="paywall-intro">
+    <div class="landing-letter">
       <p>Bon dia 🌸</p>
       <p>You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.</p>
       <p>I built all of that into a programme. It's called <strong>Rooted in 40</strong>.</p>
       <p class="sign">— Shadey</p>
     </div>
 
-    <div class="paywall-what">
-      <h2>What you get</h2>
-    </div>
+    <h3 class="landing-section-heading">What you get</h3>
 
     <div class="paywall-includes">
-      <div class="paywall-include-item">
-        <div class="ico">🌸</div>
-        <div>
-          <h4>2 Coaching sessions</h4>
-          <p>Day 1 kick-off + midpoint check-in with Shadey personally.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">💪</div>
-        <div>
-          <h4>5 Personal training sessions</h4>
-          <p>One session every weekend, training with Shadey directly.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">📋</div>
-        <div>
-          <h4>Full 5-week training schedule</h4>
-          <p>A personalised plan so you always know what to do and when.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">🏋️</div>
-        <div>
-          <h4>Gym orientation on Day 1</h4>
-          <p>So you never feel lost or intimidated in the gym again.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">📲</div>
-        <div>
-          <h4>Twice-weekly WhatsApp check-ins</h4>
-          <p>Video guidance for every solo session. You are never doing this alone.</p>
-        </div>
-      </div>
-      <div class="paywall-include-item">
-        <div class="ico">📖</div>
-        <div>
-          <h4>The Rooted Woman Method Workbook</h4>
-          <p>The full identity, rhythm, and recovery system — this workbook.</p>
-        </div>
-      </div>
+      <div class="paywall-include-item"><div class="ico">🌸</div><div><h4>2 Coaching sessions</h4><p>Day 1 kick-off + midpoint check-in with Shadey personally.</p></div></div>
+      <div class="paywall-include-item"><div class="ico">💪</div><div><h4>5 Personal training sessions</h4><p>One session every weekend, training with Shadey directly.</p></div></div>
+      <div class="paywall-include-item"><div class="ico">📋</div><div><h4>Full 5-week training schedule</h4><p>A personalised plan so you always know what to do and when.</p></div></div>
+      <div class="paywall-include-item"><div class="ico">🏋️</div><div><h4>Gym orientation on Day 1</h4><p>So you never feel lost or intimidated in the gym again.</p></div></div>
+      <div class="paywall-include-item"><div class="ico">📲</div><div><h4>Twice-weekly WhatsApp check-ins</h4><p>Video guidance for every solo session. You are never doing this alone.</p></div></div>
+      <div class="paywall-include-item"><div class="ico">📖</div><div><h4>The Rooted Woman Method Workbook</h4><p>The full identity, rhythm, and recovery system — this workbook.</p></div></div>
     </div>
 
-    <div class="paywall-price">
-      <div class="price-tag">Investment</div>
-      <div class="amount">AWG 500</div>
-      <div class="period">for the full 40 days</div>
-      <div class="spots">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
-      <a href="https://wa.me/2977300112" target="_blank" class="wa-btn">📱 WhatsApp Shadey · +297 730 0112</a>
-      <div class="paywall-price-note">If something in you is saying yes — reach out and let's talk 🌸</div>
+    <h3 class="landing-section-heading">What women say</h3>
+    <div class="testimonial-grid" id="testimonials-container"></div>
+
+    <div class="price-block">
+      <div class="price-block__tag">Investment</div>
+      <div class="price-block__amount">AWG 500</div>
+      <div class="price-block__period">for the full 40 days</div>
+      <div class="price-block__note">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
     </div>
 
-    <div class="paywall-unlock">
-      <h3>Already joined? Enter your access code</h3>
-      <p>After payment, Shadey will send you a personal access code that unlocks your full workbook, intake questionnaire, and nutrition guide.</p>
+    <div class="cta-block">
+      <div class="cta-block__heading">If something in you is saying yes —</div>
+      <div class="cta-block__sub">reach out on WhatsApp and let's talk. 🌸</div>
+      <a href="https://wa.me/2977300112" target="_blank" class="wa-link">📱 WhatsApp Shadey · +297 730 0112</a>
+      <div class="cta-block__attr">Saludos, Shadey</div>
+    </div>
+
+    <div class="waitlist-block">
+      <div class="waitlist-block__heading">Not ready to start yet?</div>
+      <div class="waitlist-block__sub">Leave your name and WhatsApp number and Shadey will reach out when the next round opens.</div>
+      <div id="waitlist-form">
+        <div class="waitlist-fields">
+          <input class="field-input" type="text" id="wl-name" placeholder="Your name" autocomplete="name" aria-label="Your name">
+          <input class="field-input" type="tel" id="wl-wa" placeholder="WhatsApp number (e.g. +297 …)" autocomplete="tel" aria-label="WhatsApp number">
+        </div>
+        <div class="unlock-error" id="wl-error" style="display:none">Please fill in both your name and WhatsApp number.</div>
+        <button class="btn-primary" id="wl-btn" onclick="submitWaitlist()" data-i18n="btn-waitlist">Join the waitlist</button>
+      </div>
+      <div id="wl-thanks" style="display:none" class="waitlist-thanks">🌸 Got it — Shadey will be in touch. Thank you for your interest.</div>
+    </div>
+
+    <div class="landing-login">
+      <div class="landing-login__rule"></div>
+      <div class="landing-login__heading">Already a client?</div>
+      <p class="landing-login__sub">Enter your personal access code to open the ROOTED 40 portal.</p>
       <div class="unlock-row">
-        <input type="text" id="unlock-input" placeholder="Enter code..." autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
-        <button onclick="tryUnlock()" aria-label="Unlock workbook">Unlock</button>
+        <input type="text" id="unlock-input" placeholder="Enter your code…" autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
+        <button onclick="tryUnlock()" aria-label="Enter portal">Enter portal →</button>
       </div>
       <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
     </div>
 
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════
+     VIEW 2 · PORTAL  (shown after login)
+═══════════════════════════════════════════════════ -->
+<div id="view-portal" style="display:none">
 
 <button class="hamburger" id="hamburger-btn" aria-label="Open menu" onclick="toggleSidebar()">
   <span></span><span></span><span></span>
@@ -128,20 +124,17 @@
     <h1>The Rooted<br>Woman Method</h1>
   </div>
 
-  <div class="nav-section-label" data-i18n="nav-programme-label">Programme</div>
-  <div class="nav-item" onclick="showPage('welcome')" id="nav-welcome" role="button" tabindex="0" aria-label="Overview">
-    <span class="dot"></span><span data-i18n="nav-welcome">Overview</span>
-  </div>
-  <div class="nav-item active" onclick="showPage('programme')" id="nav-programme" role="button" tabindex="0" aria-label="About Rooted in 40">
-    <span class="dot"></span><span data-i18n="nav-programme">About Rooted in 40</span>
+  <div class="nav-section-label">Start here</div>
+  <div class="nav-item" onclick="showPage('intake')" id="nav-intake" role="button" tabindex="0" aria-label="Intake Questionnaire">
+    <span class="dot"></span><span>Intake Questionnaire</span>
   </div>
 
-  <div class="nav-section-label" data-i18n="nav-part1-label">Part 1</div>
-  <div class="nav-item" onclick="showPage('intake')" id="nav-intake" role="button" tabindex="0" aria-label="Client Intake">
-    <span class="dot"></span><span data-i18n="nav-intake">Client Intake</span>
+  <div class="nav-section-label">My Programme</div>
+  <div class="nav-item" onclick="showPage('myprog')" id="nav-myprog" role="button" tabindex="0" aria-label="Weekly Workouts">
+    <span class="dot"></span><span>Weekly Workouts</span>
   </div>
 
-  <div class="nav-section-label" data-i18n="nav-part2-label">Part 2 — The Method</div>
+  <div class="nav-section-label">The Method</div>
   <div class="nav-item" onclick="showPage('layer1')" id="nav-layer1" role="button" tabindex="0" aria-label="Layer 1 · Identity">
     <span class="dot"></span><span data-i18n="nav-layer1">Layer 1 · Identity</span>
   </div>
@@ -152,22 +145,19 @@
     <span class="dot"></span><span data-i18n="nav-layer3">Layer 3 · Recovery</span>
   </div>
 
-  <div class="nav-section-label" data-i18n="nav-part3-label">Part 3</div>
-  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin" role="button" tabindex="0" aria-label="90-Day Check-ins">
-    <span class="dot"></span><span data-i18n="nav-checkin">90-Day Check-ins</span>
+  <div class="nav-section-label">Ongoing</div>
+  <div class="nav-item" onclick="showPage('checkin')" id="nav-checkin" role="button" tabindex="0" aria-label="Weekly Check-in">
+    <span class="dot"></span><span>Weekly Check-in</span>
   </div>
 
-  <div class="nav-section-label" data-i18n="nav-resources-label">Resources</div>
-  <div class="nav-item" onclick="showPage('myprog')" id="nav-myprog" role="button" tabindex="0" aria-label="My Programme">
-    <span class="dot"></span><span>My Programme</span>
-  </div>
+  <div class="nav-section-label">Resources</div>
   <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition" role="button" tabindex="0" aria-label="Nutrition Guide">
     <span class="dot"></span><span data-i18n="nav-nutrition">Nutrition Guide</span>
   </div>
 
-  <div class="nav-section-label" id="nav-label-reflection" data-i18n="nav-milestone-label" style="display:none">Milestone</div>
+  <div class="nav-section-label" id="nav-label-reflection" style="display:none">Milestone</div>
   <div class="nav-item" onclick="showPage('reflection')" id="nav-reflection" role="button" tabindex="0" aria-label="Day 40 Reflection" style="display:none">
-    <span class="dot"></span><span data-i18n="nav-reflection">Day 40 Reflection</span>
+    <span class="dot"></span><span>Day 40 Reflection</span>
   </div>
 
   <!-- Day counter + streak (shown after unlock) -->
@@ -195,7 +185,10 @@
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
-    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Switch language / Cambia idioma">PAP</button>
+    <div class="sidebar-footer-actions">
+      <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Switch language / Cambia idioma">PAP</button>
+      <button class="sign-out-btn" onclick="signOut()" aria-label="Sign out">Sign out</button>
+    </div>
   </div>
 </div>
 
@@ -240,10 +233,10 @@
           <h4>Nutrition Guide</h4>
           <p>Simple, sustainable habits. No calorie counting — just the basics applied consistently.</p>
         </div>
-        <div class="overview-tile" onclick="showPage('programme')">
+        <div class="overview-tile" onclick="showPage('myprog')">
           <div class="tile-tag">Programme</div>
-          <h4>About Rooted in 40</h4>
-          <p>Everything included in the 40-day experience, and how to get started.</p>
+          <h4>My Weekly Workouts</h4>
+          <p>Your personalised training schedule with videos, sets, reps, and coaching notes.</p>
         </div>
       </div>
 
@@ -1019,8 +1012,8 @@
     </div>
   </div>
 
-<!-- PROGRAMME PAGE -->
-  <div class="page active" id="page-programme">
+<!-- PROGRAMME PAGE (content moved to landing; kept as hidden anchor for legacy nav references) -->
+  <div class="page" id="page-programme" style="display:none!important" aria-hidden="true">
     <div class="section-header">
       <div class="tag">Rooted in 40 · 40-day programme</div>
       <h2>For Women Who Are<br>Done Starting Over</h2>
@@ -1429,6 +1422,7 @@
 </div>
 
 </div>
+</div><!-- /view-portal -->
 
 <!-- Consent banner (feature 29) -->
 <div class="consent-banner" id="consent-banner" role="dialog" aria-label="Data storage notice" aria-live="polite" style="display:none">

@@ -15,15 +15,12 @@ try {
 } catch(e) { console.warn('Firebase init failed, offline mode:', e); }
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
-const FREE_PAGES   = ['welcome','programme'];
-const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
+const PAGES = ['welcome','intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
 const COACH_EMAIL = 'shadeybahali@gmail.com';
 const ACCESS_CODE = 'ROOTED40';
 
-let isUnlocked  = false;
-let pendingPage = null;
-let clientCode  = null;
+let isUnlocked = false;
+let clientCode = null;
 
 // ─── FIREBASE HELPERS ─────────────────────────────────────────────────────────
 async function registerClient(code) {
@@ -158,58 +155,75 @@ function escHtmlClient(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
+function showLanding() {
+  document.getElementById('view-landing').style.display = '';
+  document.getElementById('view-portal').style.display = 'none';
+  document.getElementById('hamburger-btn').style.display = 'none';
+}
+
+function enterPortal(code) {
+  clientCode = code;
+  isUnlocked = true;
+  document.getElementById('view-landing').style.display = 'none';
+  document.getElementById('view-portal').style.display = '';
+  document.getElementById('hamburger-btn').style.display = '';
+
+  if (!localStorage.getItem('rwm-start-date')) {
+    localStorage.setItem('rwm-start-date', toDateStr(new Date()));
+  }
+
+  registerClient(code);
+  loadFromFirebase(code).then(() => updateProgress());
+  loadCoachContent(code);
+  renderMyProgramme(code);
+  updateSidebarStats();
+  renderAnchorCheckin();
+  renderProgressDashboard();
+
+  // Chronological: show intake first if not yet submitted, else workouts
+  const firstPage = localStorage.getItem('rwm-intake-submitted') ? 'myprog' : 'intake';
+  showPage(firstPage);
+}
+
+function signOut() {
+  try {
+    localStorage.removeItem('rwm-unlocked');
+    localStorage.removeItem('rwm-client-code');
+  } catch(e) {}
+  isUnlocked = false;
+  clientCode = null;
+  showLanding();
+}
+
 async function tryUnlock() {
   const input   = document.getElementById('unlock-input');
   const errorEl = document.getElementById('unlock-error');
-  const paywall = document.getElementById('paywall');
   const unlockBtn = document.querySelector('.unlock-row button');
-
-  if (!input || !errorEl || !paywall) return;
+  if (!input || !errorEl) return;
 
   const val = input.value.trim().toUpperCase().replace(/\s+/g, '');
   if (!val) return;
 
-  // Check hardcoded code first (works offline)
   let valid = (val === ACCESS_CODE);
 
-  // Also check Firebase for dynamic per-client codes
   if (!valid && db) {
     try {
-      if (unlockBtn) { unlockBtn.textContent = 'Checking...'; unlockBtn.disabled = true; }
+      if (unlockBtn) { unlockBtn.textContent = 'Checking…'; unlockBtn.disabled = true; }
       const snap = await db.ref('coach/codes/'+val).once('value');
       const codeData = snap.val();
       if (codeData && codeData.active) valid = true;
     } catch(e) {}
-    if (unlockBtn) { unlockBtn.textContent = 'Unlock ->'; unlockBtn.disabled = false; }
+    if (unlockBtn) { unlockBtn.textContent = 'Enter portal →'; unlockBtn.disabled = false; }
   }
 
   if (valid) {
-    clientCode = val;
     try {
       localStorage.setItem('rwm-unlocked', '1');
       localStorage.setItem('rwm-client-code', val);
-      if (!localStorage.getItem('rwm-start-date')) {
-        localStorage.setItem('rwm-start-date', toDateStr(new Date()));
-      }
     } catch(e) {}
-    isUnlocked = true;
     input.classList.remove('error');
     errorEl.classList.remove('visible');
-    paywall.style.display = 'none';
-    LOCKED_PAGES.forEach(p => {
-      const nav = document.getElementById('nav-'+p);
-      if (nav) nav.classList.remove('gated');
-    });
-    registerClient(val);
-    loadFromFirebase(val).then(() => updateProgress());
-    loadCoachContent(val);
-    renderMyProgramme(val);
-    updateSidebarStats();
-    renderAnchorCheckin();
-    renderProgressDashboard();
-    const dest = pendingPage || 'welcome';
-    pendingPage = null;
-    showPage(dest);
+    enterPortal(val);
   } else {
     input.classList.add('error');
     errorEl.classList.add('visible');
@@ -224,46 +238,23 @@ async function checkUnlock() {
     clientCode = localStorage.getItem('rwm-client-code') || null;
   } catch(e) {}
 
-  // If we have a stored code, verify it is still active in Firebase
-  // (allows Shadey to revoke access; hardcoded ROOTED40 always passes)
   if (isUnlocked && clientCode && clientCode !== ACCESS_CODE && db) {
     try {
       const snap = await db.ref('coach/codes/'+clientCode).once('value');
       const data = snap.val();
       if (!data || !data.active) {
-        // Code revoked -- lock the app
         isUnlocked = false;
         clientCode = null;
         try { localStorage.removeItem('rwm-unlocked'); localStorage.removeItem('rwm-client-code'); } catch(e) {}
       }
-    } catch(e) { /* Network error -- trust localStorage for offline use */ }
+    } catch(e) {}
   }
 
-  if (!isUnlocked) {
-    LOCKED_PAGES.forEach(p => {
-      const nav = document.getElementById('nav-'+p);
-      if (nav) nav.classList.add('gated');
-    });
+  if (isUnlocked && clientCode) {
+    enterPortal(clientCode);
   } else {
-    if (!localStorage.getItem('rwm-start-date')) {
-      localStorage.setItem('rwm-start-date', toDateStr(new Date()));
-    }
-    if (clientCode) {
-      registerClient(clientCode);
-      loadCoachContent(clientCode);
-      renderMyProgramme(clientCode);
-    }
-    showPage('welcome');
+    showLanding();
   }
-}
-
-function closePaywall() {
-  const paywall = document.getElementById('paywall');
-  if (paywall) paywall.style.display = 'none';
-  pendingPage = null;
-  // Make sure a free page is active
-  const active = PAGES.find(p => document.getElementById('page-'+p)?.classList.contains('active'));
-  if (!active || LOCKED_PAGES.includes(active)) showPage('welcome');
 }
 
 
@@ -472,16 +463,8 @@ function closeSidebar() {
 
 function showPage(id) {
   closeSidebar();
-  // Gate locked pages for non-unlocked users
-  if (!isUnlocked && LOCKED_PAGES.includes(id)) {
-    pendingPage = id;
-    const paywall = document.getElementById('paywall');
-    if (paywall) paywall.style.display = 'flex';
-    window.scrollTo({top:0, behavior:'smooth'});
-    return;
-  }
   // Reflection page requires day 40
-  if (id === 'reflection' && isUnlocked && getDayNumber() < 40) {
+  if (id === 'reflection' && getDayNumber() < 40) {
     const day = getDayNumber();
     openModal('loading', 'Almost there',
       `The Day 40 Reflection unlocks on your final day. You are on <strong>Day ${day} of 40</strong> — keep going.`,
@@ -1321,17 +1304,17 @@ function showProgWeek(w) {
     const isRest = !d.type || d.type === 'Rest';
     const embedUrl = isRest ? null : ytEmbed(d.videoUrl);
     const checked = log.completed ? 'checked' : '';
-    const logNote = esc(log.note || '');
+    const logNote = escHtmlClient(log.note || '');
 
     return `<div class="myprog-day-card${log.completed ? ' myprog-done' : ''}">
       <div class="myprog-day-name">${PROG_DAY_LABELS[day]}</div>
       ${isRest
         ? `<div class="myprog-rest-badge">Rest Day</div>`
-        : `<div class="myprog-workout-title">${esc(d.title || '')}</div>
-           ${d.setsreps ? `<div class="myprog-setsreps">${esc(d.setsreps)}</div>` : ''}
-           ${d.notes    ? `<div class="myprog-notes-text">${esc(d.notes)}</div>` : ''}
+        : `<div class="myprog-workout-title">${escHtmlClient(d.title || '')}</div>
+           ${d.setsreps ? `<div class="myprog-setsreps">${escHtmlClient(d.setsreps)}</div>` : ''}
+           ${d.notes    ? `<div class="myprog-notes-text">${escHtmlClient(d.notes)}</div>` : ''}
            ${embedUrl
-             ? `<div class="prog-video-wrap"><iframe src="${embedUrl}" title="${esc(d.title || 'Workout video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`
+             ? `<div class="prog-video-wrap"><iframe src="${embedUrl}" title="${escHtmlClient(d.title || 'Workout video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`
              : (d.videoUrl ? `<p class="myprog-no-video">Video unavailable</p>` : '')
            }
            <div class="myprog-log">
