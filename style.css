@@ -1898,6 +1898,42 @@
 
     .consent-banner { bottom: 16px; width: calc(100% - 32px); flex-direction: column; align-items: flex-start; gap: 12px; }
     .consent-btn { width: 100%; text-align: center; }
+
+    /* ── My Programme mobile ── */
+    #myprog-body {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .myprog-week-tabs {
+      gap: 6px;
+      padding-bottom: 4px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .myprog-week-tabs::-webkit-scrollbar { display: none; }
+
+    .myprog-week-tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .myprog-day-card { padding: 16px; }
+
+    .myprog-workout-title { font-size: 18px; }
+
+    .myprog-log-btn {
+      width: 100%;
+      text-align: center;
+      padding: 10px 16px;
+    }
+
+    /* Larger tap targets for nav items on mobile */
+    .nav-item { padding: 13px 24px; font-size: 14px; }
   }
 
 /* ─── CONSENT BANNER ─────────────────────────────────────────────────────────── */

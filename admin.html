@@ -6,6 +6,7 @@
 <title>Admin · Rooted in 40</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
 :root {
@@ -301,10 +302,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   <div class="login-card">
     <div class="login-eyebrow">Rooted in 40</div>
     <h1>Admin access</h1>
-    <p>This page is private to your coaching practice. It is not linked from the client app.</p>
-    <input class="login-input" type="password" id="admin-pw" placeholder="Enter admin password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button class="login-btn" onclick="adminLogin()">Sign in &rarr;</button>
-    <div class="login-error" id="admin-login-error">Incorrect password. Please try again.</div>
+    <p>This page is private to your coaching practice.</p>
+    <input class="login-input" type="email" id="admin-email" placeholder="Email address" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('admin-pw').focus()">
+    <input class="login-input" type="password" id="admin-pw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()" style="margin-top:10px">
+    <button class="login-btn" id="admin-login-btn" onclick="adminLogin()">Sign in &rarr;</button>
+    <div class="login-error" id="admin-login-error"></div>
   </div>
 </div>
 
@@ -492,15 +494,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         </div>
 
         <div class="settings-card">
-          <h3>Admin password</h3>
-          <p>Change the password used to access this admin page. The new password is stored in your browser's localStorage on this device.</p>
-          <div class="settings-field-label">New password</div>
-          <input class="settings-input" type="password" id="new-pw-input" placeholder="Enter new password" autocomplete="new-password">
-          <div class="settings-field-label">Confirm new password</div>
-          <input class="settings-input" type="password" id="confirm-pw-input" placeholder="Confirm new password" autocomplete="new-password">
-          <br>
-          <button class="btn-save-settings" onclick="changePassword()">Change password</button>
-          <span class="settings-saved" id="pw-saved">Updated</span>
+          <h3>Admin account</h3>
+          <p>Your admin login is managed through Firebase Authentication. To change your password or email, go to the <a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color:var(--soil);text-decoration:underline">Firebase Console</a> → Authentication → Users.</p>
         </div>
 
         <div class="settings-card danger-zone">
@@ -539,45 +534,46 @@ const firebaseConfig = {
   messagingSenderId: "898334778171",
   appId: "1:898334778171:web:08bf4e6ccd5165178ecd1e"
 };
-let db = null;
+let db   = null;
+let auth = null;
 try {
   firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
+  db   = firebase.database();
+  auth = firebase.auth();
 } catch(e) { console.warn('Firebase init failed:', e); }
 
 // ─── AUTH ──────────────────────────────────────────────────────────────────────
-const DEFAULT_PW = 'SHADEY2024';
-
-function getAdminPw() {
-  return localStorage.getItem('rwm-admin-pw') || DEFAULT_PW;
-}
-
 function adminLogin() {
-  const input = document.getElementById('admin-pw');
-  const err   = document.getElementById('admin-login-error');
-  if (input.value === getAdminPw()) {
-    sessionStorage.setItem('rwm-admin-auth', '1');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    loadClients();
-  } else {
-    input.classList.add('error');
-    err.classList.add('visible');
-    input.select();
-  }
+  const emailEl = document.getElementById('admin-email');
+  const pwEl    = document.getElementById('admin-pw');
+  const btn     = document.getElementById('admin-login-btn');
+  const err     = document.getElementById('admin-login-error');
+  err.classList.remove('visible');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  auth.signInWithEmailAndPassword(emailEl.value.trim(), pwEl.value)
+    .catch(e => {
+      err.textContent = 'Incorrect email or password.';
+      err.classList.add('visible');
+      pwEl.select();
+      btn.textContent = 'Sign in →'; btn.disabled = false;
+    });
 }
 
 function adminLogout() {
-  sessionStorage.removeItem('rwm-admin-auth');
-  location.reload();
+  auth.signOut();
 }
 
 function checkAuth() {
-  if (sessionStorage.getItem('rwm-admin-auth') === '1') {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    loadClients();
-  }
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      loadClients();
+    } else {
+      document.getElementById('login-screen').style.display = '';
+      document.getElementById('app').classList.remove('visible');
+    }
+  });
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
@@ -608,16 +604,6 @@ function saveMaxClients() {
   updateDashboard();
 }
 
-function changePassword() {
-  const np = document.getElementById('new-pw-input').value;
-  const cp = document.getElementById('confirm-pw-input').value;
-  if (!np) return alert('Enter a new password.');
-  if (np !== cp) return alert('Passwords do not match.');
-  localStorage.setItem('rwm-admin-pw', np);
-  document.getElementById('new-pw-input').value = '';
-  document.getElementById('confirm-pw-input').value = '';
-  flashSaved('pw-saved');
-}
 
 function flashSaved(id) {
   const el = document.getElementById(id);
