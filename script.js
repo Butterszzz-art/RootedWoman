@@ -1259,6 +1259,7 @@ function ytEmbed(url) {
 }
 
 let myProgData = null;
+let myProgLogs = {};
 let myProgCurrentWeek = 1;
 
 async function renderMyProgramme(code) {
@@ -1270,8 +1271,12 @@ async function renderMyProgramme(code) {
   body.innerHTML = '<p class="myprog-loading">Loading your programme…</p>';
 
   try {
-    const snap = await db.ref('programmes/' + code).once('value');
-    myProgData = snap.val() || {};
+    const [progSnap, logSnap] = await Promise.all([
+      db.ref('programmes/' + code).once('value'),
+      db.ref('programme-logs/' + code).once('value')
+    ]);
+    myProgData = progSnap.val() || {};
+    myProgLogs = logSnap.val() || {};
   } catch(e) {
     body.innerHTML = '<p class="myprog-loading">Unable to load programme — check your connection.</p>';
     return;
@@ -1308,13 +1313,17 @@ function showProgWeek(w) {
   if (!body) return;
 
   const weekData = (myProgData || {})['week' + w] || {};
+  const weekLogs = (myProgLogs || {})['week' + w] || {};
 
   body.innerHTML = PROG_DAY_KEYS.map(day => {
     const d = weekData[day] || {};
+    const log = weekLogs[day] || {};
     const isRest = !d.type || d.type === 'Rest';
     const embedUrl = isRest ? null : ytEmbed(d.videoUrl);
+    const checked = log.completed ? 'checked' : '';
+    const logNote = esc(log.note || '');
 
-    return `<div class="myprog-day-card">
+    return `<div class="myprog-day-card${log.completed ? ' myprog-done' : ''}">
       <div class="myprog-day-name">${PROG_DAY_LABELS[day]}</div>
       ${isRest
         ? `<div class="myprog-rest-badge">Rest Day</div>`
@@ -1324,10 +1333,41 @@ function showProgWeek(w) {
            ${embedUrl
              ? `<div class="prog-video-wrap"><iframe src="${embedUrl}" title="${esc(d.title || 'Workout video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`
              : (d.videoUrl ? `<p class="myprog-no-video">Video unavailable</p>` : '')
-           }`
+           }
+           <div class="myprog-log">
+             <label class="myprog-check-label">
+               <input type="checkbox" class="myprog-check" id="chk-${day}" ${checked} onchange="saveProgLog('${day}',${w})">
+               <span class="myprog-check-text">Completed</span>
+             </label>
+             <textarea class="myprog-log-note" id="lognote-${day}" placeholder="How did it go? Any notes…" rows="2">${logNote}</textarea>
+             <button class="myprog-log-btn" onclick="saveProgLog('${day}',${w})" id="logbtn-${day}">Save</button>
+             ${log.savedAt ? `<span class="myprog-log-saved">Last saved ${new Date(log.savedAt).toLocaleDateString()}</span>` : ''}
+           </div>`
       }
     </div>`;
   }).join('');
+}
+
+async function saveProgLog(day, week) {
+  if (!clientCode || !db) return;
+  const btn  = document.getElementById('logbtn-' + day);
+  const chk  = document.getElementById('chk-' + day);
+  const note = document.getElementById('lognote-' + day);
+  if (!btn || !chk || !note) return;
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  const logData = { completed: chk.checked, note: note.value.trim(), savedAt: Date.now() };
+  try {
+    await db.ref('programme-logs/' + clientCode + '/week' + week + '/' + day).set(logData);
+    if (!myProgLogs['week' + week]) myProgLogs['week' + week] = {};
+    myProgLogs['week' + week][day] = logData;
+    btn.textContent = 'Saved ✓'; btn.disabled = false;
+    // Toggle done styling on card
+    const card = chk.closest('.myprog-day-card');
+    if (card) card.classList.toggle('myprog-done', chk.checked);
+    setTimeout(() => { btn.textContent = 'Save'; }, 2000);
+  } catch(e) {
+    btn.textContent = 'Error'; btn.disabled = false;
+  }
 }
 
 async function init() {

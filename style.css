@@ -2060,3 +2060,66 @@
   color: rgba(61,53,48,0.4);
   margin-top: 8px;
 }
+
+/* ── My Programme — completion log controls ──────────────────────────────── */
+.myprog-day-card.myprog-done {
+  border-color: var(--sage);
+  background: #f8fbf8;
+}
+.myprog-log {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.myprog-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.myprog-check {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--sage);
+  cursor: pointer;
+}
+.myprog-check-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--soil);
+}
+.myprog-log-note {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--soil);
+  resize: vertical;
+  min-height: 56px;
+  background: transparent;
+  box-sizing: border-box;
+}
+.myprog-log-note:focus { outline: none; border-color: var(--sage); }
+.myprog-log-btn {
+  align-self: flex-start;
+  padding: 6px 16px;
+  background: var(--soil);
+  color: var(--cream);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.myprog-log-btn:hover { opacity: 0.85; }
+.myprog-log-saved {
+  font-size: 11px;
+  color: rgba(61,53,48,0.4);
+}

@@ -442,7 +442,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <div class="tag">Per-client</div>
           <h2>Programme builder</h2>
         </div>
-        <button class="btn-save-settings" id="prog-save-btn" onclick="saveProgWeek()" style="display:none">Save week</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-save-settings" id="prog-example-btn" onclick="loadExampleWeek()" style="display:none;background:transparent;color:var(--soil);border:1px solid var(--border)">Load example</button>
+          <button class="btn-save-settings" id="prog-save-btn" onclick="saveProgWeek()" style="display:none">Save week</button>
+        </div>
       </div>
       <div class="page-content">
 
@@ -1029,9 +1032,11 @@ async function selectProgClient() {
   progSelectedClient = sel.value || null;
   const builder = document.getElementById('prog-builder');
   const saveBtn = document.getElementById('prog-save-btn');
-  if (!progSelectedClient) { builder.style.display = 'none'; saveBtn.style.display = 'none'; return; }
+  const exBtn = document.getElementById('prog-example-btn');
+  if (!progSelectedClient) { builder.style.display = 'none'; saveBtn.style.display = 'none'; if(exBtn) exBtn.style.display='none'; return; }
   builder.style.display = '';
   saveBtn.style.display = '';
+  if(exBtn) exBtn.style.display='';
   progData = {};
   progSelectedWeek = 1;
   document.querySelectorAll('.prog-week-tab').forEach((btn, i) => btn.classList.toggle('active', i === 0));
@@ -1128,6 +1133,30 @@ async function saveProgWeek() {
     btn.textContent = 'Error — try again';
     btn.disabled = false;
   }
+}
+
+const EXAMPLE_WEEK = {
+  mon: { type:'Training', title:'Lower Body Strength — Squats',      setsreps:'4 sets × 10 reps',              notes:'Focus on depth and control. Keep chest tall, knees tracking over toes.', videoUrl:'https://www.youtube.com/watch?v=ultWZbUMPL8' },
+  tue: { type:'Rest' },
+  wed: { type:'Training', title:'Upper Body Push',                    setsreps:'3 sets × 12 reps',              notes:'Control the descent. Pause 1 second at the bottom of each rep.',          videoUrl:'https://www.youtube.com/watch?v=IODxDxX7oi4' },
+  thu: { type:'Rest' },
+  fri: { type:'Training', title:'Full Body Circuit',                  setsreps:'3 rounds · 40 sec on / 20 sec off', notes:'Move at a pace you can sustain. Modify as needed — listen to your body.', videoUrl:'https://www.youtube.com/watch?v=ml6cT4AZdqI' },
+  sat: { type:'Training', title:'Mobility & Stretch',                 setsreps:'30 minutes',                    notes:'Breathe into each stretch. Hold for at least 30 seconds per side.',        videoUrl:'https://www.youtube.com/watch?v=g_tea8ZNk5A' },
+  sun: { type:'Rest' }
+};
+
+function loadExampleWeek() {
+  PROG_DAY_KEYS.forEach(day => {
+    const d = EXAMPLE_WEEK[day] || { type:'Rest' };
+    setDayType(day, d.type);
+    if (d.type === 'Training') {
+      document.getElementById('prog-title-' + day).value    = d.title    || '';
+      document.getElementById('prog-sets-'  + day).value    = d.setsreps || '';
+      document.getElementById('prog-notes-' + day).value    = d.notes    || '';
+      document.getElementById('prog-video-' + day).value    = d.videoUrl || '';
+      previewYT(day);
+    }
+  });
 }
 
 checkAuth();
