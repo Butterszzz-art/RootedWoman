@@ -35,6 +35,10 @@
 
   <div class="landing-header">
     <div class="landing-brand">Rooted in 40</div>
+    <div class="landing-header-actions">
+      <a href="admin.html" class="landing-admin-link">Admin</a>
+      <button class="landing-login-btn" onclick="document.getElementById('landing-login-section').scrollIntoView({behavior:'smooth'})">Log in</button>
+    </div>
   </div>
 
   <div class="landing-hero">
@@ -94,7 +98,7 @@
       <div id="wl-thanks" style="display:none" class="waitlist-thanks">🌸 Got it — Shadey will be in touch. Thank you for your interest.</div>
     </div>
 
-    <div class="landing-login">
+    <div class="landing-login" id="landing-login-section">
       <div class="landing-login__rule"></div>
       <div class="landing-login__heading">Already a client?</div>
       <p class="landing-login__sub">Enter your personal access code to open the ROOTED 40 portal.</p>

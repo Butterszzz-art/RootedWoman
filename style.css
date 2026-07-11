@@ -2211,7 +2211,35 @@
   background: var(--cream);
   border-bottom: 1px solid var(--border);
   padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+.landing-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.landing-admin-link {
+  font-size: 12px;
+  color: rgba(61,53,48,0.4);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.landing-admin-link:hover { color: var(--soil); }
+.landing-login-btn {
+  padding: 8px 20px;
+  background: var(--soil);
+  color: var(--cream);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.landing-login-btn:hover { opacity: 0.82; }
 
 .landing-brand {
   font-family: 'Cormorant Garamond', serif;
