@@ -158,6 +158,9 @@
   </div>
 
   <div class="nav-section-label" data-i18n="nav-resources-label">Resources</div>
+  <div class="nav-item" onclick="showPage('myprog')" id="nav-myprog" role="button" tabindex="0" aria-label="My Programme">
+    <span class="dot"></span><span>My Programme</span>
+  </div>
   <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition" role="button" tabindex="0" aria-label="Nutrition Guide">
     <span class="dot"></span><span data-i18n="nav-nutrition">Nutrition Guide</span>
   </div>
@@ -1115,6 +1118,16 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- MY PROGRAMME PAGE -->
+  <div class="page" id="page-myprog">
+    <div class="section-header">
+      <div class="tag">My Programme</div>
+      <h2>Your Weekly Workouts</h2>
+    </div>
+    <div id="myprog-week-tabs" class="myprog-week-tabs"></div>
+    <div id="myprog-body"></div>
   </div>
 
   <!-- NUTRITION PAGE -->

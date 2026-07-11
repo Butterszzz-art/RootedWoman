@@ -15,9 +15,9 @@ try {
 } catch(e) { console.warn('Firebase init failed, offline mode:', e); }
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition','reflection'];
+const PAGES = ['welcome','programme','intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
 const FREE_PAGES   = ['welcome','programme'];
-const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition','reflection'];
+const LOCKED_PAGES = ['intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
 const COACH_EMAIL = 'shadeybahali@gmail.com';
 const ACCESS_CODE = 'ROOTED40';
 
@@ -203,6 +203,7 @@ async function tryUnlock() {
     registerClient(val);
     loadFromFirebase(val).then(() => updateProgress());
     loadCoachContent(val);
+    renderMyProgramme(val);
     updateSidebarStats();
     renderAnchorCheckin();
     renderProgressDashboard();
@@ -250,6 +251,7 @@ async function checkUnlock() {
     if (clientCode) {
       registerClient(clientCode);
       loadCoachContent(clientCode);
+      renderMyProgramme(clientCode);
     }
     showPage('welcome');
   }
@@ -1239,6 +1241,93 @@ function acceptConsent() {
   try { localStorage.setItem('rwm-consent', '1'); } catch(e) {}
   const banner = document.getElementById('consent-banner');
   if (banner) banner.style.display = 'none';
+}
+
+// ── My Programme (client-facing) ──────────────────────────────────────────────
+const PROG_DAY_KEYS   = ['mon','tue','wed','thu','fri','sat','sun'];
+const PROG_DAY_LABELS = { mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday', fri:'Friday', sat:'Saturday', sun:'Sunday' };
+
+function ytVideoId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function ytEmbed(url) {
+  const id = ytVideoId(url);
+  return id ? `https://www.youtube.com/embed/${id}` : null;
+}
+
+let myProgData = null;
+let myProgCurrentWeek = 1;
+
+async function renderMyProgramme(code) {
+  if (!code || !db) return;
+  const body  = document.getElementById('myprog-body');
+  const tabs  = document.getElementById('myprog-week-tabs');
+  if (!body || !tabs) return;
+
+  body.innerHTML = '<p class="myprog-loading">Loading your programme…</p>';
+
+  try {
+    const snap = await db.ref('programmes/' + code).once('value');
+    myProgData = snap.val() || {};
+  } catch(e) {
+    body.innerHTML = '<p class="myprog-loading">Unable to load programme — check your connection.</p>';
+    return;
+  }
+
+  // Auto-calculate current week (1-5)
+  const dayNum = getDayNumber();
+  myProgCurrentWeek = Math.min(Math.ceil(dayNum / 7), 5);
+
+  // Build week tabs (only weeks that have data)
+  const weeks = [1,2,3,4,5].filter(w => myProgData['week'+w]);
+  if (weeks.length === 0) {
+    tabs.innerHTML = '';
+    body.innerHTML = '<p class="myprog-loading">No workouts assigned yet — check back soon.</p>';
+    return;
+  }
+  // Ensure current week exists in data; fall back to first available
+  if (!myProgData['week'+myProgCurrentWeek]) myProgCurrentWeek = weeks[0];
+
+  tabs.innerHTML = weeks.map(w =>
+    `<button class="myprog-week-tab${w === myProgCurrentWeek ? ' active' : ''}" onclick="showProgWeek(${w})" aria-label="Week ${w}">Week ${w}${w === myProgCurrentWeek ? ' <span class="myprog-current-badge">current</span>' : ''}</button>`
+  ).join('');
+
+  showProgWeek(myProgCurrentWeek);
+}
+
+function showProgWeek(w) {
+  myProgCurrentWeek = w;
+  // Update tab active state
+  document.querySelectorAll('.myprog-week-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.startsWith('Week ' + w));
+  });
+  const body = document.getElementById('myprog-body');
+  if (!body) return;
+
+  const weekData = (myProgData || {})['week' + w] || {};
+
+  body.innerHTML = PROG_DAY_KEYS.map(day => {
+    const d = weekData[day] || {};
+    const isRest = !d.type || d.type === 'Rest';
+    const embedUrl = isRest ? null : ytEmbed(d.videoUrl);
+
+    return `<div class="myprog-day-card">
+      <div class="myprog-day-name">${PROG_DAY_LABELS[day]}</div>
+      ${isRest
+        ? `<div class="myprog-rest-badge">Rest Day</div>`
+        : `<div class="myprog-workout-title">${esc(d.title || '')}</div>
+           ${d.setsreps ? `<div class="myprog-setsreps">${esc(d.setsreps)}</div>` : ''}
+           ${d.notes    ? `<div class="myprog-notes-text">${esc(d.notes)}</div>` : ''}
+           ${embedUrl
+             ? `<div class="prog-video-wrap"><iframe src="${embedUrl}" title="${esc(d.title || 'Workout video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`
+             : (d.videoUrl ? `<p class="myprog-no-video">Video unavailable</p>` : '')
+           }`
+      }
+    </div>`;
+  }).join('');
 }
 
 async function init() {
