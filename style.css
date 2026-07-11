@@ -2241,6 +2241,28 @@
 }
 .landing-login-btn:hover { opacity: 0.82; }
 
+.landing-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.landing-footer-brand {
+  font-size: 12px;
+  color: rgba(61,53,48,0.35);
+  letter-spacing: 0.5px;
+}
+.landing-footer-admin {
+  font-size: 12px;
+  color: rgba(61,53,48,0.35);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+.landing-footer-admin:hover { color: var(--soil); }
+
 .landing-brand {
   font-family: 'Cormorant Garamond', serif;
   font-size: 18px;
