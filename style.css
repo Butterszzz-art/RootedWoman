@@ -2064,6 +2064,44 @@
   color: var(--soil);
   margin-bottom: 6px;
 }
+.myprog-exercise {
+  border-left: 2px solid var(--warm);
+  padding: 10px 0 10px 14px;
+  margin-bottom: 12px;
+}
+.myprog-exercise:last-of-type { margin-bottom: 0; }
+.myprog-ex-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+.myprog-ex-num {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--soil);
+  color: var(--cream);
+  font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 500;
+}
+.myprog-ex-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--soil);
+  flex: 1;
+}
+.myprog-ex-setsreps {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warm);
+  background: rgba(196,168,130,0.12);
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
 .myprog-notes-text {
   font-size: 13px;
   color: rgba(61,53,48,0.6);

@@ -1302,21 +1302,29 @@ function showProgWeek(w) {
     const d = weekData[day] || {};
     const log = weekLogs[day] || {};
     const isRest = !d.type || d.type === 'Rest';
-    const embedUrl = isRest ? null : ytEmbed(d.videoUrl);
+    const exercises = Array.isArray(d.exercises) ? d.exercises : [];
     const checked = log.completed ? 'checked' : '';
     const logNote = escHtmlClient(log.note || '');
+
+    const exercisesHtml = exercises.map((ex, i) => {
+      const embed = ex.videoUrl ? ytEmbed(ex.videoUrl) : null;
+      return `<div class="myprog-exercise">
+        <div class="myprog-ex-header">
+          <span class="myprog-ex-num">${i + 1}</span>
+          <span class="myprog-ex-name">${escHtmlClient(ex.name || '')}</span>
+          ${ex.sets && ex.reps ? `<span class="myprog-ex-setsreps">${escHtmlClient(ex.sets)}×${escHtmlClient(ex.reps)}</span>` : ''}
+        </div>
+        ${ex.notes ? `<div class="myprog-notes-text">${escHtmlClient(ex.notes)}</div>` : ''}
+        ${embed ? `<div class="prog-video-wrap"><iframe src="${embed}" title="${escHtmlClient(ex.name||'Exercise video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>` : ''}
+      </div>`;
+    }).join('');
 
     return `<div class="myprog-day-card${log.completed ? ' myprog-done' : ''}">
       <div class="myprog-day-name">${PROG_DAY_LABELS[day]}</div>
       ${isRest
         ? `<div class="myprog-rest-badge">Rest Day</div>`
-        : `<div class="myprog-workout-title">${escHtmlClient(d.title || '')}</div>
-           ${d.setsreps ? `<div class="myprog-setsreps">${escHtmlClient(d.setsreps)}</div>` : ''}
-           ${d.notes    ? `<div class="myprog-notes-text">${escHtmlClient(d.notes)}</div>` : ''}
-           ${embedUrl
-             ? `<div class="prog-video-wrap"><iframe src="${embedUrl}" title="${escHtmlClient(d.title || 'Workout video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`
-             : (d.videoUrl ? `<p class="myprog-no-video">Video unavailable</p>` : '')
-           }
+        : `${d.title ? `<div class="myprog-workout-title">${escHtmlClient(d.title)}</div>` : ''}
+           ${exercisesHtml}
            <div class="myprog-log">
              <label class="myprog-check-label">
                <input type="checkbox" class="myprog-check" id="chk-${day}" ${checked} onchange="saveProgLog('${day}',${w})">
