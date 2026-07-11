@@ -45,6 +45,14 @@
     <div class="eyebrow">40-day coaching programme</div>
     <h1>For Women Who Are<br>Done Starting Over</h1>
     <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
+    <div class="hero-login-box">
+      <div class="hero-login-label">Already a client? Enter your access code</div>
+      <div class="unlock-row hero-unlock-row">
+        <input type="text" id="unlock-input" placeholder="Your personal code…" autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
+        <button onclick="tryUnlock()">Enter portal →</button>
+      </div>
+      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check or message Shadey.</div>
+    </div>
   </div>
 
   <div class="landing-body">
@@ -98,16 +106,6 @@
       <div id="wl-thanks" style="display:none" class="waitlist-thanks">🌸 Got it — Shadey will be in touch. Thank you for your interest.</div>
     </div>
 
-    <div class="landing-login" id="landing-login-section">
-      <div class="landing-login__rule"></div>
-      <div class="landing-login__heading">Already a client?</div>
-      <p class="landing-login__sub">Enter your personal access code to open the ROOTED 40 portal.</p>
-      <div class="unlock-row">
-        <input type="text" id="unlock-input" placeholder="Enter your code…" autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
-        <button onclick="tryUnlock()" aria-label="Enter portal">Enter portal →</button>
-      </div>
-      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check and try again, or message Shadey on WhatsApp.</div>
-    </div>
 
   </div>
 </div>

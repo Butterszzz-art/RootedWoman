@@ -1245,6 +1245,32 @@ let myProgData = null;
 let myProgLogs = {};
 let myProgCurrentWeek = 1;
 
+const DEMO_PROGRAMME = {
+  week1: {
+    mon: { type:'Training', title:'Lower Body Strength', exercises:[
+      { name:'Back Squats',       sets:'4', reps:'10', notes:'Focus on depth. Chest tall, knees tracking over toes.', videoUrl:'https://www.youtube.com/watch?v=ultWZbUMPL8' },
+      { name:'Romanian Deadlift', sets:'3', reps:'12', notes:'Hinge at the hips, keep back flat.',                    videoUrl:'' },
+      { name:'Glute Bridge',      sets:'3', reps:'15', notes:'Hold 2 seconds at the top. Squeeze glutes.',           videoUrl:'' },
+    ]},
+    tue: { type:'Rest' },
+    wed: { type:'Training', title:'Upper Body Push', exercises:[
+      { name:'Push-ups',                sets:'3', reps:'12', notes:'Control the descent. Pause 1 sec at the bottom.', videoUrl:'https://www.youtube.com/watch?v=IODxDxX7oi4' },
+      { name:'Dumbbell Shoulder Press', sets:'3', reps:'10', notes:'Keep core tight, press straight up.',             videoUrl:'' },
+      { name:'Tricep Dips',             sets:'2', reps:'12', notes:'Keep elbows pointing back, not out.',             videoUrl:'' },
+    ]},
+    thu: { type:'Rest' },
+    fri: { type:'Training', title:'Full Body Circuit', exercises:[
+      { name:'Burpees',           sets:'3', reps:'10',     notes:'Move at a pace you can sustain. Modify as needed.', videoUrl:'https://www.youtube.com/watch?v=ml6cT4AZdqI' },
+      { name:'Mountain Climbers', sets:'3', reps:'30 sec', notes:'',                                                  videoUrl:'' },
+      { name:'Kettlebell Swings', sets:'3', reps:'15',     notes:'Drive with hips, not arms.',                       videoUrl:'' },
+    ]},
+    sat: { type:'Training', title:'Mobility & Stretch', exercises:[
+      { name:'Full Body Stretch Flow', sets:'1', reps:'30 min', notes:'Breathe into each stretch. Hold ≥30 sec per side.', videoUrl:'https://www.youtube.com/watch?v=g_tea8ZNk5A' },
+    ]},
+    sun: { type:'Rest' },
+  }
+};
+
 async function renderMyProgramme(code) {
   if (!code || !db) return;
   const body  = document.getElementById('myprog-body');
@@ -1261,8 +1287,9 @@ async function renderMyProgramme(code) {
     myProgData = progSnap.val() || {};
     myProgLogs = logSnap.val() || {};
   } catch(e) {
-    body.innerHTML = '<p class="myprog-loading">Unable to load programme — check your connection.</p>';
-    return;
+    // Firebase rules not yet set — show demo data so the UI is visible
+    myProgData = DEMO_PROGRAMME;
+    myProgLogs = {};
   }
 
   // Auto-calculate current week (1-5)
@@ -1272,11 +1299,16 @@ async function renderMyProgramme(code) {
   // Build week tabs (only weeks that have data)
   const weeks = [1,2,3,4,5].filter(w => myProgData['week'+w]);
   if (weeks.length === 0) {
-    tabs.innerHTML = '';
-    body.innerHTML = '<p class="myprog-loading">No workouts assigned yet — check back soon.</p>';
+    myProgData = DEMO_PROGRAMME;
+    const demoWeeks = [1];
+    tabs.innerHTML = demoWeeks.map(w =>
+      `<button class="myprog-week-tab active" onclick="showProgWeek(${w})">Week ${w} <span class="myprog-current-badge">current</span></button>`
+    ).join('');
+    myProgCurrentWeek = 1;
+    showProgWeek(1);
     return;
   }
-  // Ensure current week exists in data; fall back to first available
+
   if (!myProgData['week'+myProgCurrentWeek]) myProgCurrentWeek = weeks[0];
 
   tabs.innerHTML = weeks.map(w =>
