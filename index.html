@@ -216,6 +216,9 @@
   <div class="nav-item" onclick="showPage('nutrition')" id="nav-nutrition" role="button" tabindex="0" aria-label="Nutrition Guide">
     <span class="dot"></span><span data-i18n="nav-nutrition">Nutrition Guide</span>
   </div>
+  <div class="nav-item" onclick="showPage('gym')" id="nav-gym" role="button" tabindex="0" aria-label="Gym Guide">
+    <span class="dot"></span><span data-i18n="nav-gym">Gym Guide</span>
+  </div>
 
   <div class="nav-section-label" id="nav-label-reflection" style="display:none">Milestone</div>
   <div class="nav-item" onclick="showPage('reflection')" id="nav-reflection" role="button" tabindex="0" aria-label="Day 40 Reflection" style="display:none">
@@ -1116,8 +1119,8 @@
         <div class="exercise-card qw-card">
           <div class="qw-icon">💧</div>
           <div>
-            <div class="field-label mb-5">Quick Win 1 — Drink 2 litres of water every day</div>
-            <p class="section-intro mb-0">Most people are dehydrated and don't know it. Fatigue, headaches, hunger, poor focus, and cravings are often simply your body asking for water. Start your morning with a large glass before coffee or food. Finish 1.5 litres before 3pm — the rest comes easily.</p>
+            <div class="field-label mb-5">Quick Win 1 — Drink a minimum of 2 litres of water every day</div>
+            <p class="section-intro mb-0">Most people are dehydrated and don't know it. Fatigue, headaches, hunger, poor focus, and cravings are often simply your body asking for water. Start your morning with a large glass before coffee or food. Keep a bottle visible at your desk. Finish 1.5 litres before 12pm — the rest comes easily. Want a personal target? Multiply your body weight in kg by 40ml.</p>
           </div>
         </div>
 
@@ -1125,7 +1128,7 @@
           <div class="qw-icon">🥤</div>
           <div>
             <div class="field-label mb-5">Quick Win 2 — Eliminate sugary drinks and sodas</div>
-            <p class="section-intro mb-0">Sodas, fruit juices, energy drinks, and sweetened coffees are some of the biggest sources of hidden sugar. They spike your blood sugar, which leads to energy crashes and cravings. Replace with water, sparkling water, unsweetened herbal tea, or black coffee. Start by eliminating one per day.</p>
+            <p class="section-intro mb-0">Sodas, fruit juices, energy drinks, sweetened coffees, and sports drinks are some of the biggest sources of hidden sugar. They add calories without making you feel full, and they spike your blood sugar, which leads to energy crashes and cravings. Replace with water, sparkling water, unsweetened herbal tea, or black coffee. If this feels hard, start by eliminating one per day and build from there.</p>
           </div>
         </div>
 
@@ -1165,7 +1168,7 @@
           <div class="qw-icon">🥩</div>
           <div>
             <div class="field-label mb-5">Quick Win 7 — Include protein in every meal</div>
-            <p class="section-intro mb-0">Protein is the building block of muscle and keeps you fuller for longer. Good sources: chicken, fish, eggs, Greek yoghurt, legumes, cottage cheese, tofu. You don't need to count grams — just make sure it's on the plate.</p>
+            <p class="section-intro mb-0">Protein is the building block of muscle. If you're training, your body needs it to recover and grow stronger — and it keeps you fuller for longer, reducing cravings. Good sources: chicken, fish, eggs, Greek yoghurt, legumes, cottage cheese, tofu. You don't need to count grams — just make sure it's on the plate.</p>
           </div>
         </div>
 
@@ -1222,7 +1225,7 @@
       <div class="avoid-list">
         <div class="avoid-item">
           <span class="avoid-x">x</span>
-          <span class="avoid-text">Sugary drinks and sodas — Fanta, Pepsi, fruit juice, energy drinks, sweetened iced tea</span>
+          <span class="avoid-text">Sugary drinks and sodas — Fanta, Pepsi, Coca-Cola, fruit juice, energy drinks, sweetened iced tea</span>
         </div>
         <div class="avoid-item">
           <span class="avoid-x">x</span>
@@ -1281,8 +1284,413 @@
         </div>
       </div>
 
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 5 — Training &amp; Food</h3>
+      <p class="section-intro">What you eat before and after training changes everything. Food is not separate from your training — it is part of it. Eating enough of the right food is not a reward for training. It is a requirement for training to work.</p>
+
+      <div class="field-label mb-8">The Pre-Workout Meal — eat 1 to 1.5 hours before training</div>
+      <div class="quick-wins-list">
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🔥</div>
+          <div>
+            <div class="field-label mb-5">Training on an empty stomach burns muscle, not fat</div>
+            <p class="section-intro mb-0">Without fuel, your body turns to muscle tissue for energy — a process called catabolism. The result: lower strength, faster-dropping endurance, earlier breakdown in form, slower recovery, and the muscle you're working to build gets used as fuel instead.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🍜</div>
+          <div>
+            <div class="field-label mb-5">Carbohydrates are your fuel</div>
+            <p class="section-intro mb-0">Carbs are stored in muscles and liver as glycogen and released as glucose during training. Without enough beforehand, you'll feel heavy, flat, and weak — not because you're unfit, but because you're unfuelled. Good sources: oats, rice, sweet potato, whole grain bread, banana.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🥩</div>
+          <div>
+            <div class="field-label mb-5">Protein protects your muscle</div>
+            <p class="section-intro mb-0">Pre-workout protein doesn't fuel the session — carbs do that — but it protects muscle from being broken down and starts recovery before the session is even finished. Good sources: chicken breast, fish, eggs, Greek yoghurt, whey protein.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">⏰</div>
+          <div>
+            <div class="field-label mb-5">Timing</div>
+            <p class="section-intro mb-0">Eat a solid meal with protein and carbs 1–1.5 hours before training. No time for a full meal? A light snack 30–60 minutes before — a banana with a little protein, or a protein shake — is better than nothing. Avoid high-fat, high-fibre food right before training; it slows digestion and can cause discomfort mid-session.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="avoid-list">
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Chicken breast + brown rice + green salad (preferred)</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Eggs on sourdough toast + a piece of fruit</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Oats with protein powder stirred in + a banana</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Greek yoghurt + oats + berries</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Tuna + rice cakes + a small handful of nuts</span></div>
+      </div>
+
+      <div class="field-label mb-8 mt-20">The Post-Workout Meal — eat within 60 to 90 minutes after training</div>
+      <div class="quick-wins-list">
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🔬</div>
+          <div>
+            <div class="field-label mb-5">The most important nutritional moment of your day</div>
+            <p class="section-intro mb-0">In the 60–90 minutes after training, muscle cells are highly sensitive to insulin and the demand for amino acids to begin repair is at its highest. Eat well in this window and you accelerate recovery, reduce soreness, and build stronger muscle. Skip it or eat poorly, and you leave the training process incomplete.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">💪</div>
+          <div>
+            <div class="field-label mb-5">Protein is non-negotiable</div>
+            <p class="section-intro mb-0">Protein provides the amino acids your body uses to repair and rebuild muscle fibres broken down during training. Aim for a post-workout meal with 25–40g of protein. Good sources: salmon, chicken breast, white fish, tuna, or a quality whey protein shake.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">⚡</div>
+          <div>
+            <div class="field-label mb-5">Carbohydrates restock what you used</div>
+            <p class="section-intro mb-0">Glycogen used during training gets replenished by post-workout carbs — directed straight to the muscle, not stored as fat. Restricting carbs after training out of fear of weight gain is counterproductive: you're not eating extra, you're replacing what the session used. Good sources: brown or white rice, sweet potato, regular potato, oats, beans.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="avoid-list">
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Salmon + brown rice + zucchini</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Chicken breast + sweet potato + a large green salad</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Tuna + white rice + steamed broccoli</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">Lean ground beef + brown rice + green beans</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">✓</span><span class="avoid-text">White fish + potatoes + spinach</span></div>
+      </div>
+
+      <div class="field-label mb-8 mt-20">Micronutrients — the details that support everything</div>
+      <div class="food-grid">
+        <div class="food-card">
+          <div class="food-icon">🥦</div>
+          <div class="field-label mb-4">Magnesium</div>
+          <p class="feature-desc">Supports muscle contraction and relaxation, reduces cramps, improves sleep. Leafy greens, nuts, seeds, dark chocolate, legumes.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🩸</div>
+          <div class="field-label mb-4">Iron</div>
+          <p class="feature-desc">Carries oxygen to your muscles. Low iron is a common cause of fatigue during training. Red meat, spinach, lentils, fortified cereals — pair with vitamin C to absorb better.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">☀️</div>
+          <div class="field-label mb-4">Vitamin D</div>
+          <p class="feature-desc">Supports muscle function, bone strength, and immunity. Many women are deficient. Fatty fish, eggs, fortified dairy, and sunlight.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🦴</div>
+          <div class="field-label mb-4">Calcium</div>
+          <p class="feature-desc">Essential for muscle contractions and bone density — increasingly important as you train and age. Dairy, fortified plant milks, almonds, leafy greens.</p>
+        </div>
+        <div class="food-card">
+          <div class="food-icon">🍌</div>
+          <div class="field-label mb-4">Potassium</div>
+          <p class="feature-desc">Regulates fluid balance and prevents cramps during and after training. Bananas, sweet potato, spinach, avocado, coconut water.</p>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>Many women have been told that eating less is always better — that food is something to be earned, controlled, or feared. Eating the right food in the right quantities at the right time is one of the most powerful tools you have for changing your body, your energy, and your health. It is not indulgence. It is strategy. The Rooted Woman does not fear food. She uses it.</p>
+      </div>
+
       <div class="closing-quote">
         <div class="closing-quote__text">"You do not need to eat perfectly.<br>You need to eat better than you did yesterday."</div>
+        <div class="closing-quote__attr">The Rooted Woman Method</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GYM GUIDE PAGE -->
+  <div class="page" id="page-gym">
+    <div class="section-header">
+      <div class="tag">Resources · Beginner's Gym Guide</div>
+      <h2>For the Woman Walking In<br>for the Very First Time</h2>
+      <p>You belong here. You have always belonged here.</p>
+    </div>
+    <div class="section-content">
+
+      <div class="declaration-box">
+        <p class="ex" style="margin-bottom:20px;font-size:13px;font-style:normal;text-transform:uppercase;letter-spacing:1px;color:var(--sage)">My First Day — A note from your coach</p>
+        <p class="ex">I remember walking through those doors like it was yesterday. I had talked myself into it for weeks. Put on the most presentable workout clothes I owned — nothing matched, nothing felt right — and walked in. And then I stopped.</p>
+        <p class="ex">In front of me were women who looked like they had been sculpted. Toned arms, visible abs, coordinated sets. They moved through the gym like they owned it. I felt myself shrinking. I looked down at what I was wearing. I looked at my body. I thought — I do not belong here. These women are already everything I want to be. And I am starting from zero.</p>
+        <p class="ex">Then I looked around at the equipment. Machines I had never seen before, cables going in directions I could not figure out. And then I saw the men — big, muscular, lifting weights I could not even imagine picking up. I wanted to leave.</p>
+        <p class="ex">But I stayed. And what I know now — what I wish someone had told me that day — is this: <strong>every single person in that gym was a beginner once.</strong> The difference between her and me in that moment was not talent, or genetics, or money. It was time. She had simply been doing this longer than I had.</p>
+        <p class="ex">The men who made me feel like I did not belong? They were not thinking about me at all. People in the gym are almost always too focused on their own training to pay attention to anyone else. And the women I wanted to be? I became one. Not overnight. But over time, with consistency, with the courage to keep showing up even on the days I felt out of place — I became her. You will too.</p>
+        <p class="ex" style="margin-bottom:0">That is why I created this guide. Not to give you a perfect plan, but to give you what I wish someone had given me on that first day — the truth about what it feels like to begin, and the knowledge that beginning is the bravest thing you can do. — Shadey</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 1 — You Belong Here</h3>
+      <p class="section-intro">What to do when the gym feels terrifying. This is one of the most common — and least talked about — experiences a beginner has. Naming it is the first step to moving past it.</p>
+
+      <div class="quick-wins-list">
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">👯</div>
+          <div>
+            <div class="field-label mb-5">The women you are comparing yourself to</div>
+            <p class="section-intro mb-0">Every woman whose body looks the way you want yours to look started exactly where you're standing right now. Their body is the result of time and consistency — not a standard you need to meet before you're allowed to be there. Stop comparing your beginning to someone else's middle.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🏋️</div>
+          <div>
+            <div class="field-label mb-5">The big muscular men</div>
+            <p class="section-intro mb-0">They are almost certainly not paying attention to you — most serious gym-goers are absorbed in their own training. You have every right to be there. The free weights, the squat rack, the cable machines — all of it is for you too. Take your space.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🎛️</div>
+          <div>
+            <div class="field-label mb-5">Not knowing how to use the machines</div>
+            <p class="section-intro mb-0">Every machine has a label or diagram on the side — start there, then try it with light weight to get the feel. If you still can't figure it out, ask a trainer or staff member. It takes about thirty seconds, and even gym-goers with ten years' experience have to work out unfamiliar equipment.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">👀</div>
+          <div>
+            <div class="field-label mb-5">When you feel people are watching</div>
+            <p class="section-intro mb-0">They are probably not — and even if someone glances over, they're seeing a woman working on herself. That feeling fades with time. After a few weeks, the gym starts to feel familiar. Put your headphones in, follow your programme, and let the rest fade into the background.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>The matching workout set, the perfect hair, the confidence — none of that makes her workout better than yours. You showing up in whatever you have is already everything. And it is always OK to ask a trainer how a machine works — that is smart, not embarrassing. You will get a better result and avoid injury.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 2 — Before You Train</h3>
+      <p class="section-intro">What to do before every session.</p>
+
+      <div class="quick-wins-list">
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🏃</div>
+          <div>
+            <div class="field-label mb-5">Always warm up — no exceptions</div>
+            <p class="section-intro mb-0">Begin every session with 10 minutes of light cardio — a brisk walk, a gentle cycle, or a slow jog. This raises your heart rate and prepares your joints for movement. Training a cold body is how injuries happen.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">💧</div>
+          <div>
+            <div class="field-label mb-5">Drink water before you start</div>
+            <p class="section-intro mb-0">Come to the gym already hydrated. Drink at least one large glass of water before you leave home, and keep a bottle with you throughout your session.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🍜</div>
+          <div>
+            <div class="field-label mb-5">Don't train on an empty stomach</div>
+            <p class="section-intro mb-0">You don't need a big meal, but you need something — a banana, a small bowl of oats, or a yoghurt 30–60 minutes before you train. Training fasted often leads to dizziness, fatigue, and early burnout in the session.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">📄</div>
+          <div>
+            <div class="field-label mb-5">Know your session before you walk in</div>
+            <p class="section-intro mb-0">Read through your training schedule the night before or on the way there. Walking in without a plan leads to wandering, wasted time, and the temptation to give up when you can't figure out what to do next.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 3 — Posture</h3>
+      <p class="section-intro">How to stand, move, and hold yourself correctly. Poor posture doesn't just produce worse results — it causes injury.</p>
+
+      <div class="quote-block">
+        <p><strong>Neutral spine</strong> is the most important concept in training. It means your back is in its natural gentle S-curve — not arched excessively, not rounded or hunched. To find it: stand tall, pull your shoulders back and down, keep your chest open, and imagine a straight line from the crown of your head to your tailbone.</p>
+      </div>
+
+      <div class="inline-pair">
+        <div class="food-card" style="margin-bottom:0">
+          <div class="field-label mb-8">✅ Correct posture</div>
+          <p class="feature-desc">Chest open and lifted · Shoulders back and down · Gentle natural curve in the lower back · Core lightly engaged · Head in line with spine</p>
+        </div>
+        <div class="food-card" style="margin-bottom:0">
+          <div class="field-label mb-8">❌ Common mistakes</div>
+          <p class="feature-desc">Shoulders rolled forward · Lower back excessively arched · Upper back rounded or hunched · Head jutting forward · Chest collapsed inward</p>
+        </div>
+      </div>
+
+      <div class="field-label mb-8 mt-20">Posture during exercises — the most common beginner errors</div>
+      <div class="quick-wins-list">
+        <div class="exercise-card qw-card">
+          <div>
+            <div class="field-label mb-5">Squats and lunges</div>
+            <p class="section-intro mb-0">The back rounds forward as you lower. Keep your chest up and spine neutral throughout. If your back rounds, the weight is too heavy or your mobility is limited — reduce the weight and work on depth gradually.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div>
+            <div class="field-label mb-5">Pressing movements (shoulder press, chest press)</div>
+            <p class="section-intro mb-0">The lower back excessively arches to compensate for tight shoulders. Keep the core engaged and the ribs down.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div>
+            <div class="field-label mb-5">Pulling movements (rows, lat pulldowns)</div>
+            <p class="section-intro mb-0">The shoulders roll forward at the end of the movement. Focus on pulling the shoulder blades together and keeping the chest open throughout.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>If something feels wrong in your back during an exercise, stop. Reset your posture. Start lighter. Your spine is not worth the extra weight on the bar.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 4 — Core Engagement</h3>
+      <p class="section-intro">The core is the entire system of muscles that stabilises your trunk — deep abdominals, the muscles around your spine, your pelvic floor, your diaphragm, and your glutes. It is the foundation of every movement your body makes.</p>
+
+      <div class="avoid-list">
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">1</span><span class="avoid-text">Take a breath in and let your belly expand naturally.</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">2</span><span class="avoid-text">As you exhale, imagine you're bracing for a light punch to the stomach — not sucking in, but stiffening from the inside out.</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">3</span><span class="avoid-text">Hold that gentle stiffness without holding your breath.</span></div>
+        <div class="avoid-item"><span class="avoid-x" style="color:var(--sage)">4</span><span class="avoid-text">That is an engaged core. Practice this standing still before you apply it to exercises.</span></div>
+      </div>
+
+      <div class="quote-block">
+        <p>Keep your core engaged throughout every exercise — not just the hard part. Before you lift, engage. Before you squat, engage. Before you press, engage. Make it a habit before it becomes automatic.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 5 — Breathing</h3>
+      <p class="section-intro">The most overlooked technique in training. Holding your breath increases blood pressure, reduces performance, causes dizziness, and can lead to injury.</p>
+
+      <div class="quote-block">
+        <p><strong>The basic rule: exhale on the effort, inhale on the release.</strong> The effort is the hardest part of the movement — the push, the pull, the drive upward. That is when you exhale.</p>
+      </div>
+
+      <div class="food-grid">
+        <div class="food-card">
+          <div class="field-label mb-4">During a squat</div>
+          <p class="feature-desc">Inhale as you lower down. Exhale as you push back up to standing.</p>
+        </div>
+        <div class="food-card">
+          <div class="field-label mb-4">During a row</div>
+          <p class="feature-desc">Inhale as you extend the arms forward. Exhale as you pull the weight toward you.</p>
+        </div>
+        <div class="food-card">
+          <div class="field-label mb-4">During a hip thrust</div>
+          <p class="feature-desc">Inhale at the bottom. Exhale as you drive the hips up.</p>
+        </div>
+        <div class="food-card">
+          <div class="field-label mb-4">During a shoulder press</div>
+          <p class="feature-desc">Inhale as you lower the weight. Exhale as you press it overhead.</p>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>Never hold your breath during an exercise. If you find yourself holding your breath, the weight is likely too heavy or the movement is too unfamiliar. Reduce the weight and reset.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 6 — Form and Technique Over Weight</h3>
+      <p class="section-intro">The most important rule in the gym: perfect form with light weight will always produce better results — and fewer injuries — than poor form with heavy weight.</p>
+
+      <div class="quick-wins-list">
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🎯</div>
+          <div>
+            <div class="field-label mb-5">Why form matters more than weight</div>
+            <p class="section-intro mb-0">When form breaks down — too heavy, too fatigued, not yet learned — other muscles compensate and the joints absorb the stress instead. A perfectly executed hip thrust with 20kg does more for your glutes than a sloppy one with 60kg, every time.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">📈</div>
+          <div>
+            <div class="field-label mb-5">When you're ready to increase weight</div>
+            <p class="section-intro mb-0">When you can complete every rep of every set with full control and correct form, without straining. If you're grinding out the last reps with compromised posture or momentum, you're not ready — stay at the current weight until it feels solid.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">⚠️</div>
+          <div>
+            <div class="field-label mb-5">The ego trap</div>
+            <p class="section-intro mb-0">Lifting a weight that's too heavy because you want to look like you can handle it — or because the person next to you is lifting heavier. Nobody is impressed by heavy weight lifted with poor form, and the injury it causes can keep you out of the gym for months.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>The small plate rule: when you increase weight, increase by the smallest amount available. Small, consistent increases over time produce far greater results than ego-driven jumps that compromise your form.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 7 — Mind-Muscle Connection</h3>
+      <p class="section-intro">The ability to consciously focus on and feel the muscle you're supposed to be working. Intentional focus on the target muscle during training increases its activation and produces better results.</p>
+
+      <div class="quote-block">
+        <p>Before you start a set, place your hand lightly on the muscle you're about to work — your glutes for a hip thrust, your lats for a lat pulldown. Feel where it is, then consciously squeeze it during the movement. Slow the rep down to give yourself more time to feel it. Quality over quantity — ten reps where you genuinely feel the muscle working beats twenty reps where you're just moving the weight from A to B.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg">Section 8 — Muscle Burn vs Pain</h3>
+      <p class="section-intro">Know the difference. Respect both. This is one of the most important sections in this guide — please read it carefully.</p>
+
+      <div class="inline-pair">
+        <div class="food-card" style="margin-bottom:0">
+          <div class="field-label mb-8">🔥 Muscle burn — continue</div>
+          <p class="feature-desc">Heat inside the muscle · Fatigue and discomfort · Fades quickly after the set · In the belly of the muscle · Normal and expected — this is the discomfort that produces results</p>
+        </div>
+        <div class="food-card" style="margin-bottom:0">
+          <div class="field-label mb-8">⚠️ Pain — stop immediately</div>
+          <p class="feature-desc">Sharp or shooting sensation · Joint discomfort · Persists after you stop · Feels wrong · Never push through this</p>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        <p>If you feel pain — stop immediately. Do not push through it. Do not finish the set. Rack the weight, rest, and assess. If it persists, do not continue training that day and consult a professional. There is no rep, no set, and no weight that is worth an injury that takes you out of the gym for months. Your body is communicating with you. Listen to it.</p>
+      </div>
+
+      <hr class="divider">
+      <h3 class="section-heading-lg section-heading-lg--tight">Section 9 — Rest, Hydration &amp; After Training</h3>
+      <p class="section-intro">The work does not stop when you leave the gym.</p>
+
+      <div class="quick-wins-list">
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">⏱️</div>
+          <div>
+            <div class="field-label mb-5">Rest between sets</div>
+            <p class="section-intro mb-0">Rest is part of the training, not laziness. As a beginner, rest 60–90 seconds between sets for most exercises, and 90–120 seconds for heavier compound movements like squats, hip thrusts, and deadlifts. Use the time to breathe, check your form, and prepare for the next set.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">💧</div>
+          <div>
+            <div class="field-label mb-5">Hydration during training</div>
+            <p class="section-intro mb-0">Drink consistently throughout your session, not just when you feel thirsty — by the time thirst hits, you're already mildly dehydrated. Aim for small sips every 10–15 minutes. Dizziness, headache, cramps, or sudden fatigue mean stop, sit down, and drink water.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🧘</div>
+          <div>
+            <div class="field-label mb-5">After your session</div>
+            <p class="section-intro mb-0">Cool down with 5–10 minutes of light movement and stretch the major muscle groups you worked. Eat within 60–90 minutes — a meal with protein and carbohydrates supports recovery and muscle development.</p>
+          </div>
+        </div>
+        <div class="exercise-card qw-card">
+          <div class="qw-icon">🤝</div>
+          <div>
+            <div class="field-label mb-5">Gym etiquette — the basics</div>
+            <p class="section-intro mb-0">Wipe down every machine or bench after use. Re-rack your weights exactly where you found them. Don't sit on a machine between sets if others are waiting. Ask before working in on a machine someone else is using.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="closing-quote">
+        <div class="closing-quote__text">"The gym will become your space.<br>Give it time. Give yourself grace. Keep showing up."</div>
         <div class="closing-quote__attr">The Rooted Woman Method</div>
       </div>
 

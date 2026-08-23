@@ -15,7 +15,7 @@ try {
 } catch(e) { console.warn('Firebase init failed, offline mode:', e); }
 
 // ─── APP STATE ────────────────────────────────────────────────────────────────
-const PAGES = ['welcome','intake','layer1','layer2','layer3','checkin','nutrition','reflection','myprog'];
+const PAGES = ['welcome','intake','layer1','layer2','layer3','checkin','nutrition','gym','reflection','myprog'];
 const COACH_EMAIL = 'shadeybahali@gmail.com';
 const ACCESS_CODE = 'ROOTED40';
 
@@ -959,6 +959,7 @@ const TRANSLATIONS = {
     'nav-checkin':         '90-Day Check-ins',
     'nav-resources-label': 'Resources',
     'nav-nutrition':       'Nutrition Guide',
+    'nav-gym':             'Gym Guide',
     'nav-milestone-label': 'Milestone',
     'nav-reflection':      'Day 40 Reflection',
     'sidebar-progress':    'Progress',
@@ -979,6 +980,7 @@ const TRANSLATIONS = {
     'nav-checkin':         'Check-in di 90 Dia',
     'nav-resources-label': 'Recursonan',
     'nav-nutrition':       'Guia di Nutricion',
+    'nav-gym':             'Guia di Gimnasio',
     'nav-milestone-label': 'Hito',
     'nav-reflection':      'Reflexion Dia 40',
     'sidebar-progress':    'Progreso',
