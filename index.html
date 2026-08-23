@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rooted in 40 · The Rooted Woman Method</title>
+<title>Rooted in 40 · Build the habits. Become the woman — in 40 days.</title>
 <meta name="description" content="A 40-day coaching and training programme for women who are done starting over. Identity, rhythm, and knowing how to return — without shame.">
 
 <!-- Open Graph / WhatsApp / Instagram -->
@@ -36,81 +36,137 @@
   <div class="landing-header">
     <div class="landing-brand">Rooted in 40</div>
     <div class="landing-header-actions">
-      <button class="landing-login-btn" onclick="document.getElementById('hero-unlock-input').focus();document.getElementById('landing-login-section').scrollIntoView({behavior:'smooth'})">Client login</button>
+      <button class="landing-login-btn" onclick="scrollToStep('step-unlock')">Client login</button>
     </div>
   </div>
 
-  <div class="landing-hero">
-    <div class="eyebrow">40-day coaching programme</div>
-    <h1>For Women Who Are<br>Done Starting Over</h1>
-    <p>A coaching and training experience built around identity, rhythm, and knowing how to return — without shame.</p>
-    <div class="hero-login-box">
-      <div class="hero-login-label">Already a client? Enter your access code</div>
-      <div class="unlock-row hero-unlock-row">
-        <input type="text" id="unlock-input" placeholder="Your personal code…" autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
-        <button onclick="tryUnlock()">Enter portal →</button>
-      </div>
-      <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check or message Shadey.</div>
+  <button class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+  <!-- STEP 1 — HERO -->
+  <section class="funnel-step funnel-hero" id="step-hero">
+    <div class="funnel-blob funnel-blob--1"></div>
+    <div class="funnel-blob funnel-blob--2"></div>
+    <div class="funnel-hero-inner">
+      <div class="funnel-eyebrow reveal-line" style="transition-delay:0ms">A 40-day transformation experience</div>
+      <h1 class="funnel-hero-title">
+        <span class="reveal-line" style="transition-delay:180ms">Build the habits.</span>
+        <span class="reveal-line reveal-line--em" style="transition-delay:400ms">Become the woman — in 40 days.</span>
+      </h1>
+      <button class="funnel-cta-primary reveal-line" style="transition-delay:650ms" onclick="scrollToStep('step-fit')">Is this for me?</button>
     </div>
-  </div>
+    <div class="funnel-scroll-hint reveal-line" style="transition-delay:950ms" aria-hidden="true">↓</div>
+  </section>
 
-  <div class="landing-body">
+  <!-- STEP 2 — IS THIS FOR YOU -->
+  <section class="funnel-step funnel-fit" id="step-fit">
+    <div class="funnel-eyebrow reveal">This package is for you if…</div>
+    <ul class="fit-checklist">
+      <li class="fit-item"><span class="fit-check">✓</span><span>You have tried programmes before but <strong>struggled to make them stick</strong> beyond a few weeks.</span></li>
+      <li class="fit-item"><span class="fit-check">✓</span><span>You want to <strong>learn to train properly</strong> — not just follow a plan, but understand your body.</span></li>
+      <li class="fit-item"><span class="fit-check">✓</span><span>You want <strong>accountability that feels personal</strong>, not like a number in a challenge group.</span></li>
+      <li class="fit-item"><span class="fit-check">✓</span><span>You are ready to <strong>commit 40 days</strong> to building a life you don't need to escape from.</span></li>
+      <li class="fit-item"><span class="fit-check">✓</span><span>You want to work with someone who has been through their <strong>own transformation</strong> — body, mind, and soul.</span></li>
+    </ul>
+    <button class="funnel-cta-secondary" id="fit-cta" onclick="scrollToStep('step-includes')">Yes, this is me →</button>
+  </section>
 
-    <div class="landing-letter">
-      <p>Bon dia 🌸</p>
-      <p>You know how women always ask how I stay consistent? How I keep showing up for myself even when life gets heavy? It took me years to figure it out — and it wasn't about discipline or willpower. It was about something much deeper: identity, rhythm, and knowing how to come back without shame when you fall.</p>
-      <p>I built all of that into a programme. It's called <strong>Rooted in 40</strong>.</p>
-      <p class="sign">— Shadey</p>
-    </div>
-
-    <h3 class="landing-section-heading">What you get</h3>
-
-    <div class="paywall-includes">
-      <div class="paywall-include-item"><div class="ico">🌸</div><div><h4>2 Coaching sessions</h4><p>Day 1 kick-off + midpoint check-in with Shadey personally.</p></div></div>
-      <div class="paywall-include-item"><div class="ico">💪</div><div><h4>5 Personal training sessions</h4><p>One session every weekend, training with Shadey directly.</p></div></div>
-      <div class="paywall-include-item"><div class="ico">📋</div><div><h4>Full 5-week training schedule</h4><p>A personalised plan so you always know what to do and when.</p></div></div>
-      <div class="paywall-include-item"><div class="ico">🏋️</div><div><h4>Gym orientation on Day 1</h4><p>So you never feel lost or intimidated in the gym again.</p></div></div>
-      <div class="paywall-include-item"><div class="ico">📲</div><div><h4>Twice-weekly WhatsApp check-ins</h4><p>Video guidance for every solo session. You are never doing this alone.</p></div></div>
-      <div class="paywall-include-item"><div class="ico">📖</div><div><h4>The Rooted Woman Method Workbook</h4><p>The full identity, rhythm, and recovery system — this workbook.</p></div></div>
-    </div>
-
-    <h3 class="landing-section-heading">What women say</h3>
-    <div class="testimonial-grid" id="testimonials-container"></div>
-
-    <div class="price-block">
-      <div class="price-block__tag">Investment</div>
-      <div class="price-block__amount">AWG 500</div>
-      <div class="price-block__period">for the full 40 days</div>
-      <div class="price-block__note">I work with a small number of women at a time so I can give this the attention it deserves. Spots are limited.</div>
-    </div>
-
-    <div class="cta-block">
-      <div class="cta-block__heading">If something in you is saying yes —</div>
-      <div class="cta-block__sub">reach out on WhatsApp and let's talk. 🌸</div>
-      <a href="https://wa.me/2977300112" target="_blank" class="wa-link">📱 WhatsApp Shadey · +297 730 0112</a>
-      <div class="cta-block__attr">Saludos, Shadey</div>
-    </div>
-
-    <div class="waitlist-block">
-      <div class="waitlist-block__heading">Not ready to start yet?</div>
-      <div class="waitlist-block__sub">Leave your name and WhatsApp number and Shadey will reach out when the next round opens.</div>
-      <div id="waitlist-form">
-        <div class="waitlist-fields">
-          <input class="field-input" type="text" id="wl-name" placeholder="Your name" autocomplete="name" aria-label="Your name">
-          <input class="field-input" type="tel" id="wl-wa" placeholder="WhatsApp number (e.g. +297 …)" autocomplete="tel" aria-label="WhatsApp number">
+  <!-- STEP 3 — WHAT YOU GET -->
+  <section class="funnel-step funnel-includes" id="step-includes">
+    <div class="funnel-eyebrow reveal">Built for (semi) beginners</div>
+    <h2 class="funnel-heading reveal">You will never feel lost — even on the days you train alone.</h2>
+    <div class="includes-grid">
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">🌸</div><h3>2 Coaching Sessions</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>One session at the beginning and one at midpoint to realign and recommit.</p></div>
         </div>
-        <div class="unlock-error" id="wl-error" style="display:none">Please fill in both your name and WhatsApp number.</div>
-        <button class="btn-primary" id="wl-btn" onclick="submitWaitlist()" data-i18n="btn-waitlist">Join the waitlist</button>
       </div>
-      <div id="wl-thanks" style="display:none" class="waitlist-thanks">🌸 Got it — Shadey will be in touch. Thank you for your interest.</div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">💪</div><h3>8 Personal Training Sessions</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>8 personal training sessions (2 per weekend over 5 weeks) on Friday, Saturday, or Sunday — proper technique, gym confidence, and hands-on familiarity with the equipment you'll use.</p></div>
+        </div>
+      </div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">📅</div><h3>40-Day Training Schedule</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>A personalised training schedule that evolves with your progress — so you always know exactly what to do, even when training alone.</p></div>
+        </div>
+      </div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">📲</div><h3>WhatsApp Access</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>Weekly WhatsApp check-ins + open WhatsApp access — questions any day, form checks, weight advice, machine setup, all covered between sessions.</p></div>
+        </div>
+      </div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">▶️</div><h3>Video Guidance</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>Video guidance for every exercise in your training plan — so you always know exactly what to do and how to do it.</p></div>
+        </div>
+      </div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">💬</div><h3>Mid-Week Check-In</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>Mid-week check-in from coach to review your progress, answer questions, and keep you on track.</p></div>
+        </div>
+      </div>
+      <div class="include-card">
+        <div class="include-card-inner">
+          <div class="include-card-face include-card-front"><div class="include-icon">📖</div><h3>Guides &amp; Workbook</h3><span class="include-flip-hint">Tap for details</span></div>
+          <div class="include-card-face include-card-back"><p>The Rooted in 40 Nutrition Guide, Rooted in 40 Gym Guide, and The Rooted Woman Method Workbook — your complete blueprint for nutrition, training, and mindset.</p></div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="landing-footer">
-      <div class="landing-footer-brand">Rooted in 40 · The Rooted Woman Method</div>
-      <a href="admin.html" class="landing-footer-admin">Coach login</a>
+  <!-- STEP 4 — YOUR WEEKLY RHYTHM -->
+  <section class="funnel-step funnel-rhythm" id="step-rhythm">
+    <div class="funnel-eyebrow reveal">Your weekly rhythm</div>
+    <h2 class="funnel-heading reveal">A structure that works around real life.</h2>
+    <div class="rhythm-grid">
+      <div class="rhythm-day"><div class="rhythm-day-name">Monday</div><div class="rhythm-day-focus">Lower body</div><span class="rhythm-pill rhythm-pill--solo">Solo</span></div>
+      <div class="rhythm-day"><div class="rhythm-day-name">Tuesday</div><div class="rhythm-day-focus">Upper body</div><span class="rhythm-pill rhythm-pill--solo">Solo</span></div>
+      <div class="rhythm-day"><div class="rhythm-day-name">Wednesday</div><div class="rhythm-day-focus">Lower body</div><span class="rhythm-pill rhythm-pill--solo">Solo</span></div>
+      <div class="rhythm-day rhythm-day--rest"><div class="rhythm-day-name">Thursday</div><div class="rhythm-day-focus">Active recovery</div><span class="rhythm-pill rhythm-pill--rest">Rest</span></div>
+      <div class="rhythm-day rhythm-day--pt"><div class="rhythm-day-name">Friday</div><div class="rhythm-day-focus">Lower or upper body</div><span class="rhythm-pill rhythm-pill--pt">PT Session</span></div>
+      <div class="rhythm-day rhythm-day--pt"><div class="rhythm-day-name">Saturday</div><div class="rhythm-day-focus">Upper or lower body</div><span class="rhythm-pill rhythm-pill--pt">PT Session</span></div>
+      <div class="rhythm-day rhythm-day--rest"><div class="rhythm-day-name">Sunday</div><div class="rhythm-day-focus">Rest</div><span class="rhythm-pill rhythm-pill--rest">Rest</span></div>
     </div>
+    <div class="rhythm-legend"><span class="rhythm-pill rhythm-pill--solo">Solo</span>&nbsp;= Independent training&nbsp;&nbsp;·&nbsp;&nbsp;<span class="rhythm-pill rhythm-pill--pt">PT Session</span>&nbsp;= Personal training session</div>
+  </section>
 
+  <!-- STEP 5 — WHY 40 DAYS -->
+  <section class="funnel-step funnel-why" id="step-why">
+    <div class="funnel-eyebrow reveal">Why 40 days?</div>
+    <h2 class="funnel-why-title reveal">Not 30. Not 21.</h2>
+    <p class="funnel-why-body reveal">Forty days is the window where a new behaviour moves from effort to identity — where showing up stops feeling like a choice and starts feeling like who you are.</p>
+    <p class="funnel-why-quote reveal">"I know this because I have lived it."<span class="funnel-why-attr">— Shadey Figaroa</span></p>
+  </section>
+
+  <!-- STEP 6 — ARE YOU IN? (CTA, no price) -->
+  <section class="funnel-step funnel-cta-section" id="step-cta">
+    <h2 class="funnel-cta-heading reveal">40 days.<br>Are you in?</h2>
+    <!-- price to be shown later -->
+    <a class="funnel-cta-whatsapp reveal" href="https://wa.me/2977300112" target="_blank" rel="noopener">Send me details →</a>
+    <button class="funnel-secondary-link reveal" onclick="scrollToStep('step-unlock')">Already joined? Enter your access code</button>
+  </section>
+
+  <!-- STEP 7 — ACCESS CODE -->
+  <section class="funnel-step funnel-unlock" id="step-unlock">
+    <div class="funnel-unlock-label">Already a client?</div>
+    <div class="unlock-row">
+      <input type="text" id="unlock-input" placeholder="Your personal code…" autocomplete="off" spellcheck="false" aria-label="Access code" onkeydown="if(event.key==='Enter') tryUnlock()">
+      <button onclick="tryUnlock()">Enter portal →</button>
+    </div>
+    <div class="unlock-error" id="unlock-error">That code doesn't match. Double-check or message Shadey.</div>
+  </section>
+
+  <div class="landing-footer">
+    <div class="landing-footer-brand">Rooted in 40 · The Rooted Woman Method</div>
+    <a href="admin.html" class="landing-footer-admin">Coach login</a>
   </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════
@@ -127,6 +183,7 @@
   <div class="sidebar-brand">
     <div class="eyebrow">Rooted in 40</div>
     <h1>The Rooted<br>Woman Method</h1>
+    <p class="sidebar-tagline">Build the habits. Become the woman — in 40 days.</p>
   </div>
 
   <div class="nav-section-label">Start here</div>
@@ -243,6 +300,13 @@
           <h4>My Weekly Workouts</h4>
           <p>Your personalised training schedule with videos, sets, reps, and coaching notes.</p>
         </div>
+      </div>
+
+      <div class="why40-card">
+        <div class="why40-eyebrow">Why 40 days?</div>
+        <h3>Not 30. Not 21.</h3>
+        <p>Forty days is the window where a new behaviour moves from effort to identity — where showing up stops feeling like a choice and starts feeling like who you are.</p>
+        <p class="why40-quote">"I know this because I have lived it."<span class="why40-attr">— Shadey Figaroa</span></p>
       </div>
 
       <!-- Daily anchor check-in (shown after unlock) -->
@@ -1026,6 +1090,7 @@
       <div class="tag">My Programme</div>
       <h2>Your Weekly Workouts</h2>
     </div>
+    <div id="myprog-banner"></div>
     <div id="myprog-week-tabs" class="myprog-week-tabs"></div>
     <div id="myprog-body"></div>
   </div>

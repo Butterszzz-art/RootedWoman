@@ -1,6 +1,6 @@
 # Rooted in 40 — The Rooted Woman Method
 
-A coaching and personal training web app for the Rooted in 40 programme, built for coach Shadey Bahali.
+A coaching and personal training web app for the Rooted in 40 programme, built for coach Shadey Figaroa.
 
 ## What it is
 

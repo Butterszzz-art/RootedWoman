@@ -779,7 +779,7 @@ async function submitWaitlist() {
       emailjs.init({ publicKey: pk });
       await emailjs.send(sid, tid, {
         to_email:    COACH_EMAIL,
-        to_name:     'Shadey',
+        to_name:     'Shadey Figaroa',
         from_name:   name,
         client_name: name,
         client_wa:   wa,
@@ -790,6 +790,88 @@ async function submitWaitlist() {
 
   document.getElementById('waitlist-form').style.display = 'none';
   document.getElementById('wl-thanks').style.display = '';
+}
+
+// ─── SALES FUNNEL (landing page scroll experience) ─────────────────────────────
+function scrollToStep(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initFunnel() {
+  const hero = document.getElementById('step-hero');
+  if (!hero) return; // not on the landing page (e.g. admin/coach pages)
+
+  // Hero lines fade in on load, staggered by their own transition-delay
+  requestAnimationFrame(() => {
+    hero.querySelectorAll('.reveal-line').forEach(el => el.classList.add('is-visible'));
+  });
+
+  // Stagger entrance delay for grouped items based on position in their parent
+  document.querySelectorAll('.fit-checklist').forEach(list => {
+    Array.from(list.children).forEach((el, i) => { el.style.transitionDelay = (i * 120) + 'ms'; });
+  });
+  document.querySelectorAll('.includes-grid').forEach(grid => {
+    Array.from(grid.children).forEach((el, i) => { el.style.transitionDelay = (i * 90) + 'ms'; });
+  });
+  document.querySelectorAll('.rhythm-grid').forEach(grid => {
+    Array.from(grid.children).forEach((el, i) => { el.style.transitionDelay = (i * 90) + 'ms'; });
+  });
+
+  // Generic scroll-triggered reveal
+  const revealEls = document.querySelectorAll('.reveal, .fit-item, .include-card, .rhythm-day');
+  if (revealEls.length && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => observer.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('is-visible'));
+  }
+
+  // Reveal the "Yes, this is me" CTA once all 5 checklist items have appeared
+  const fitItems = document.querySelectorAll('.fit-item');
+  const fitCta = document.getElementById('fit-cta');
+  if (fitItems.length && fitCta && 'IntersectionObserver' in window) {
+    let revealed = 0;
+    const fitObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          revealed++;
+          fitObserver.unobserve(entry.target);
+          if (revealed >= fitItems.length) {
+            setTimeout(() => fitCta.classList.add('is-visible'), 500);
+          }
+        }
+      });
+    }, { threshold: 0.3 });
+    fitItems.forEach(el => fitObserver.observe(el));
+  } else if (fitCta) {
+    fitCta.classList.add('is-visible');
+  }
+
+  // Include cards flip on tap/click (and on hover for mouse users, via CSS)
+  document.querySelectorAll('.include-card').forEach(card => {
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.addEventListener('click', () => card.classList.toggle('is-flipped'));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.classList.toggle('is-flipped'); }
+    });
+  });
+
+  // Floating scroll-to-top button
+  const topBtn = document.getElementById('scroll-top-btn');
+  if (topBtn) {
+    window.addEventListener('scroll', () => {
+      topBtn.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.8);
+    }, { passive: true });
+  }
 }
 
 // ─── DAY 40 REVIEW ────────────────────────────────────────────────────────────
@@ -1244,72 +1326,60 @@ function ytEmbed(url) {
 let myProgData = null;
 let myProgLogs = {};
 let myProgCurrentWeek = 1;
-
-const DEMO_PROGRAMME = {
-  week1: {
-    mon: { type:'Training', title:'Lower Body Strength', exercises:[
-      { name:'Back Squats',       sets:'4', reps:'10', notes:'Focus on depth. Chest tall, knees tracking over toes.', videoUrl:'https://www.youtube.com/watch?v=ultWZbUMPL8' },
-      { name:'Romanian Deadlift', sets:'3', reps:'12', notes:'Hinge at the hips, keep back flat.',                    videoUrl:'' },
-      { name:'Glute Bridge',      sets:'3', reps:'15', notes:'Hold 2 seconds at the top. Squeeze glutes.',           videoUrl:'' },
-    ]},
-    tue: { type:'Rest' },
-    wed: { type:'Training', title:'Upper Body Push', exercises:[
-      { name:'Push-ups',                sets:'3', reps:'12', notes:'Control the descent. Pause 1 sec at the bottom.', videoUrl:'https://www.youtube.com/watch?v=IODxDxX7oi4' },
-      { name:'Dumbbell Shoulder Press', sets:'3', reps:'10', notes:'Keep core tight, press straight up.',             videoUrl:'' },
-      { name:'Tricep Dips',             sets:'2', reps:'12', notes:'Keep elbows pointing back, not out.',             videoUrl:'' },
-    ]},
-    thu: { type:'Rest' },
-    fri: { type:'Training', title:'Full Body Circuit', exercises:[
-      { name:'Burpees',           sets:'3', reps:'10',     notes:'Move at a pace you can sustain. Modify as needed.', videoUrl:'https://www.youtube.com/watch?v=ml6cT4AZdqI' },
-      { name:'Mountain Climbers', sets:'3', reps:'30 sec', notes:'',                                                  videoUrl:'' },
-      { name:'Kettlebell Swings', sets:'3', reps:'15',     notes:'Drive with hips, not arms.',                       videoUrl:'' },
-    ]},
-    sat: { type:'Training', title:'Mobility & Stretch', exercises:[
-      { name:'Full Body Stretch Flow', sets:'1', reps:'30 min', notes:'Breathe into each stretch. Hold ≥30 sec per side.', videoUrl:'https://www.youtube.com/watch?v=g_tea8ZNk5A' },
-    ]},
-    sun: { type:'Rest' },
-  }
-};
+let myProgAssigned = null; // { templateId, templateName, difficulty, notes, durationWeeks, startDate, assignedAt }
 
 async function renderMyProgramme(code) {
   if (!code || !db) return;
-  const body  = document.getElementById('myprog-body');
-  const tabs  = document.getElementById('myprog-week-tabs');
+  const body   = document.getElementById('myprog-body');
+  const tabs   = document.getElementById('myprog-week-tabs');
+  const banner = document.getElementById('myprog-banner');
   if (!body || !tabs) return;
 
+  tabs.innerHTML = '';
+  if (banner) banner.innerHTML = '';
   body.innerHTML = '<p class="myprog-loading">Loading your programme…</p>';
 
+  let profile = {};
   try {
-    const [progSnap, logSnap] = await Promise.all([
+    const [progSnap, logSnap, profileSnap] = await Promise.all([
       db.ref('programmes/' + code).once('value'),
-      db.ref('programme-logs/' + code).once('value')
+      db.ref('programme-logs/' + code).once('value'),
+      db.ref('clients/' + code + '/profile').once('value'),
     ]);
     myProgData = progSnap.val() || {};
     myProgLogs = logSnap.val() || {};
+    profile    = profileSnap.val() || {};
   } catch(e) {
-    // Firebase rules not yet set — show demo data so the UI is visible
-    myProgData = DEMO_PROGRAMME;
+    myProgData = {};
     myProgLogs = {};
   }
 
-  // Auto-calculate current week (1-5)
-  const dayNum = getDayNumber();
-  myProgCurrentWeek = Math.min(Math.ceil(dayNum / 7), 5);
+  myProgAssigned = profile.assignedProgramme || null;
 
-  // Build week tabs (only weeks that have data)
-  const weeks = [1,2,3,4,5].filter(w => myProgData['week'+w]);
-  if (weeks.length === 0) {
-    myProgData = DEMO_PROGRAMME;
-    const demoWeeks = [1];
-    tabs.innerHTML = demoWeeks.map(w =>
-      `<button class="myprog-week-tab active" onclick="showProgWeek(${w})">Week ${w} <span class="myprog-current-badge">current</span></button>`
-    ).join('');
-    myProgCurrentWeek = 1;
-    showProgWeek(1);
+  // Build week tabs (only weeks that have data — templates can run up to 8 weeks)
+  const weeks = [1,2,3,4,5,6,7,8].filter(w => myProgData['week'+w]);
+
+  if (!myProgAssigned || weeks.length === 0) {
+    body.innerHTML = `<div class="myprog-empty">
+      <div class="myprog-empty-icon">🌸</div>
+      <h3>Your coach will assign your programme soon</h3>
+      <p>Once Shadey builds your weekly plan, it will appear here automatically.</p>
+      <a class="myprog-empty-wa" href="https://wa.me/2977300112" target="_blank" rel="noopener">📱 Message Shadey on WhatsApp</a>
+    </div>`;
     return;
   }
 
-  if (!myProgData['week'+myProgCurrentWeek]) myProgCurrentWeek = weeks[0];
+  if (banner) {
+    banner.innerHTML = `<div class="myprog-banner">
+      ${myProgAssigned.difficulty ? `<span class="myprog-banner-diff">${escHtmlClient(myProgAssigned.difficulty)}</span>` : ''}
+      ${myProgAssigned.notes ? `<p>${escHtmlClient(myProgAssigned.notes)}</p>` : ''}
+    </div>`;
+  }
+
+  // Auto-calculate current week from days since unlock
+  const dayNum = getDayNumber();
+  myProgCurrentWeek = Math.min(Math.ceil(dayNum / 7), weeks.length);
+  if (!weeks.includes(myProgCurrentWeek)) myProgCurrentWeek = weeks[0];
 
   tabs.innerHTML = weeks.map(w =>
     `<button class="myprog-week-tab${w === myProgCurrentWeek ? ' active' : ''}" onclick="showProgWeek(${w})" aria-label="Week ${w}">Week ${w}${w === myProgCurrentWeek ? ' <span class="myprog-current-badge">current</span>' : ''}</button>`
@@ -1340,22 +1410,28 @@ function showProgWeek(w) {
 
     const exercisesHtml = exercises.map((ex, i) => {
       const embed = ex.videoUrl ? ytEmbed(ex.videoUrl) : null;
+      const videoLink = !embed && ex.videoUrl ? `<a class="myprog-video-link" href="${escHtmlClient(ex.videoUrl)}" target="_blank" rel="noopener">▶ Watch video</a>` : '';
       return `<div class="myprog-exercise">
         <div class="myprog-ex-header">
           <span class="myprog-ex-num">${i + 1}</span>
           <span class="myprog-ex-name">${escHtmlClient(ex.name || '')}</span>
           ${ex.sets && ex.reps ? `<span class="myprog-ex-setsreps">${escHtmlClient(ex.sets)}×${escHtmlClient(ex.reps)}</span>` : ''}
+          ${ex.restTime ? `<span class="myprog-ex-rest">Rest ${escHtmlClient(ex.restTime)}</span>` : ''}
         </div>
         ${ex.notes ? `<div class="myprog-notes-text">${escHtmlClient(ex.notes)}</div>` : ''}
-        ${embed ? `<div class="prog-video-wrap"><iframe src="${embed}" title="${escHtmlClient(ex.name||'Exercise video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>` : ''}
+        ${embed ? `<div class="prog-video-wrap"><iframe src="${embed}" title="${escHtmlClient(ex.name||'Exercise video')}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>` : videoLink}
       </div>`;
     }).join('');
+
+    const sessionPillClass = d.sessionType ? d.sessionType.replace(/\s+/g,'') : '';
 
     return `<div class="myprog-day-card${log.completed ? ' myprog-done' : ''}">
       <div class="myprog-day-name">${PROG_DAY_LABELS[day]}</div>
       ${isRest
         ? `<div class="myprog-rest-badge">Rest Day</div>`
-        : `${d.title ? `<div class="myprog-workout-title">${escHtmlClient(d.title)}</div>` : ''}
+        : `${d.sessionType ? `<span class="myprog-session-pill myprog-session-pill--${sessionPillClass}">${escHtmlClient(d.sessionType)}</span>` : ''}
+           ${d.title ? `<div class="myprog-workout-title">${escHtmlClient(d.title)}</div>` : ''}
+           ${d.dayNotes ? `<div class="myprog-daynotes">${escHtmlClient(d.dayNotes)}</div>` : ''}
            ${exercisesHtml}
            <div class="myprog-log">
              <label class="myprog-check-label">
@@ -1398,6 +1474,7 @@ async function init() {
   loadAll();
   showConsent();
   renderTestimonials();
+  initFunnel();
   // Restore language preference
   const savedLang = localStorage.getItem('rwm-lang') || 'en';
   applyLang(savedLang);
