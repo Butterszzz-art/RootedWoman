@@ -1092,6 +1092,9 @@
     <div class="section-header">
       <div class="tag">My Programme</div>
       <h2>Your Weekly Workouts</h2>
+      <div class="myprog-header-actions" id="myprog-header-actions" style="display:none">
+        <button class="btn-ghost myprog-pdf-btn" id="myprog-pdf-btn" onclick="exportProgrammePDF()">⬇ Export as PDF</button>
+      </div>
     </div>
     <div id="myprog-banner"></div>
     <div id="myprog-week-tabs" class="myprog-week-tabs"></div>
@@ -1809,6 +1812,9 @@
   <p class="consent-text">This app saves your answers and daily check-ins in your browser using localStorage — nothing is sent to any server without your action.</p>
   <button class="consent-btn" onclick="acceptConsent()" aria-label="Acknowledge and close data storage notice">Got it</button>
 </div>
+
+<!-- PDF export build target (feature: export programme as PDF) -->
+<div id="pdf-export-root" class="pdf-root" aria-hidden="true"></div>
 
 <script src="script.js" defer></script>
 </body>

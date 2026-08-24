@@ -402,6 +402,60 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .intake-row-value { font-size: 14px; color: var(--soil); font-weight: 300; line-height: 1.6; }
 .intake-row-value.empty { color: var(--soil-hint); font-style: italic; }
 .intake-row-value pre { font-family: 'DM Sans', sans-serif; white-space: pre-wrap; }
+
+/* ─── PDF EXPORT (programme) ─────────────────────────────────────────── */
+.pdf-export-btn { background: transparent; color: var(--soil); border: 1px solid var(--border); }
+#pdf-export-root { display: none; }
+body.pdf-mode > *:not(#pdf-export-root) { display: none !important; }
+body.pdf-mode #pdf-export-root { display: block !important; }
+
+.pdf-root {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--soil);
+  background: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pdf-cover {
+  min-height: 100vh; box-sizing: border-box; padding: 90px 60px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  page-break-after: always; break-after: page;
+}
+.pdf-cover-eyebrow { font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--warm); margin-bottom: 22px; }
+.pdf-cover-title { font-family: 'Cormorant Garamond', serif; font-size: 46px; font-weight: 400; color: var(--soil); line-height: 1.15; margin-bottom: 18px; }
+.pdf-cover-divider { width: 56px; height: 2px; background: var(--warm); margin: 0 0 26px; }
+.pdf-cover-name { font-family: 'Cormorant Garamond', serif; font-size: 27px; font-weight: 500; color: var(--sage); margin-bottom: 12px; }
+.pdf-cover-meta { font-size: 12.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-muted); margin-bottom: 30px; }
+.pdf-cover-notes { max-width: 480px; font-style: italic; color: var(--soil-muted); line-height: 1.7; margin-bottom: 46px; }
+.pdf-cover-footer { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--soil-hint); }
+
+.pdf-week { box-sizing: border-box; padding: 54px 50px; page-break-before: always; break-before: page; }
+.pdf-week:first-of-type { page-break-before: avoid; break-before: avoid; }
+.pdf-week-header { text-align: center; margin-bottom: 30px; }
+.pdf-week-eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 400; color: var(--soil); }
+
+.pdf-day-grid { display: flex; flex-direction: column; gap: 14px; }
+.pdf-day-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; background: var(--cream); page-break-inside: avoid; break-inside: avoid; }
+.pdf-day-card.pdf-rest { background: transparent; padding: 11px 22px; display: flex; align-items: center; justify-content: space-between; }
+.pdf-day-name { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; color: var(--soil); }
+.pdf-rest-badge { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--soil-hint); }
+.pdf-session-pill { display: inline-block; font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 99px; background: var(--sage-pale); color: var(--sage); margin: 8px 0 6px; }
+.pdf-workout-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--soil); margin-bottom: 4px; }
+.pdf-daynotes { font-size: 12.5px; color: var(--soil-muted); font-style: italic; margin-bottom: 8px; }
+.pdf-exercise-list { list-style: none; margin-top: 8px; display: flex; flex-direction: column; gap: 9px; }
+.pdf-exercise { border-top: 1px solid var(--border); padding-top: 9px; }
+.pdf-exercise:first-child { border-top: none; padding-top: 0; }
+.pdf-ex-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pdf-ex-num { font-size: 11px; color: var(--warm); font-weight: 600; min-width: 14px; }
+.pdf-ex-name { font-weight: 600; font-size: 14px; color: var(--soil); flex: 1; min-width: 120px; }
+.pdf-ex-setsreps { font-size: 12.5px; color: var(--sage); font-weight: 600; }
+.pdf-ex-rest { font-size: 11px; color: var(--soil-hint); }
+.pdf-ex-notes { font-size: 12px; color: var(--soil-muted); margin-top: 3px; padding-left: 22px; }
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body.pdf-mode { background: #fff; }
+}
 </style>
 </head>
 <body>
@@ -569,6 +623,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <h2>Programme builder</h2>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-save-settings pdf-export-btn" id="prog-pdf-btn" onclick="exportClientProgrammePDF()" style="display:none">⬇ Export as PDF</button>
           <button class="btn-save-settings" id="prog-example-btn" onclick="loadExampleWeek()" style="display:none;background:transparent;color:var(--soil);border:1px solid var(--border)">Load example</button>
           <button class="btn-save-settings" id="prog-save-btn" onclick="saveProgWeek()" style="display:none">Save week</button>
         </div>
@@ -1272,10 +1327,12 @@ async function selectProgClient() {
   const builder = document.getElementById('prog-builder');
   const saveBtn = document.getElementById('prog-save-btn');
   const exBtn = document.getElementById('prog-example-btn');
-  if (!progSelectedClient) { builder.style.display = 'none'; saveBtn.style.display = 'none'; if(exBtn) exBtn.style.display='none'; return; }
+  const pdfBtn = document.getElementById('prog-pdf-btn');
+  if (!progSelectedClient) { builder.style.display = 'none'; saveBtn.style.display = 'none'; if(exBtn) exBtn.style.display='none'; if(pdfBtn) pdfBtn.style.display='none'; return; }
   builder.style.display = '';
   saveBtn.style.display = '';
   if(exBtn) exBtn.style.display='';
+  if(pdfBtn) pdfBtn.style.display='';
   progData = {};
   progSelectedWeek = 1;
   document.querySelectorAll('.prog-week-tab').forEach((btn, i) => btn.classList.toggle('active', i === 0));
@@ -1834,7 +1891,120 @@ async function assignProgramme(code, btn) {
   if (btn) { btn.textContent = 'Assign'; btn.disabled = false; }
 }
 
+// ─── PDF EXPORT (programme) ───────────────────────────────────────────────────
+function buildProgrammePdfHtml(weeksData, meta) {
+  const weeks = Object.keys(weeksData || {})
+    .map(k => parseInt(k.replace('week', ''), 10))
+    .filter(n => !isNaN(n))
+    .sort((a, b) => a - b);
+
+  const metaLine = [meta.templateName, meta.difficulty, weeks.length ? (weeks.length + (weeks.length === 1 ? ' week' : ' weeks')) : '']
+    .filter(Boolean).map(esc).join(' &middot; ');
+
+  const cover = `<div class="pdf-cover">
+    <div class="pdf-cover-eyebrow">Rooted in 40</div>
+    <h1 class="pdf-cover-title">Your Training Programme</h1>
+    <div class="pdf-cover-divider"></div>
+    <div class="pdf-cover-name">${esc(meta.clientName || 'Client')}</div>
+    ${metaLine ? `<div class="pdf-cover-meta">${metaLine}</div>` : ''}
+    ${meta.notes ? `<p class="pdf-cover-notes">${esc(meta.notes)}</p>` : ''}
+    <div class="pdf-cover-footer">Prepared by Shadey Figaroa &middot; ${esc(new Date().toLocaleDateString())}</div>
+  </div>`;
+
+  const weeksHtml = weeks.map(w => {
+    const weekData = weeksData['week' + w] || {};
+    const daysHtml = PROG_DAY_KEYS.map(day => {
+      const d = weekData[day] || {};
+      const isRest = !d.type || d.type === 'Rest';
+      if (isRest) {
+        return `<div class="pdf-day-card pdf-rest">
+          <span class="pdf-day-name">${PROG_DAY_LABELS[day]}</span>
+          <span class="pdf-rest-badge">Rest Day</span>
+        </div>`;
+      }
+      const exercises = Array.isArray(d.exercises) ? d.exercises : [];
+      const exHtml = exercises.length ? exercises.map((ex, i) => `
+        <li class="pdf-exercise">
+          <div class="pdf-ex-head">
+            <span class="pdf-ex-num">${i + 1}</span>
+            <span class="pdf-ex-name">${esc(ex.name || '')}</span>
+            ${ex.sets && ex.reps ? `<span class="pdf-ex-setsreps">${esc(ex.sets)}&times;${esc(ex.reps)}</span>` : ''}
+            ${ex.restTime ? `<span class="pdf-ex-rest">Rest ${esc(ex.restTime)}</span>` : ''}
+          </div>
+          ${ex.notes ? `<div class="pdf-ex-notes">${esc(ex.notes)}</div>` : ''}
+        </li>`).join('') : '<li class="pdf-exercise pdf-ex-notes">No exercises added yet.</li>';
+      return `<div class="pdf-day-card">
+        <div class="pdf-day-name">${PROG_DAY_LABELS[day]}</div>
+        ${d.sessionType && d.sessionType !== 'Training' ? `<span class="pdf-session-pill">${esc(d.sessionType)}</span>` : ''}
+        ${d.title ? `<div class="pdf-workout-title">${esc(d.title)}</div>` : ''}
+        ${d.dayNotes ? `<div class="pdf-daynotes">${esc(d.dayNotes)}</div>` : ''}
+        <ol class="pdf-exercise-list">${exHtml}</ol>
+      </div>`;
+    }).join('');
+    return `<div class="pdf-week">
+      <div class="pdf-week-header"><div class="pdf-week-eyebrow">Week ${w}</div></div>
+      <div class="pdf-day-grid">${daysHtml}</div>
+    </div>`;
+  }).join('');
+
+  return cover + weeksHtml;
+}
+
+function runProgrammePdfExport(weeksData, meta) {
+  const root = document.getElementById('pdf-export-root');
+  if (!root) return;
+  root.innerHTML = buildProgrammePdfHtml(weeksData, meta);
+  const prevTitle = document.title;
+  document.title = (meta.clientName || 'Client').replace(/\s+/g, ' ').trim() + ' - Rooted in 40 Programme';
+  document.body.classList.add('pdf-mode');
+
+  const cleanup = () => {
+    document.body.classList.remove('pdf-mode');
+    document.title = prevTitle;
+    root.innerHTML = '';
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(() => { if (document.body.classList.contains('pdf-mode')) cleanup(); }, 30000); // fallback
+
+  requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+}
+
+async function exportClientProgrammePDF() {
+  if (!db || !progSelectedClient) return;
+  const btn = document.getElementById('prog-pdf-btn');
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = 'Preparing…'; btn.disabled = true; }
+  try {
+    const weekKeys = ['week1','week2','week3','week4','week5'];
+    const snaps = await Promise.all(weekKeys.map(wk => db.ref('programmes/' + progSelectedClient + '/' + wk).once('value')));
+    const weeksData = {};
+    weekKeys.forEach((wk, i) => { const v = snaps[i].val(); if (v) weeksData[wk] = v; });
+
+    const client = allClients.find(c => c.code === progSelectedClient);
+    const clientName = (client && client.data && client.data['i-name']) || (client && client.profile && client.profile.name) || progSelectedClient;
+    const assigned = client && client.profile && client.profile.assignedProgramme;
+
+    if (!Object.keys(weeksData).length) {
+      alert('This client has no saved programme weeks yet — add exercises and click "Save week" first.');
+    } else {
+      runProgrammePdfExport(weeksData, {
+        clientName,
+        templateName: assigned ? assigned.templateName : '',
+        difficulty:   assigned ? assigned.difficulty : '',
+        notes:        assigned ? assigned.notes : '',
+      });
+    }
+  } catch(e) {
+    alert('Could not prepare the PDF — please try again.');
+  }
+  if (btn) { btn.textContent = original; btn.disabled = false; }
+}
+
 checkAuth();
 </script>
+
+<!-- PDF export build target (feature: export programme as PDF) -->
+<div id="pdf-export-root" class="pdf-root" aria-hidden="true"></div>
 </body>
 </html>

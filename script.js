@@ -1340,6 +1340,8 @@ async function renderMyProgramme(code) {
   tabs.innerHTML = '';
   if (banner) banner.innerHTML = '';
   body.innerHTML = '<p class="myprog-loading">Loading your programme…</p>';
+  const pdfActions = document.getElementById('myprog-header-actions');
+  if (pdfActions) pdfActions.style.display = 'none';
 
   let profile = {};
   try {
@@ -1387,6 +1389,7 @@ async function renderMyProgramme(code) {
     `<button class="myprog-week-tab${w === myProgCurrentWeek ? ' active' : ''}" onclick="showProgWeek(${w})" aria-label="Week ${w}">Week ${w}${w === myProgCurrentWeek ? ' <span class="myprog-current-badge">current</span>' : ''}</button>`
   ).join('');
 
+  if (pdfActions) pdfActions.style.display = '';
   showProgWeek(myProgCurrentWeek);
 }
 
@@ -1469,6 +1472,99 @@ async function saveProgLog(day, week) {
   } catch(e) {
     btn.textContent = 'Error'; btn.disabled = false;
   }
+}
+
+// ── Export programme as PDF (print-to-PDF, styled to match the app) ──────────
+function buildProgrammePdfHtml(weeksData, meta) {
+  const weeks = Object.keys(weeksData || {})
+    .map(k => parseInt(k.replace('week', ''), 10))
+    .filter(n => !isNaN(n))
+    .sort((a, b) => a - b);
+
+  const metaLine = [meta.templateName, meta.difficulty, weeks.length ? (weeks.length + (weeks.length === 1 ? ' week' : ' weeks')) : '']
+    .filter(Boolean).map(escHtmlClient).join(' &middot; ');
+
+  const cover = `<div class="pdf-cover">
+    <div class="pdf-cover-eyebrow">Rooted in 40</div>
+    <h1 class="pdf-cover-title">Your Training Programme</h1>
+    <div class="pdf-cover-divider"></div>
+    <div class="pdf-cover-name">${escHtmlClient(meta.clientName || 'Client')}</div>
+    ${metaLine ? `<div class="pdf-cover-meta">${metaLine}</div>` : ''}
+    ${meta.notes ? `<p class="pdf-cover-notes">${escHtmlClient(meta.notes)}</p>` : ''}
+    <div class="pdf-cover-footer">Prepared by Shadey Figaroa &middot; ${escHtmlClient(new Date().toLocaleDateString())}</div>
+  </div>`;
+
+  const weeksHtml = weeks.map(w => {
+    const weekData = weeksData['week' + w] || {};
+    const daysHtml = PROG_DAY_KEYS.map(day => {
+      const d = weekData[day] || {};
+      const isRest = !d.type || d.type === 'Rest';
+      if (isRest) {
+        return `<div class="pdf-day-card pdf-rest">
+          <span class="pdf-day-name">${PROG_DAY_LABELS[day]}</span>
+          <span class="pdf-rest-badge">Rest Day</span>
+        </div>`;
+      }
+      const exercises = Array.isArray(d.exercises) ? d.exercises : [];
+      const exHtml = exercises.length ? exercises.map((ex, i) => `
+        <li class="pdf-exercise">
+          <div class="pdf-ex-head">
+            <span class="pdf-ex-num">${i + 1}</span>
+            <span class="pdf-ex-name">${escHtmlClient(ex.name || '')}</span>
+            ${ex.sets && ex.reps ? `<span class="pdf-ex-setsreps">${escHtmlClient(ex.sets)}&times;${escHtmlClient(ex.reps)}</span>` : ''}
+            ${ex.restTime ? `<span class="pdf-ex-rest">Rest ${escHtmlClient(ex.restTime)}</span>` : ''}
+          </div>
+          ${ex.notes ? `<div class="pdf-ex-notes">${escHtmlClient(ex.notes)}</div>` : ''}
+        </li>`).join('') : '<li class="pdf-exercise pdf-ex-notes">No exercises added yet.</li>';
+      return `<div class="pdf-day-card">
+        <div class="pdf-day-name">${PROG_DAY_LABELS[day]}</div>
+        ${d.sessionType && d.sessionType !== 'Training' ? `<span class="pdf-session-pill">${escHtmlClient(d.sessionType)}</span>` : ''}
+        ${d.title ? `<div class="pdf-workout-title">${escHtmlClient(d.title)}</div>` : ''}
+        ${d.dayNotes ? `<div class="pdf-daynotes">${escHtmlClient(d.dayNotes)}</div>` : ''}
+        <ol class="pdf-exercise-list">${exHtml}</ol>
+      </div>`;
+    }).join('');
+    return `<div class="pdf-week">
+      <div class="pdf-week-header"><div class="pdf-week-eyebrow">Week ${w}</div></div>
+      <div class="pdf-day-grid">${daysHtml}</div>
+    </div>`;
+  }).join('');
+
+  return cover + weeksHtml;
+}
+
+function runProgrammePdfExport(weeksData, meta) {
+  const root = document.getElementById('pdf-export-root');
+  if (!root) return;
+  root.innerHTML = buildProgrammePdfHtml(weeksData, meta);
+  const prevTitle = document.title;
+  document.title = (meta.clientName || 'Client').replace(/\s+/g, ' ').trim() + ' - Rooted in 40 Programme';
+  document.body.classList.add('pdf-mode');
+
+  const cleanup = () => {
+    document.body.classList.remove('pdf-mode');
+    document.title = prevTitle;
+    root.innerHTML = '';
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(() => { if (document.body.classList.contains('pdf-mode')) cleanup(); }, 30000); // fallback
+
+  requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+}
+
+async function exportProgrammePDF() {
+  if (!myProgData || !myProgAssigned) return;
+  const btn = document.getElementById('myprog-pdf-btn');
+  const original = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = 'Preparing…'; btn.disabled = true; }
+  runProgrammePdfExport(myProgData, {
+    clientName:   localStorage.getItem('rwm-i-name') || 'Client',
+    templateName: myProgAssigned.templateName || '',
+    difficulty:   myProgAssigned.difficulty || '',
+    notes:        myProgAssigned.notes || '',
+  });
+  if (btn) setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 800);
 }
 
 async function init() {
