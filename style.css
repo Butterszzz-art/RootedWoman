@@ -2592,3 +2592,179 @@
   .funnel-cta-section { padding: 72px 20px; }
   .rhythm-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── PDF EXPORT (programme) ──────────────────────────────────────────────── */
+.myprog-header-actions { margin-top: 18px; }
+.myprog-pdf-btn,
+.pdf-export-btn { padding: 10px 22px; font-size: 13px; }
+.myprog-pdf-btn .btn-spin,
+.pdf-export-btn .btn-spin { display: inline-block; animation: pdf-spin 0.8s linear infinite; }
+@keyframes pdf-spin { to { transform: rotate(360deg); } }
+
+/* Hidden off-screen build target — only shown while printing */
+#pdf-export-root { display: none; }
+body.pdf-mode > *:not(#pdf-export-root) { display: none !important; }
+body.pdf-mode #pdf-export-root { display: block !important; }
+
+.pdf-root {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--soil);
+  background: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.pdf-cover {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 90px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  page-break-after: always;
+  break-after: page;
+}
+.pdf-cover-eyebrow {
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--warm);
+  margin-bottom: 22px;
+}
+.pdf-cover-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 46px;
+  font-weight: 400;
+  color: var(--soil);
+  line-height: 1.15;
+  margin-bottom: 18px;
+}
+.pdf-cover-divider {
+  width: 56px;
+  height: 2px;
+  background: var(--warm);
+  margin: 0 0 26px;
+}
+.pdf-cover-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 27px;
+  font-weight: 500;
+  color: var(--sage);
+  margin-bottom: 12px;
+}
+.pdf-cover-meta {
+  font-size: 12.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--soil-muted);
+  margin-bottom: 30px;
+}
+.pdf-cover-notes {
+  max-width: 480px;
+  font-style: italic;
+  color: var(--soil-muted);
+  line-height: 1.7;
+  margin-bottom: 46px;
+}
+.pdf-cover-footer {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--soil-hint);
+}
+
+.pdf-week {
+  box-sizing: border-box;
+  padding: 54px 50px;
+  page-break-before: always;
+  break-before: page;
+}
+.pdf-week:first-of-type { page-break-before: avoid; break-before: avoid; }
+.pdf-week-header { text-align: center; margin-bottom: 30px; }
+.pdf-week-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--soil);
+}
+.pdf-week-sub {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--warm);
+  margin-top: 4px;
+}
+
+.pdf-day-grid { display: flex; flex-direction: column; gap: 14px; }
+.pdf-day-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  background: var(--cream);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+.pdf-day-card.pdf-rest {
+  background: transparent;
+  padding: 11px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pdf-day-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--soil);
+}
+.pdf-rest-badge {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--soil-hint);
+}
+.pdf-session-pill {
+  display: inline-block;
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--sage-pale);
+  color: var(--sage);
+  margin: 8px 0 6px;
+}
+.pdf-workout-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--soil);
+  margin-bottom: 4px;
+}
+.pdf-daynotes {
+  font-size: 12.5px;
+  color: var(--soil-muted);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.pdf-exercise-list {
+  list-style: none;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.pdf-exercise { border-top: 1px solid var(--border); padding-top: 9px; }
+.pdf-exercise:first-child { border-top: none; padding-top: 0; }
+.pdf-ex-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pdf-ex-num { font-size: 11px; color: var(--warm); font-weight: 600; min-width: 14px; }
+.pdf-ex-name { font-weight: 600; font-size: 14px; color: var(--soil); flex: 1; min-width: 120px; }
+.pdf-ex-setsreps { font-size: 12.5px; color: var(--sage); font-weight: 600; }
+.pdf-ex-rest { font-size: 11px; color: var(--soil-hint); }
+.pdf-ex-notes { font-size: 12px; color: var(--soil-muted); margin-top: 3px; padding-left: 22px; }
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body.pdf-mode { background: #fff; }
+}
